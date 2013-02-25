@@ -30,7 +30,7 @@ EffectsClass = Class.extend({
 		// Render an explosion at the x and y co-ordinates
 		clearInterval(this.effecttimer);
 		this.effectframe = 0;
-		this.playSound(this.boomRequest.response);
+		sound.playSound(sound.boomRequest);
 		this.effecttimer = setInterval( function() {
 			effects.wipe();
 			if( effects.effectframe == 15)
@@ -47,7 +47,7 @@ EffectsClass = Class.extend({
 		// Render an explosion at the x and y co-ordinates
 		clearInterval(this.effecttimer);
 		this.effectframe = 0;
-		this.playSound(this.teleportRequest.response);
+		sound.playSound(sound.teleportRequest);
 		this.effecttimer = setInterval( function() {
 			effects.wipe();
 			if( effects.effectframe == 15)
@@ -56,7 +56,7 @@ EffectsClass = Class.extend({
 				clearInterval(effects.effecttimer);
 				return;
 			}
-			drawSprite(effects.teleport[effects.effectframe++].id, cv.Effectslayer, x, y);
+//			drawSprite(effects.teleport[effects.effectframe++].id, cv.Effectslayer, x, y);
 		},60);
 	},
 	

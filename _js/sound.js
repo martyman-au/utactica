@@ -2,15 +2,15 @@ SoundClass = Class.extend({
 	
 	mmmRequest: null,		// The XMLHttp request object for the game music
 	context: null,
-	mainNode: null,
-	clip: null,
+//	mainNode: null,
+//	clip: null,
 	
 	init: function () {
 		this.mmmRequest = new XMLHttpRequest();
 		this.mmmRequest.open('GET', '_media/Man-Made Messiah v0_8.mp3', true );
 		this.mmmRequest.responseType = 'arraybuffer';
 		this.mmmRequest.send();
-//		this.playMusic(this.mmmRequest);
+		this.mmmRequest.onload = function () { sound.playMusic(sound.mmmRequest); }
 
 		this.boomRequest = new XMLHttpRequest();
 		this.boomRequest.open('GET', '_media/boom.mp3', true );
@@ -23,37 +23,40 @@ SoundClass = Class.extend({
 		this.teleportRequest.send();
 
 		this.context = new webkitAudioContext();
-		this.mainNode = this.context.createGainNode(0);
-		this.mainNode.connect(this.context.destination);
-		this.clip = this.context.createBufferSource();
-	
+
+//		this.playMusic(sound.mmmRequest);
+
 	},
 
 	
 	playMusic: function (sound) {
 //		console.log(sound);
-//		console.log(this.clip);
-//		try {
-			this.context.decodeAudioData(sound.response, function (buffer) {
-//				this.clip.buffer = buffer;
-//		console.log(this.clip);				
-				this.clip.gain.value = 1.0;
-				this.clip.connect(this.mainNode);
-				this.clip.loop = t;
-				this.clip.noteOn(0);
+		try {
+		var mainNode = this.context.createGainNode(0);
+		mainNode.connect(this.context.destination);
+		var clip = this.context.createBufferSource();
+		this.context.decodeAudioData(sound.response, function (buffer) {
+				clip.buffer = buffer;
+				clip.gain.value = 1.0;
+				clip.connect(mainNode);
+				clip.loop = true;
+				clip.noteOn(0);
 			}, function (data) {});
-//		}
-//		catch(e) {
-//			console.warn('Web Audio API is not supported in this browser');
-//		}
+		}
+		catch(e) {
+			console.warn('Web Audio API is not supported in this browser');
+		}
 	},
 	
 	playSound: function (sound) {
 		try {
-			this.context.decodeAudioData(sound, function (buffer) {
+		var mainNode = this.context.createGainNode(0);
+		mainNode.connect(this.context.destination);
+		var clip = this.context.createBufferSource();
+		this.context.decodeAudioData(sound.response, function (buffer) {
 				clip.buffer = buffer;
 				clip.gain.value = 1.0;
-				clip.connect(this.mainNode);
+				clip.connect(mainNode);
 				clip.loop = false;
 				clip.noteOn(0);
 			}, function (data) {});

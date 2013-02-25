@@ -90,7 +90,7 @@ UIClass = Class.extend({
 			else units.units[units.activeUnit].teleport();   // "x" will teleport the active unit (for testing)
 		}
 //		console.log(e.keyCode);
-	sound.playMusic(sound.boomRequest.response);
+//	sound.playMusic(sound.boomRequest);
 
 	},
 	
