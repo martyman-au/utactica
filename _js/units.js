@@ -33,17 +33,14 @@ UnitsClass = Class.extend({
 		this.activeUnit = null;
 		for( i in this.units )
 		{
-//			console.log(this.units);
 			unit = this.units[i];
 			unit.dactivate();
-//			console.log(unit);
 
 			if( unit.clickHit(x,y))
 			{
 				unit.activate();
 				this.activeUnit = i;
 			}
-//			else console.log('miss: '+x+' <> '+this.units[i].ux+' and '+y+' <> '+this.units[i].uy);
 		}
 	},
 	
