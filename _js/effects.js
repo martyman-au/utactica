@@ -20,12 +20,12 @@ EffectsClass = Class.extend({
 		}
 		
 		this.boomRequest = new XMLHttpRequest();
-		this.boomRequest.open('GET', 'boom.mp3', true );
+		this.boomRequest.open('GET', '_media/boom.mp3', true );
 		this.boomRequest.responseType = 'arraybuffer';
 		this.boomRequest.send();
 
 		this.teleportRequest = new XMLHttpRequest();
-		this.teleportRequest.open('GET', 'teleport.mp3', true );
+		this.teleportRequest.open('GET', '_media/teleport.mp3', true );
 		this.teleportRequest.responseType = 'arraybuffer';
 		this.teleportRequest.send();
 	},

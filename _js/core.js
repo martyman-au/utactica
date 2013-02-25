@@ -47,7 +47,7 @@ merge = function(original, extended)
 	}
 	return original;
 };
-
+ 
 function copy(object) 
 {
 	if (!object || typeof (object) != 'object' ||
