@@ -84,7 +84,11 @@ UIClass = Class.extend({
 			units.move(code); 				// This is a move command
 		}
 		if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
-		if( code == 'kc88' ) units.units[units.activeUnit].explode();   // "x" will explode the active unit (for testing)
+		if( code == 'kc88' )
+		{
+			if( units.units[units.activeUnit].type == 'soldier') units.units[units.activeUnit].explode();   // "x" will explode the active unit (for testing)
+			else units.units[units.activeUnit].teleport();   // "x" will teleport the active unit (for testing)
+		}
 //		console.log(e.keyCode);
 	},
 	
