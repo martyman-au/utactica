@@ -1,0 +1,31 @@
+Credits
+
+Some of the tools, code and images used in this game was sourced from existing sources. These sources are listed below.
+
+core.js javascript class code as used in udacity's CS??? class.
+
+Texture packer was used to create the sprite sheet and json file.
+
+Explosions generated using Positech's explosion generator
+http://www.positech.co.uk/content/explosion/explosiongenerator.html
+
+Javascript array randomisation from stack overflow
+http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
+
+Canvas draw rounded corners code
+http://js-bits.blogspot.com.au/2010/07/canvas-rounded-corner-rectangles.html
+
+Preloader
+https://github.com/jussi-kalliokoski/html5Preloader.js
+
+
+The audio files are either lciensed freely or under CC BY 3.0
+
+Music
+http://opengameart.org/content/man-made-messiah
+
+Explosion
+http://www.flashkit.com/soundfx/Mayhem/Explosives/Explosio-Ivan-8042/index.php
+
+Teleport
+http://www.flashkit.com/soundfx/Electronic/Arcade/SpriteEx-Mark_E_B-8069/index.php
