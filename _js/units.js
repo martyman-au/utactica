@@ -1,5 +1,5 @@
 UnitsClass = Class.extend({
-	
+	// Class that contains all of the units in the game
 	units: new Array(),
 	activeUnit: null,
 	
@@ -53,6 +53,7 @@ UnitsClass = Class.extend({
 
 
 UnitClass = Class.extend({
+	// Class that defines an individual unit
 	unitid: null,
 	type: '',
 	side: '',
@@ -65,9 +66,6 @@ UnitClass = Class.extend({
 	slotoffsety: 0,
 	spritewidth: 50,
 	spriteheight: 50,
-
-
-
 	
 	init: function (unitid, type, side, tile) {
 		this.unitid = unitid;
@@ -183,6 +181,12 @@ UnitClass = Class.extend({
 	explode: function () {
 		effects.runExplosion(this.ux, this.uy);
 //		effects.runTeleport(this.ux, this.uy);
+		this.wipe();
+		delete units.units[this.unitid];
+	},
+	
+	teleport: function () {
+		effects.runTeleport(this.ux, this.uy);
 		this.wipe();
 		delete units.units[this.unitid];
 	}
