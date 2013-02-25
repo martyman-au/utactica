@@ -29,12 +29,12 @@ EffectsClass = Class.extend({
 		this.teleportRequest.responseType = 'arraybuffer';
 		this.teleportRequest.send();
 	},
-	
+
 	wipe: function () {
 		// Clear the effects layer (usually between frames)
 		cv.Effectslayer.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
 	},
-	
+
 	runExplosion: function (x,y) {
 		// Render an explosion at the x and y co-ordinates
 		clearInterval(this.effecttimer);
@@ -72,12 +72,9 @@ EffectsClass = Class.extend({
 	playSound: function (sound) {
 		try {
 			var context = new webkitAudioContext();
-
 			var mainNode = context.createGainNode(0);
 			mainNode.connect(context.destination);
-
 			var clip = context.createBufferSource();
-
 			context.decodeAudioData(sound, function (buffer) {
 				clip.buffer = buffer;
 				clip.gain.value = 1.0;
