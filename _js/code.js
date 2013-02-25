@@ -13,9 +13,9 @@ var loadData = function() {
 //	myLoader.addFiles('boom*:boom.mp3', 'teleport*:teleport.mp3');
 	
 	sprites = new SpriteSheetClass();
-	sprites.load('http://people.physics.anu.edu.au/~martin/utactica/sprites.png');
+	sprites.load('http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.png');
 
-	jsonURL = 'http://people.physics.anu.edu.au/~martin/utactica/sprites.json';
+	jsonURL = 'http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.json';
 	var spritejson = new XMLHttpRequest();
 	spritejson.open("GET", jsonURL, true);
 	spritejson.onload = function() {
