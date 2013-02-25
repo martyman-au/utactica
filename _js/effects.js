@@ -19,15 +19,6 @@ EffectsClass = Class.extend({
 			if(version ==2) this.explosion.push(frames[i]);
 		}
 		
-		this.boomRequest = new XMLHttpRequest();
-		this.boomRequest.open('GET', '_media/boom.mp3', true );
-		this.boomRequest.responseType = 'arraybuffer';
-		this.boomRequest.send();
-
-		this.teleportRequest = new XMLHttpRequest();
-		this.teleportRequest.open('GET', '_media/teleport.mp3', true );
-		this.teleportRequest.responseType = 'arraybuffer';
-		this.teleportRequest.send();
 	},
 
 	wipe: function () {
@@ -69,22 +60,5 @@ EffectsClass = Class.extend({
 		},60);
 	},
 	
-	playSound: function (sound) {
-		try {
-			var context = new webkitAudioContext();
-			var mainNode = context.createGainNode(0);
-			mainNode.connect(context.destination);
-			var clip = context.createBufferSource();
-			context.decodeAudioData(sound, function (buffer) {
-				clip.buffer = buffer;
-				clip.gain.value = 1.0;
-				clip.connect(mainNode);
-				clip.loop = false;
-				clip.noteOn(0);
-			}, function (data) {});
-		}
-		catch(e) {
-			console.warn('Web Audio API is not supported in this browser');
-		}
-	}
+
 });

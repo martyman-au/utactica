@@ -4,6 +4,7 @@ var board = {};
 var units = {};
 var effects = {};
 var ui = {};
+var sound = {};
 //var myLoader = {};
 
 
@@ -54,12 +55,12 @@ var setupGame = function() {
 	units = new UnitsClass();						// units
 	effects = new EffectsClass(sprites); // effects (animations, etc)			
 	ui = new UIClass();								// user interface
+	sound = new SoundClass();
 	
 	window.onkeydown = ui.keypress;
 	cv.setScale();
 	redraw();
-//	window.setInterval(function(){redraw()},1000);
-
+//	music.playMusic(music.mmmRequest.response);
 };
 
 
