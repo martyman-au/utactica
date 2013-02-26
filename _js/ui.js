@@ -76,8 +76,16 @@ UIClass = Class.extend({
 			return;
 		}		
 		else if( y > (window.innerHeight - this.bannerheight)) console.log('banner click');
-//		elseif( 0 ) arrowclick();
-		else units.click(sx,sy);	// send scaled click to Units
+		else
+		{
+			units.click(sx,sy);	// send scaled click to Units
+			// Check if the click hits any widgets
+			var i = null;
+			for( i in this.widgets )
+			{
+				this.widgets[i].click(x,y);
+			}
+		}
 	},
 	
 	keypress: function (e) {
@@ -100,9 +108,6 @@ UIClass = Class.extend({
 			if( units.units[units.activeUnit].type == 'soldier') units.units[units.activeUnit].explode();   // "x" will explode the active unit (for testing)
 			else units.units[units.activeUnit].teleport();   // "x" will teleport the active unit (for testing)
 		}
-//		console.log(e.keyCode);
-//	sound.playMusic(sound.boomRequest);
-
 	},
 	
 	renderpopup: function (name) {
@@ -126,6 +131,7 @@ ButtonClass = Class.extend({
 	position: {x: null, y: null},
 	artwork: new Array(),
 	state: 0,
+	callback: null,
 	
 	init: function (position, artwork) {
 		this.position = position;
@@ -138,5 +144,9 @@ ButtonClass = Class.extend({
 	
 	toggleState: function () {
 		this.state = this.state % 2;
+	},
+	
+	click: function (x,y) {
+		this.toggleState();
 	},
 });
