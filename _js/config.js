@@ -1,5 +1,6 @@
 var colours = {
 	// colours used on the game canvas
+	// we can tweak them everywhere they are used from here
 	lightgrey: '#DDDDDD',
 	grey: '#777777',
 	darkgrey: '#333333',
@@ -10,8 +11,9 @@ var colours = {
 	greyout: 'rgba(0,0,0,0.3)'
 }
 
+//config stores game configuration options
 var config = {
-	
+	// styles configure which of our defined colours are used for each element (mainly UI stuff)
 	styles: {
 		resourcetextshaddow: colours.darkgrey,
 		resourcetext: colours.white,
@@ -44,6 +46,8 @@ var config = {
 		kc34: { x: 1, y: 1 }
 	},
 	
+	//boardPattern hold an array of rows, each row has entries for which columns contain a tile
+	// TODO: should this be made into an array with simple 0 or 1 at each grid index?
 	boardPattern: [
 		[4],
 		[3,5],
@@ -60,25 +64,10 @@ var config = {
 		[4]
 		],
 	
+	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
 	
+	//resources are the resources to be distributed should be hte sam enumber as the resourcedTiles above  TODO: auto pad to length
 	resources: ['f1','f1','f2','f3','s1','s1','s2','s3','','','','','','','','','','','','','']
 	
 };
-
-var explosion2 = ['explosions/explosion2_01.png',
-				'explosions/explosion2_02.png',
-				'explosions/explosion2_03.png',
-				'explosions/explosion2_04.png',
-				'explosions/explosion2_05.png',
-				'explosions/explosion2_06.png',
-				'explosions/explosion2_07.png',
-				'explosions/explosion2_08.png',
-				'explosions/explosion2_09.png',
-				'explosions/explosion2_10.png',
-				'explosions/explosion2_11.png',
-				'explosions/explosion2_12.png',
-				'explosions/explosion2_13.png',
-				'explosions/explosion2_14.png',
-				'explosions/explosion2_15.png',
-				'explosions/explosion2_16.png'];
