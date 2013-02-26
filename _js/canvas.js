@@ -1,19 +1,21 @@
 CanvasClass = Class.extend({
-	
+	// Class for the canvases used to render the game
+	cnvBoard: {},		// Canvas for the board
+	cnvUnits: {},		// Canvas for units
+	cnvEffects: {},		// Canvas for effects (explosions, etc)
+	cnvUI: {},			// Canvas for UI elements
 	Boardlayer: null,	// Context used for rendering board and background
 	Unitslayer: null,	// Context used for rendering units
 	Efectslayer: null,	// Context used for rendering units
 	UIlayer: null,		// Context used for the user interface
-	Offset: {x:0, y:0},		// Offset required to center rendering in canvas
+	Offset: {x:0, y:0},	// Offset required to center rendering in canvas
 	Scale: null,		// Scale required to fit board into canvas
-	LayoutUnit: null,	// A layout unit equal to 1% of the screen height
-	cnvBoard: {},
-	cnvUnits: {},
-	cnvUI: {},
-	screenRatio: null,
-	screenMode: null,
+	screenRatio: null,	// Apect ratio of the dipslay window
+	screenMode: null,	// sreen mode setting used to switch UI layout for portrait layout
 
-	init: function (pattern) {	
+	init: function () {
+		// Create canvases for the various game layers
+		// TODO: can we deduplicate this code?
 		var body = document.getElementById("body"); 
 		this.cnvBoard = document.createElement("canvas");
 		this.cnvBoard.style.position="absolute";
@@ -47,11 +49,13 @@ CanvasClass = Class.extend({
 	
 	getMouse: function(e) {
 		// return an object with sx and sy being the X and Y position of the click on the scaled canvases and x and y being the unscaled canvas click location
+		// TODO: Is this the best place for this
 		return {sx: e.pageX / this.Scale, sy: e.pageY / this.Scale, x: e.pageX, y: e.pageY };
 	},
  
 	
 	setSize: function (width, height) {
+		// Sets the size of all of the cavases to the window size
 		this.Boardlayer.canvas.width = width;
 		this.Boardlayer.canvas.height = height;
 		this.Unitslayer.canvas.width = width;
@@ -65,7 +69,6 @@ CanvasClass = Class.extend({
 	setScale: function () {
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
 		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / 1210)); // Scale needed to fit board in canvas
-
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
 		this.Offset.x = ((window.innerWidth - (1385 * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
@@ -77,20 +80,14 @@ CanvasClass = Class.extend({
 		this.Boardlayer.scale(this.Scale,this.Scale);
 		this.Unitslayer.scale(this.Scale,this.Scale);
 		this.Effectslayer.scale(this.Scale,this.Scale);
-//		this.UIlayer.scale(this.Scale,this.Scale); // UI Canvas does not need to rescale for screen size
 		
 		if( this.screenRatio < 0.7 ) this.screenMode = 'portrait';
 		else this.screenMode = 'landscape'
 		
 		units.scale();	// calculate new unit positions
-//		effects.scale();
-
-//		ui.scale(); 	// notify ui that the screen size has changed
-		
 		
 //		if( this.screenMode == 'landscape')	document.getElementById("GameTitle").style.fontSize = (window.innerWidth*0.08)+"px";
 //		else document.getElementById("GameTitle").style.fontSize = (window.innerWidth*0.2)+"px";
-
 	}
 	
 });
