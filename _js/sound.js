@@ -1,16 +1,16 @@
 SoundClass = Class.extend({
 	
 	mmmRequest: null,		// The XMLHttp request object for the game music
-	context: null,
-//	mainNode: null,
-//	clip: null,
+	context: null,			// audio context
 	
 	init: function () {
+		// Load in the audio files
+		// TODO: can we deduplicate this?
 		this.mmmRequest = new XMLHttpRequest();
 		this.mmmRequest.open('GET', '_media/Man-Made Messiah v0_8.mp3', true );
 		this.mmmRequest.responseType = 'arraybuffer';
 		this.mmmRequest.send();
-		this.mmmRequest.onload = function () { sound.playMusic(sound.mmmRequest); }
+		this.mmmRequest.onload = function () { sound.playMusic(sound.mmmRequest); } // Start music as soon as it is loaded
 
 		this.boomRequest = new XMLHttpRequest();
 		this.boomRequest.open('GET', '_media/boom.mp3', true );
@@ -23,14 +23,10 @@ SoundClass = Class.extend({
 		this.teleportRequest.send();
 
 		this.context = new webkitAudioContext();
-
-//		this.playMusic(sound.mmmRequest);
-
 	},
 
-	
+	// TODO: do playMusic and playSound have to be seperate functions?
 	playMusic: function (sound) {
-//		console.log(sound);
 		try {
 		var mainNode = this.context.createGainNode(0);
 		mainNode.connect(this.context.destination);
