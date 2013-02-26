@@ -1,61 +1,58 @@
 BoardClass = Class.extend({
 	
-	tiles: new Array(),
+	tiles: new Array(), // Array to store board tile objects
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
 		// an array of arrays for each row of the board
+		// fills this.tiles with tile objects
 		var tilenum = 0;
 		var grididx = {};
 		var position = {};
-		var center = {};
-//		console.log(Object.keys(pattern));
-		for( i in pattern ) {
-			var row = pattern[i];
-			for( j in row )
+		for( i in pattern ) { 				// for each row on the board
+			var row = pattern[i];			// grab that row
+			for( j in row )					// for each tile in the row
 			{
-				posx = (row[j]*148);
-				posy = (i*86);
-				grididx.x = row[j];
-				grididx.y = i;
-				position.x = posx;
-				position.y = posy;
-				this.tiles[tilenum++] = new TileClass( tilenum, grididx, position, '');
+				grididx.x = row[j];			// calculate a grid index for the tile
+				grididx.y = i;				//
+				position.x = (row[j]*148);	// calculate the x position of the tile (top left)  TODO: fix hard coding
+				position.y = (i*86);		// calculate the y position of the tile (top left)  TODO: fix hard coding
+				this.tiles[tilenum++] = new TileClass( tilenum, grididx, position, ''); // create and save new tile object
 			}	
 		}
-
-		this.distributeResources();
+		this.distributeResources();			// seed resources across the completed board
 	},
 	
 	distributeResources: function () {
-		// Seed tiles with resources
-		fisherYates ( config.resources ); // shuffle resources
-		for( i in config.resources )
+		// Seed tiles with randomly chosen resources
+		fisherYates ( config.resources ); 	// shuffle resources array (includes "resources" and "no resources" to be dealt out across the board
+		for( i in config.resources )		// for each resource
 		{
 			if (config.resources.hasOwnProperty(i))
 			{
-				this.tiles[config.resourcedTiles[i]].resource = config.resources[i];
+				this.tiles[config.resourcedTiles[i]].resource = config.resources[i];	// save resource to tile object
 			}
 		}
 	},
 	
 	render: function () {
-		//Render the background and playing board to the board canvas
+		//Render the board tiles to the board canvas
 		for( i in this.tiles ) {
 			this.tiles[i].render();
 		}
-
 	},
 	
 	checkmove: function (tgt) {
+		// given a target x and y board index, run through the tiles and check if one exists at that location
+		// TODO: game logic needed here, to track attacks etc?
 		for( i in this.tiles )
 		{
 			if( (this.tiles[i].grididx.x == tgt.x) && (this.tiles[i].grididx.y == tgt.y))
 			{
-				return i;
+				return i; // return the tilenumber of the tile at that requested grid reference
 			}
 		}
-		return null;
+		return null;	// else return null
 	}
 });
 
@@ -65,7 +62,7 @@ TileClass = Class.extend({
 	position: {x: null, y: null},	// position of the top left corner of the tile (in scaled pixels)
 	center: {x: null, y: null},		// position of the center of the tile (in scaled pixels)
 	resource: null,					// resource location on the tile
-	slots: {
+	slots: {						// slots that can hold units on a tile TODO: seems messy
 		slot0: { unit: null,
 				xoffset: -1,
 				yoffset: -1},
@@ -84,25 +81,25 @@ TileClass = Class.extend({
 		},
 				
 	init: function (tilenum, grididx, position, resource) {
+		// Initialise a tile object with a tilenumber, grid index, x and y pixel position and resource (if exists)
 		this.tilenum = tilenum;
-		this.grididx = copy(grididx);
-		this.position = copy(position);
+		this.grididx = copy(grididx);		// TODO: is this the best way to do this?
+		this.position = copy(position);		// TODO: is this the best way to do this?
 		this.resource = resource;
-		this.center.x = position.x+100;
-		this.center.y = position.y+88;
+		this.center.x = position.x+100;		// TODO: hard coded
+		this.center.y = position.y+88;		// TODO: hard coded
 	},
 	
 	render: function () {
-//		cv.Boardlayer.drawImage(hextile,this.position.x + cv.Offset.x, this.position.y + cv.Offset.y);
+		// render a tile and it's resource (if exists)
 		drawSprite('hextile.png', cv.Boardlayer, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
 		if(this.resource)
 		{
-			var resource = null;
+			var resourceimg = '';
 			if(this.resource.substring(0,1) == 'f') resourceimg = 'food-resource.png';
 			else resourceimg = 'science-resource.png';
 			drawSprite(resourceimg, cv.Boardlayer, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
 			cv.Boardlayer.font = "normal 700 80px 'Roboto Condensed'";
-//			cv.Boardlayer.font = "bold 80pt sans-serif";
 			cv.Boardlayer.fillStyle = config.styles.resourcetext; 
 			cv.Boardlayer.shadowOffsetX = 2;
 			cv.Boardlayer.shadowOffsetY = 2;
@@ -114,10 +111,11 @@ TileClass = Class.extend({
 	},
 	
 	remUnit: function (unitid) {
+		// remove reference to a unit from a tile slot location
+		// TODO: this seems messy
 		var i = null;
 		for( i in this.slots )
 		{
-//			console.log(this.slots[i]);
 			if(this.slots[i].unit == unitid) this.slots[i].unit = null;
 		}
 	}
