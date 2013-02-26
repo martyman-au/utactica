@@ -13,11 +13,16 @@ EffectsClass = Class.extend({
 		var frames = sprites.getType('explosions');
 		for( i in Object.keys(frames) )
 		{
-			version = frames[i].id.substring( 20, 21 );
 			index = frames[i].id.substring( 22, 24 );
-			if(version ==2) this.explosion.push(frames[i]); // TODO: hardcoded
+			this.explosion.push(frames[i]); // TODO: hardcoded
 		}
 		
+		var frames = sprites.getType('teleport');
+		for( i in Object.keys(frames) )
+		{
+			index = frames[i].id.substring( 10, 12 );
+			this.teleport.push(frames[i]); // TODO: hardcoded
+		}
 	},
 
 	wipe: function () {
@@ -50,14 +55,14 @@ EffectsClass = Class.extend({
 		sound.playSound(sound.teleportRequest);
 		this.effecttimer = setInterval( function() {
 			effects.wipe();					// clear effects layer
-			if( effects.effectframe == 15)	// if we have reached the end TODO: hardcoded
+			if( effects.effectframe == 12)	// if we have reached the end TODO: hardcoded
 			{
 				effects.effectframe = 0;			// reset frame counter
 				clearInterval(effects.effecttimer);	// clear animation timer
 				return;								
 			}
-//			drawSprite(effects.teleport[effects.effectframe++].id, cv.Effectslayer, x, y); // TODO: need to create teleport effect
-		},60);
+			drawSprite(effects.teleport[effects.effectframe++].id, cv.Effectslayer, x, y); // TODO: need to create teleport effect
+		},30);
 	},
 
 });
