@@ -2,6 +2,7 @@ UIClass = Class.extend({
 	tiles: new Array(),
 	bannerheight: 100,
 	popup: false,
+	widgets: {},
 	
 	init: function () {
 		//fixes a problem where double clicking causes text to get selected on the canvas
@@ -13,6 +14,16 @@ UIClass = Class.extend({
 			ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
 //			units.click(mouse.sx,mouse.sy);	// send scaled click to Units
 		});
+		
+		// Initialise User Interface widgets
+		this.widgets.speaker = new ButtonClass( {x:40,y:window.innerHeight-this.bannerheight+50}, ['speaker.png', 'speaker_mute.png']);
+		this.widgets.endturn = new ButtonClass( {x:window.innerWidth-122,y:window.innerHeight-this.bannerheight+50}, ['end-turn-button.png']);	
+		this.widgets.upright = new ButtonClass( {x:window.innerWidth-40,y:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
+		this.widgets.up = new ButtonClass( {x:window.innerWidth-100,y:40}, ['arrows/up.png','arrows/up-highlighted.png']);
+		this.widgets.upleft = new ButtonClass( {x:window.innerWidth-160,y:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
+		this.widgets.downright = new ButtonClass( {x:window.innerWidth-40,y:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
+		this.widgets.down = new ButtonClass( {x:window.innerWidth-100,y:120}, ['arrows/down.png','arrows/down-highlighted.png']);
+		this.widgets.downleft = new ButtonClass( {x:window.innerWidth-160,y:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 	},
 	
 	render: function () {
@@ -43,17 +54,17 @@ UIClass = Class.extend({
 		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, this.bannerheight/20);  // now fill the canvas
 		cv.UIlayer.fillStyle = config.styles.bannerhigh2; // set banner colour
 		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight/80);  // now fill the canvas
-//		cv.UIlayer.drawImage(end_turn_button, window.innerWidth - 245, window.innerHeight - this.bannerheight + 2);
-		drawSprite('end-turn-button.png', cv.UIlayer, window.innerWidth - 122, window.innerHeight - this.bannerheight + 50);
+		this.widgets.endturn.render();
+		this.widgets.speaker.render();
 	},
 	
 	renderArrows: function () {
-		drawSprite('arrows/up-right.png', cv.UIlayer, window.innerWidth - 40, 40);
-		drawSprite('arrows/up.png', cv.UIlayer, window.innerWidth - 100, 40);
-		drawSprite('arrows/up-left.png', cv.UIlayer, window.innerWidth - 160, 40);
-		drawSprite('arrows/down-right.png', cv.UIlayer, window.innerWidth - 40, 120);
-		drawSprite('arrows/down.png', cv.UIlayer, window.innerWidth - 100, 120);
-		drawSprite('arrows/down-left.png', cv.UIlayer, window.innerWidth - 160, 120);
+		this.widgets.upright.render();
+		this.widgets.up.render();
+		this.widgets.upleft.render();
+		this.widgets.downright.render();
+		this.widgets.down.render();
+		this.widgets.downleft.render();
 	},
 
 	click: function (x,y,sx,sy) {
@@ -100,7 +111,6 @@ UIClass = Class.extend({
 		var radius = 30;
 		
 		this.popup = true;
-		
 		this.redraw();
 		
 		cv.UIlayer.fillStyle = config.styles.popupgreyout;
@@ -108,4 +118,25 @@ UIClass = Class.extend({
 		cv.UIlayer.fillStyle = config.styles.popupbg;
 		cv.UIlayer.roundRect((window.innerWidth-popwidth)/2 , (window.innerHeight-popheight)/2, popwidth, popheight, radius, config.styles.bannerbg )
 	}
+});
+
+
+ButtonClass = Class.extend({
+	// Used to create buttons for the UTACTICA UI
+	position: {x: null, y: null},
+	artwork: new Array(),
+	state: 0,
+	
+	init: function (position, artwork) {
+		this.position = position;
+		this.artwork = artwork;
+	},
+	
+	render: function () {
+		drawSprite(this.artwork[this.state], cv.UIlayer, this.position.x, this.position.y);
+	},
+	
+	toggleState: function () {
+		this.state = this.state % 2;
+	},
 });
