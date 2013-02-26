@@ -5,27 +5,23 @@ var units = {};
 var effects = {};
 var ui = {};
 var sound = {};
-//var myLoader = {};
-
 
 var loadData = function() {
-	
-//	myLoader = html5Preloader();
-//	myLoader.addFiles('boom*:boom.mp3', 'teleport*:teleport.mp3');
 	
 	sprites = new SpriteSheetClass();
 	sprites.load('http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.png');
 
-	jsonURL = 'http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.json';
+	// now load json defining the sprite sheet
 	var spritejson = new XMLHttpRequest();
+	jsonURL = 'http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.json';
 	spritejson.open("GET", jsonURL, true);
 	spritejson.onload = function() {
-					json = this.responseText;
-					sprites.parseAtlasDefinition(json);
-					setupGame();
+					sprites.parseAtlasDefinition(this.responseText);
+					setupGame();							// TODO: Probably not the best spot to be calling this code?
 				};
 	spritejson.send();
 	
+	// Google font loader code
 	WebFontConfig = {
 		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
 		fontactive: function(fontFamily, fontDescription) {
@@ -53,23 +49,21 @@ var setupGame = function() {
 	cv = new CanvasClass();  						// canvas layers and contexts
 	board = new BoardClass(config.boardPattern);	// board and tiles
 	units = new UnitsClass();						// units
-	effects = new EffectsClass(sprites); // effects (animations, etc)			
+	effects = new EffectsClass(sprites); 			// effects (animations, etc)			
 	ui = new UIClass();								// user interface
-	sound = new SoundClass();
+	sound = new SoundClass();						// all sound output (music, effects)
 	
-	window.onkeydown = ui.keypress;
-	cv.setScale();
-	redraw();
-//	music.playMusic(music.mmmRequest.response);
+	window.onkeydown = ui.keypress;	 // TODO: best place for this?
+	cv.setScale();		// TODO: not sure about this line and the next
+	redraw();			// ditto
 };
-
-
 
 	
 var redraw = function() {
+	// re-draw all of the game layers
+	// TODO: should we be wiping here, or calling built in redraw funcitons?
 	board.render(); // render the playing board
 	units.render(); // render the playing board
-//	effects.render(); // render the playing board
 	ui.render();	// render the user interface	
 }
 
@@ -77,7 +71,6 @@ window.onresize = function(event) {  // on resize we should reset the canvas siz
 	cv.setScale();
 	board.render();
 	units.render();
-//	effects.render();
 	ui.render();
 }
 
