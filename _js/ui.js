@@ -16,6 +16,7 @@ UIClass = Class.extend({
 		});
 		
 		// Initialise User Interface widgets
+		// TODO: fix the fact the positoin does not change when window width or heigh changes... need to use a html style "left: 50" type notation?
 		this.widgets.speaker = new ButtonClass( {x:40,y:window.innerHeight-this.bannerheight+50}, ['speaker.png', 'speaker_mute.png']);
 		this.widgets.endturn = new ButtonClass( {x:window.innerWidth-122,y:window.innerHeight-this.bannerheight+50}, ['end-turn-button.png']);	
 		this.widgets.upright = new ButtonClass( {x:window.innerWidth-40,y:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
