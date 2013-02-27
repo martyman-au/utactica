@@ -12,12 +12,13 @@ UIClass = Class.extend({
 		cv.cnvUI.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
 			ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-//			units.click(mouse.sx,mouse.sy);	// send scaled click to Units
+			units.click(mouse.sx,mouse.sy);	// send scaled click to Units
 		});
 		
 		// Initialise User Interface widgets
 		// TODO: fix the fact the positoin does not change when window width or height changes... need to use a html style "left: 50" type notation?
 		this.widgets.speaker = new ButtonClass( {left:40,bottom:50}, ['speaker.png', 'speaker_mute.png']);
+		this.widgets.speaker.action = function (){ this.toggleState(); sound.toggleMute(); };
 		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png']);	
 		this.widgets.upright = new ButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
 		this.widgets.up = new ButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
@@ -70,7 +71,7 @@ UIClass = Class.extend({
 
 	click: function (x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
-		console.log(x,y);
+//		console.log(x,y);
 		if(this.popup) // If there is a popup then close it and exit
 		{
 			this.popup = false;
@@ -87,7 +88,11 @@ UIClass = Class.extend({
 		var i = null;
 		for( i in this.widgets )
 		{
-			this.widgets[i].click(x,y);
+			if( this.widgets[i].clickhit(x,y) )
+			{
+				this.widgets[i].action();
+				break;
+			}
 		}
 	},
 	
@@ -103,6 +108,7 @@ UIClass = Class.extend({
 		if( code in config.movekeys )
 		{
 			// animate on screen arrow?
+			ui.moveIconFlash(code);
 			units.move(code); 				// This is a move command
 		}
 		if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
@@ -111,6 +117,24 @@ UIClass = Class.extend({
 			if( units.units[units.activeUnit].type == 'soldier') units.units[units.activeUnit].explode();   // "x" will explode the active unit (for testing)
 			else units.units[units.activeUnit].teleport();   // "x" will teleport the active unit (for testing)
 		}
+	},
+	
+	moveIconFlash: function (code) {
+//			console.log(config.movekeys[code]);
+			x = config.movekeys[code].x;
+			y = config.movekeys[code].y;
+			if(y == 1)
+			{
+				if( x == 1 ) this.widgets.downright.pulse();
+				else this.widgets.downleft.pulse();
+			}
+			else if( y == -1 )
+			{
+				if( x == 1 ) this.widgets.upright.pulse();
+				else this.widgets.upleft.pulse();
+			}
+			else if( y == -2) this.widgets.up.pulse();
+			else this.widgets.down.pulse();
 	},
 	
 	renderpopup: function (name) {
@@ -161,15 +185,19 @@ ButtonClass = Class.extend({
 	toggleState: function () {
 		if( this.state == 0) this.state = 1;
 		else this.state = 0;
-		console.log(this);
 		ui.redraw(); 			// TODO: need to chaneg this to only wipe and redraw the button
 	},
 	
-	click: function (x,y) {
+	pulse: function () {
+		this.toggleState();
+		var tmp = this;
+		window.setTimeout( function(){tmp.toggleState()}, 150);
+	},
+	
+	clickhit: function (x,y) {
 		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
 		{
-			console.log('hit');
-			this.toggleState();
+			return true;
 		}
 	},
 });

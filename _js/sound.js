@@ -2,9 +2,15 @@ SoundClass = Class.extend({
 	
 	mmmRequest: null,		// The XMLHttp request object for the game music
 	context: null,			// audio context
+	mainNode: null, 
+	mute: false,
 	
 	init: function () {
 		// Load in the audio files
+		this.context = new webkitAudioContext();
+		this.mainNode = this.context.createGainNode(0);
+		this.mainNode.connect(this.context.destination);
+
 		// TODO: can we deduplicate this?
 		this.mmmRequest = new XMLHttpRequest();
 		this.mmmRequest.open('GET', '_media/Man-Made Messiah v0_8.mp3', true );
@@ -22,19 +28,16 @@ SoundClass = Class.extend({
 		this.teleportRequest.responseType = 'arraybuffer';
 		this.teleportRequest.send();
 
-		this.context = new webkitAudioContext();
+
 	},
 
 	// TODO: do playMusic and playSound have to be seperate functions?
-	playMusic: function (sound) {
+	playMusic: function (file) {
 		try {
-		var mainNode = this.context.createGainNode(0);
-		mainNode.connect(this.context.destination);
 		var clip = this.context.createBufferSource();
-		this.context.decodeAudioData(sound.response, function (buffer) {
+		this.context.decodeAudioData(file.response, function (buffer) {
 				clip.buffer = buffer;
-				clip.gain.value = 1.0;
-				clip.connect(mainNode);
+				clip.connect(sound.mainNode);
 				clip.loop = true;
 				clip.noteOn(0);
 			}, function (data) {});
@@ -44,15 +47,12 @@ SoundClass = Class.extend({
 		}
 	},
 	
-	playSound: function (sound) {
+	playSound: function (file) {
 		try {
-		var mainNode = this.context.createGainNode(0);
-		mainNode.connect(this.context.destination);
 		var clip = this.context.createBufferSource();
-		this.context.decodeAudioData(sound.response, function (buffer) {
+		this.context.decodeAudioData(file.response, function (buffer) {
 				clip.buffer = buffer;
-				clip.gain.value = 1.0;
-				clip.connect(mainNode);
+				clip.connect(sound.mainNode);
 				clip.loop = false;
 				clip.noteOn(0);
 			}, function (data) {});
@@ -60,5 +60,18 @@ SoundClass = Class.extend({
 		catch(e) {
 			console.warn('Web Audio API is not supported in this browser');
 		}
-	}	
+	},
+
+	toggleMute: function () {
+		if( this.mute )
+		{
+			this.mute = false;
+			this.mainNode.gain.value = 1.0;
+		}
+		else
+		{
+			this.mute = true;
+			this.mainNode.gain.value = 0.0;
+		}
+	}
 });
