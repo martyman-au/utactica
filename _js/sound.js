@@ -18,15 +18,15 @@ SoundClass = Class.extend({
 		this.mmmRequest.send();
 		this.mmmRequest.onload = function () { sound.playMusic(sound.mmmRequest); } // Start music as soon as it is loaded
 
-		this.boomRequest = new XMLHttpRequest();
-		this.boomRequest.open('GET', '_media/boom.mp3', true );
-		this.boomRequest.responseType = 'arraybuffer';
-		this.boomRequest.send();
+		this.explosion = new XMLHttpRequest();
+		this.explosion.open('GET', '_media/boom.mp3', true );
+		this.explosion.responseType = 'arraybuffer';
+		this.explosion.send();
 
-		this.teleportRequest = new XMLHttpRequest();
-		this.teleportRequest.open('GET', '_media/teleport.mp3', true );
-		this.teleportRequest.responseType = 'arraybuffer';
-		this.teleportRequest.send();
+		this.teleport = new XMLHttpRequest();
+		this.teleport.open('GET', '_media/teleport.mp3', true );
+		this.teleport.responseType = 'arraybuffer';
+		this.teleport.send();
 
 
 	},

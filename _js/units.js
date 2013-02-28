@@ -45,6 +45,7 @@ UnitsClass = Class.extend({
 	},
 	
 	move: function (keycode) {
+		console.log(keycode);
 		if( this.activeUnit == null ) return;
 		else this.units[this.activeUnit].move(keycode);
 	}
@@ -179,14 +180,13 @@ UnitClass = Class.extend({
 	},
 	
 	explode: function () {
-		effects.runExplosion(this.ux, this.uy);
-//		effects.runTeleport(this.ux, this.uy);
+		effects.renderEffect('explosion', this.ux, this.uy)
 		this.wipe();
 		delete units.units[this.unitid];
 	},
 	
 	teleport: function () {
-		effects.runTeleport(this.ux, this.uy);
+		effects.renderEffect('teleport', this.ux, this.uy)
 		this.wipe();
 		delete units.units[this.unitid];
 	}

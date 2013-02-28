@@ -1,15 +1,18 @@
 EffectsClass = Class.extend({
 	// Class for effect display and generation (mainly visual animations) sound is triggered from here but runs from SoundClass
 	explosion: Array(), 	// stores the frames used to animate explosions
-	teleport: Array(), 		// stores the frames used to animate explosions
-	effectframe: 0,			// Keeps track of the frame we are up to in the running current effect animation
-	effecttimer: null,		// Stores the setInterval timer used to run the effect animations (only one at once)
+	teleport: Array(), 		// stores the frames used to animate teleports
+	animTimer: {},			// Stores the setInterval timer used to run the effect animations (only one at once)
+	animations: new Array(),// Array of AnimationClasses populated and cleared before and after each effect
 	
 	init: function () {
-		// Initialise effects, load sprites into arrays
+		// Initialise efffects
+		// Load effect sprites into local arrays
+		// Start animation timer
 		var i = null;
 		var version = null;
 		var index = null;
+
 		var frames = sprites.getType('explosions');
 		for( i in Object.keys(frames) )
 		{
@@ -23,46 +26,54 @@ EffectsClass = Class.extend({
 			index = frames[i].id.substring( 10, 12 );
 			this.teleport.push(frames[i]); // TODO: hardcoded
 		}
+		
+		this.animTimer = setInterval( function(){effects.animFrame();}, 30);
 	},
 
 	wipe: function () {
 		// Clear the effects layer (usually between frames)
 		// TODO: would it be better to just clear the required area?
+		// TODO: this should query the locations of all of the current effects and clear them
 		cv.Effectslayer.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
 	},
 
-	runExplosion: function (x,y) {
-		// Render an explosion effect at the x and y co-ordinates
-		clearInterval(this.effecttimer);
-		this.effectframe = 0;
-		sound.playSound(sound.boomRequest);
-		this.effecttimer = setInterval( function() {
-			effects.wipe();					// clear effects layer
-			if( effects.effectframe == 15)	// if ew have reached the end TODO: hardcoded
-			{
-				effects.effectframe = 0;			// reset frame counter
-				clearInterval(effects.effecttimer);	//clear animation timer
-				return;
-			}
-			drawSprite(effects.explosion[effects.effectframe++].id, cv.Effectslayer, x, y);
-		},60);
+	animFrame: function () {
+		// Called every 30ms by this.animTimer
+		this.wipe();
+		for( i in this.animations )
+		{
+			if( this.animations[i].drawFrame() == 'done')
+				delete this.animations[i];
+		}
+		
 	},
 
-		runTeleport: function (x,y) {
-		// Render a teleport effect at the x and y co-ordinates
-		clearInterval(this.effecttimer);
-		this.effectframe = 0;
-		sound.playSound(sound.teleportRequest);
-		this.effecttimer = setInterval( function() {
-			effects.wipe();					// clear effects layer
-			if( effects.effectframe == 12)	// if we have reached the end TODO: hardcoded
-			{
-				effects.effectframe = 0;			// reset frame counter
-				clearInterval(effects.effecttimer);	// clear animation timer
-				return;								
-			}
-			drawSprite(effects.teleport[effects.effectframe++].id, cv.Effectslayer, x, y); // TODO: need to create teleport effect
-		},30);
+	renderEffect: function (name, x, y) {
+		// Create an effect using AnimationClass
+		sound.playSound(sound[name]);
+		this.animations.push( new AnimationClass(this[name] ,x ,y ) );
 	},
 
+});
+
+
+AnimationClass = Class.extend({
+	// Class defining an instance of an animation effect
+	x: null,
+	y: null,
+	frame: 0,
+	frames: new Array(),
+	
+	init: function (frames, x, y) {
+		this.frames = frames;
+		this.x = x;
+		this.y = y;
+	},
+	
+	drawFrame: function () {
+		// Render the next frame to the screen
+		if( this.frame >= this.frames.length)
+			return 'done';								
+		drawSprite(this.frames[this.frame++].id, cv.Effectslayer, this.x, this.y);
+	},
 });

@@ -53,9 +53,9 @@ var setupGame = function() {
 	ui = new UIClass();								// user interface
 	sound = new SoundClass();						// all sound output (music, effects)
 	
-	window.onkeydown = ui.keypress;	 // TODO: best place for this?
-	cv.setScale();		// TODO: not sure about this line and the next
-	redraw();			// ditto
+	window.onkeydown = ui.keypress;	// TODO: best place for this?
+	cv.setScale();					// TODO: not sure about this line and the next
+	redraw();						// ditto
 };
 
 	
