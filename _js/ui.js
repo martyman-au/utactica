@@ -11,21 +11,34 @@ UIClass = Class.extend({
 		// add a listner for mouse clicks
 		cv.cnvUI.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
-			ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-			units.click(mouse.sx,mouse.sy);	// send scaled click to Units
+			var uihit = ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units
 		});
 		
 		// Initialise User Interface widgets
 		// TODO: fix the fact the positoin does not change when window width or height changes... need to use a html style "left: 50" type notation?
 		this.widgets.speaker = new ButtonClass( {left:40,bottom:50}, ['speaker.png', 'speaker_mute.png']);
-		this.widgets.speaker.action = function (){ this.toggleState(); sound.toggleMute(); };
+		this.widgets.speaker.action = function (){this.toggleState(); sound.toggleMute(); };
+
 		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png']);	
+
 		this.widgets.upright = new ButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
+		this.widgets.upright.action = function (){ units.move('kc33');  this.pulse() };
+
 		this.widgets.up = new ButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
+		this.widgets.up.action = function (){ units.move('kc38');  this.pulse() };
+
 		this.widgets.upleft = new ButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
+		this.widgets.upleft.action = function (){ units.move('kc36');  this.pulse() };
+
 		this.widgets.downright = new ButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
+		this.widgets.downright.action = function (){ units.move('kc34');  this.pulse() };
+
 		this.widgets.down = new ButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
+		this.widgets.down.action = function (){ units.move('kc40');  this.pulse() };
+
 		this.widgets.downleft = new ButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
+		this.widgets.downleft.action = function (){ units.move('kc35');  this.pulse() };
 	},
 	
 	render: function () {
@@ -76,14 +89,10 @@ UIClass = Class.extend({
 		{
 			this.popup = false;
 			this.redraw();
-			return;
+			return true;
 		}		
 //		else if( y > (window.innerHeight - this.bannerheight)) console.log('banner click');
-		else this.buttonsclick(x,y);
-
-	},
-	
-	buttonsclick: function (x,y) {
+		
 		// Check if the click hits any widgets
 		var i = null;
 		for( i in this.widgets )
@@ -91,10 +100,12 @@ UIClass = Class.extend({
 			if( this.widgets[i].clickhit(x,y) )
 			{
 				this.widgets[i].action();
-				break;
+				return true;
 			}
 		}
+		return false;
 	},
+
 	
 	keypress: function (e) {
 		// deal with all keypresses here
