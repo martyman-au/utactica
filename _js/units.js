@@ -90,6 +90,7 @@ UnitClass = Class.extend({
 	activate: function () {
 		this.state = 'active';
 		this.redraw();
+		effects.renderEffect('active', this.ux, this.uy)
 	},
 	
 	dactivate: function () {
