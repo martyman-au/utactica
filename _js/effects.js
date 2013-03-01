@@ -61,7 +61,13 @@ EffectsClass = Class.extend({
 		if( config.animations[name].sound ) sound.playSound(sound[name]);
 		this.animations.push( new AnimationClass(name, this[name] ,x ,y ) );
 	},
-
+	
+	deleteAnimation: function (name) {
+		for( i in this.animations )
+		{
+			if(this.animations[i].name == name) delete this.animations[i];
+		}
+	},
 });
 
 
@@ -72,27 +78,24 @@ AnimationClass = Class.extend({
 	frame: 0,
 	frames: new Array(),
 	name: '',
+	count: 0,
+	inc: 1,
 	
-	init: function (name, frames, x, y) {
+	init: function (name, frames, x, y) {x
 		this.name = name;
 		this.frames = frames;
 		this.x = x;
 		this.y = y;
-		console.log(this);
 	},
 	
 	drawFrame: function () {
 		// Render the next frame to the screen
-//		var f = ;
-		var f = Math.ceil(this.frame++ / config.animations[this.name].rate)
-		if( this.frame > this.frames.length)
-		{
-			if( config.animations[this.name].playback == 'once') return 'done';
-//			else if( config.animations[this.name].playback == 'continous') this.frame = 0;
-			else if( config.animations[this.name].playback == 'bounce') f = ( this.frames.length * 2 ) - this.frame;  // still bugs in the franme rate code 
-		}
-		if( f == 0) this.frame = 1;
-		console.log(f);
-		drawSprite(this.frames[f % this.frames.length].id, cv.Effectslayer, this.x, this.y);
+		this.count++;
+		if(!(this.count % config.animations[this.name].rate)) this.frame = this.frame + this.inc;
+		
+		if( this.frame >= this.frames.length && config.animations[this.name].playback == 'once' ) return 'done';
+		else if(( this.frame >= (this.frames.length - 1) || this.frame <= 0 ) && config.animations[this.name].playback == 'bounce') this.inc = this.inc * -1;  // TODO: still bugs in the franme rate code 
+
+		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);
 	},
 });

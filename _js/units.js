@@ -33,10 +33,12 @@ UnitsClass = Class.extend({
 		this.activeUnit = null;
 		for( i in this.units )
 		{
-			unit = this.units[i];
-			unit.dactivate();
-
-			if( unit.clickHit(x,y))
+			this.units[i].deactivate();
+		}
+		for( i in this.units )
+		{
+		unit = this.units[i];
+		if( unit.clickHit(x,y))
 			{
 				unit.activate();
 				this.activeUnit = i;
@@ -67,6 +69,7 @@ UnitClass = Class.extend({
 	slotoffsety: 0,
 	spritewidth: 50,
 	spriteheight: 50,
+	activeAnim: {},
 	
 	init: function (unitid, type, side, tile) {
 		this.unitid = unitid;
@@ -90,12 +93,13 @@ UnitClass = Class.extend({
 	activate: function () {
 		this.state = 'active';
 		this.redraw();
-		effects.renderEffect('active', this.ux, this.uy)
+		effects.renderEffect('active', this.ux, this.uy);
 	},
 	
-	dactivate: function () {
+	deactivate: function () {
 		this.state = 'normal';
 		this.redraw();
+		effects.deleteAnimation('active');
 	},
 	
 	redraw: function () {
@@ -115,6 +119,8 @@ UnitClass = Class.extend({
 			this.tileid = newtile; 	// Set unit to new tile location
 			this.findSlot();		// Find which slot on the tile is available
 			this.redraw();			// Wipe and redraw in new location
+			effects.deleteAnimation('active');
+			effects.renderEffect('active', this.ux, this.uy);
 		}
 	},
 
@@ -123,7 +129,10 @@ UnitClass = Class.extend({
 	},
 	
 	render: function () {
-		var spriteimg = {};
+//		var spriteimg = '';
+		
+		var spriteimg = this.side+'-'+this.type+'.png';
+/*		
 		if( this.side == 'blue' )
 		{
 			if( this.type == 'worker' && this.state == 'active' ) spriteimg = 'blue-worker.png';
@@ -138,6 +147,7 @@ UnitClass = Class.extend({
 			else if( this.type == 'soldier' && this.state == 'active' ) spriteimg = 'red-soldier.png';
 			else if( this.type == 'soldier' && this.state == 'normal' ) spriteimg = 'red-soldier-grey.png';
 		}
+*/
 		drawSprite(spriteimg, cv.Unitslayer, this.ux, this.uy)
 	},
 	
@@ -181,12 +191,14 @@ UnitClass = Class.extend({
 	},
 	
 	explode: function () {
+		effects.deleteAnimation('active');
 		effects.renderEffect('explosion', this.ux, this.uy)
 		this.wipe();
 		delete units.units[this.unitid];
 	},
 	
 	teleport: function () {
+		effects.deleteAnimation('active');
 		effects.renderEffect('teleport', this.ux, this.uy)
 		this.wipe();
 		delete units.units[this.unitid];
