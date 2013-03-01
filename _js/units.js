@@ -4,45 +4,41 @@ UnitsClass = Class.extend({
 	activeUnit: null,
 	
 	init: function () {
-		this.units[0] = new UnitClass(0, 'soldier', 'blue', 4);
-		this.units[1] = new UnitClass(1, 'worker', 'blue', 17);
-		this.units[2] = new UnitClass(2, 'worker', 'blue', 12);
-		this.units[3] = new UnitClass(3, 'worker', 'red', 10);
+		this.allocateUnits();
+	},
+	
+	allocateUnits: function () {
+		this.units.push( new UnitClass(0, 'soldier', 'blue', 4) );
+		this.units.push( new UnitClass(1, 'worker', 'blue', 17) );
+		this.units.push( new UnitClass(2, 'worker', 'blue', 12) );
+		this.units.push( new UnitClass(3, 'worker', 'red', 10) );
 	},
 	
 	render: function () {
-		cv.Unitslayer.clearRect(0, 0, cv.cnvUnits.width / cv.Scale, cv.cnvUnits.height / cv.Scale);
-		for( i in this.units )
-		{
-			this.units[i].render();
-		}
-//		console.log('full units render');
+		// Render all of the units on the board
+		cv.Unitslayer.clearRect(0, 0, cv.cnvUnits.width / cv.Scale, cv.cnvUnits.height / cv.Scale); // clear all of units layer
+		for( i in this.units ) this.units[i].render(); // render every unit
 	},
 	
 	scale: function () {
-		for( i in this.units )
-		{
-			this.units[i].calcPos();	
-		}
+		// Calculate position of units after rescale
+		for( i in this.units ) this.units[i].calcPos();
 	},
 	
 	click: function (x,y) {
 		// Deal with a click by checking if it hits any units
 		var i = null;
 		var unit = null;
+		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
 		this.activeUnit = null;
 		for( i in this.units )
 		{
-			this.units[i].deactivate();
-		}
-		for( i in this.units )
-		{
-		unit = this.units[i];
-		if( unit.clickHit(x,y))
-			{
-				unit.activate();
-				this.activeUnit = i;
-			}
+			unit = this.units[i];
+			if( unit.clickHit(x,y))
+				{
+					unit.activate();
+					this.activeUnit = i;
+				}
 		}
 	},
 	
@@ -79,7 +75,7 @@ UnitClass = Class.extend({
 	},
 	
 	toggle: function () {
-//		console.log('hit');
+		// toggle unit to being active state
 		if(this.state == 'normal')
 		{
 			this.state = 'active';
@@ -115,7 +111,7 @@ UnitClass = Class.extend({
 		var newtile = board.checkmove(tgt); // check if the deired move corresponds to a tile
 		if( newtile != null ) 
 		{
-			board.tiles[this.tileid].remUnit(this.unitid);
+//			board.tiles[this.tileid].remUnit(this.unitid); // Clear slot on board
 			this.tileid = newtile; 	// Set unit to new tile location
 			this.findSlot();		// Find which slot on the tile is available
 			this.redraw();			// Wipe and redraw in new location
@@ -129,25 +125,7 @@ UnitClass = Class.extend({
 	},
 	
 	render: function () {
-//		var spriteimg = '';
-		
 		var spriteimg = this.side+'-'+this.type+'.png';
-/*		
-		if( this.side == 'blue' )
-		{
-			if( this.type == 'worker' && this.state == 'active' ) spriteimg = 'blue-worker.png';
-			else if( this.type == 'worker' && this.state == 'normal' ) spriteimg = 'blue-worker-grey.png';
-			else if( this.type == 'soldier' && this.state == 'active' ) spriteimg = 'blue-soldier.png';
-			else if( this.type == 'soldier' && this.state == 'normal' ) spriteimg = 'blue-soldier-grey.png';
-		}
-		else
-		{
-			if( this.type == 'worker' && this.state == 'active' ) spriteimg = 'red-worker.png';
-			else if( this.type == 'worker' && this.state == 'normal' ) spriteimg = 'red-worker-grey.png';
-			else if( this.type == 'soldier' && this.state == 'active' ) spriteimg = 'red-soldier.png';
-			else if( this.type == 'soldier' && this.state == 'normal' ) spriteimg = 'red-soldier-grey.png';
-		}
-*/
 		drawSprite(spriteimg, cv.Unitslayer, this.ux, this.uy)
 	},
 	
@@ -183,24 +161,26 @@ UnitClass = Class.extend({
 	},
 	
 	clickHit: function (x,y) {
-		if (( x > ( this.ux - this.spritewidth/2 )) && ( x < this.ux + this.spritewidth/2 ) && ( y > (this.uy - this.spriteheight/2 ) ) && ( y < this.uy + this.spriteheight/2 ) )
-		{
-			return true;
-		}
+		var sx = this.spritewidth/2;
+		var sy = this.spriteheight/2;
+		
+		if (( x > ( this.ux - sx )) && ( x < this.ux + sx ) && ( y > (this.uy - sy ) ) && ( y < this.uy + sy ) ) return true;
 		else return false;
 	},
 	
 	explode: function () {
 		effects.deleteAnimation('active');
+		units.activeUnit = null;
 		effects.renderEffect('explosion', this.ux, this.uy)
 		this.wipe();
-		delete units.units[this.unitid];
+		return 'delete';
 	},
 	
 	teleport: function () {
 		effects.deleteAnimation('active');
+		units.activeUnit = null;
 		effects.renderEffect('teleport', this.ux, this.uy)
 		this.wipe();
-		delete units.units[this.unitid];
+		return 'delete';
 	}
 });

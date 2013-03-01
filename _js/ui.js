@@ -125,8 +125,15 @@ UIClass = Class.extend({
 		if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
 		if( code == 'kc88' )
 		{
-			if( units.units[units.activeUnit].type == 'soldier') units.units[units.activeUnit].explode();   // "x" will explode the active unit (for testing)
-			else units.units[units.activeUnit].teleport();   // "x" will teleport the active unit (for testing)
+			var unit = units.activeUnit;
+			if( units.units[units.activeUnit].type == 'soldier')
+			{
+				if(units.units[unit].explode()) delete units.units[unit];   // "x" will explode the active unit (for testing)
+			}
+			else
+			{
+				if(units.units[unit].teleport()) delete units.units[unit];   // "x" will teleport the active unit (for testing)
+			}
 		}
 	},
 	
@@ -176,7 +183,6 @@ ButtonClass = Class.extend({
 	init: function (position, artwork) {
 		this.position = position;
 		this.artwork = artwork;
-
 	},
 	
 	render: function () {
