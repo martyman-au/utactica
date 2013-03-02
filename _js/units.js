@@ -83,23 +83,17 @@ UnitClass = Class.extend({
 		if(this.side) this.colour = 'blue'; // Side 1 has blue units
 		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
-		this.slotid = this.findSlot();		// Find which slot on the tile is available
+		this.slotid = this.findSlot(this.tileid);		// Find which slot on the tile is available
 		if(this.type == 'soldier') this.loseeffect = 'explosion';
 		else this.loseeffect = 'teleport';
 	},
-	
-	toggle: function () {
+/*	
+	toggle: function () {  // NOT USED ANY MORE??
 		// toggle unit to being active state
-		if(this.state == 'normal')
-		{
-			this.state = 'active';
-		}
-		else if(this.state == 'active')
-		{
-			this.state = 'normal';
-		}
+		if(this.state == 'normal') this.state = 'active';
+		else if(this.state == 'active') this.state = 'normal';
 	},
-
+*/
 	activate: function () {
 		this.state = 'active';
 		this.redraw();
@@ -123,16 +117,22 @@ UnitClass = Class.extend({
 		var tgt = {}; 	// Target tile x and y indexes
 		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
 		tgt.y = parseInt(board.tiles[this.tileid].grididx.y) + config.movekeys[code].y;
-		var newtile = board.checkmove(tgt); // check if the deired move corresponds to a tile
-		if( newtile != null ) // check if we are moving towards an existing tile
+		var newtile = board.checkmove(tgt); // find the ID of the deired tile
+		if( newtile ) // if the desired tile exists
 		{
-			this.tileid = newtile; 	// Set unit to new tile location
-			this.slotid = this.findSlot();		// Find which slot on the tile is available
-			this.redraw();			// Wipe and redraw in new location
-			effects.deleteAnimation('active');
-			effects.renderEffect('active', this.ux, this.uy);
-			if( --this.remainingmoves < 1) this.deactivate();
+			var newslot = this.findSlot(newtile);		// Find which slot on the tile is available
+			if( newslot )
+			{
+				this.tileid = newtile; 	// Set unit to new tile location
+				this.slotid = newslot;	// set unit to new tile slot
+				this.redraw();			// Wipe and redraw in new location
+				effects.deleteAnimation('active');
+				effects.renderEffect('active', this.ux, this.uy);
+				if( --this.remainingmoves < 1) this.deactivate();
+			}
+			else sound.playSound(sound['doh']);
 		}
+		else sound.playSound(sound['doh']);
 	},
 
 	wipe: function (dir) {
@@ -157,9 +157,9 @@ UnitClass = Class.extend({
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
 	
-	findSlot: function () {
+	findSlot: function (tile) {
 		// Find an available slot on a tile for the unit
-		var slots = board.tiles[this.tileid].slots;
+		var slots = board.tiles[tile].slots;
 		var i = null;
 		for( i in slots){		
 			if( ! slots[i].unit )

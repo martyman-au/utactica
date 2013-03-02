@@ -1,7 +1,10 @@
 gameClass = Class.extend({
 	turn: null,
-	foodcash: [100,100],
+	foodcash: [250,250],
 	sciencecash: [100,100],
+	production: [1,1],
+	attack: [10,10],
+	defence: [10,10],
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -38,20 +41,6 @@ gameClass = Class.extend({
 		
 	},
 	
-	endTurn: function () {
-		// Perform actions required to end a players turn
-		// Deactivate current unit, collect resources
-		// TODO: collect resources
-		units.deactivate();
-		for( i in units.units )
-		{
-			if(units.units[i].side == this.turn) units.units[i].remainingmoves = units.units[i].maxmoves;
-		}
-		if(this.turn) this.turn = 0;
-		else this.turn = 1;
-		this.redraw();
-	},
-	
 	setupListners: function () {
 		window.onkeydown = ui.keypress;	// TODO: best place for this?
 		
@@ -69,7 +58,30 @@ gameClass = Class.extend({
 		units.render(); // render the playing board
 		ui.render();	// render the user interface	
 	},
-
+	
+	endTurn: function () {
+		// Perform actions required to end a players turn
+		// Deactivate current unit, collect resources
+		// TODO: collect resources
+		units.deactivate();
+		for( i in units.units )
+		{
+			var unit = units.units[i];
+			if(unit.side == this.turn)
+			{
+				if(unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);
+				unit.remainingmoves = unit.maxmoves;
+			}
+		}
+		if(this.turn) this.turn = 0;
+		else this.turn = 1;
+		this.redraw();
+	},
+	
+	collectResource: function (resource) {
+		if( resource.substring(0,1) == 'f') this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
+		else if( resource.substring(0,1) == 's') this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
+	},
 });
 
 // variables used to hold main game objects

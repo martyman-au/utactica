@@ -77,7 +77,7 @@ var config = {
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
 	
 	//resources are the resources to be distributed should be hte sam enumber as the resourcedTiles above  TODO: auto pad to length
-	resources: ['f1','f1','f2','f3','s1','s1','s2','s3','','','','','','','','','','','','',''],
+	resources: ['f10','f10','f20','f30','s10','s10','s20','s30','','','','','','','','','','','','',''],
 	
 	animations: {
 		explosion: { playback: 'once', sound: true, rate: 2 },

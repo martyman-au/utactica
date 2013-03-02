@@ -75,9 +75,9 @@ TileClass = Class.extend({
 		slot3: { unit: false,
 				xoffset: 1,
 				yoffset: 1},
-		slot4: { unit: false,
-				xoffset: 0,
-				yoffset: 0}
+//		slot4: { unit: false,
+//				xoffset: 0,
+//				yoffset: 0}
 		},
 				
 	init: function (tilenum, grididx, position, resource) {
@@ -99,18 +99,17 @@ TileClass = Class.extend({
 			if(this.resource.substring(0,1) == 'f') resourceimg = 'food-resource.png';
 			else resourceimg = 'science-resource.png';
 			drawSprite(resourceimg, cv.Boardlayer, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
-			cv.Boardlayer.font = "normal 700 80px 'Roboto Condensed'";
+			cv.Boardlayer.font = "normal 700 50px 'Roboto Condensed'";
 			cv.Boardlayer.fillStyle = config.styles.resourcetext; 
-			cv.Boardlayer.shadowOffsetX = 2;
-			cv.Boardlayer.shadowOffsetY = 2;
-			cv.Boardlayer.shadowBlur = 10;
+			cv.Boardlayer.shadowOffsetX = 1;
+			cv.Boardlayer.shadowOffsetY = 1;
+			cv.Boardlayer.shadowBlur = 6;
 			cv.Boardlayer.shadowColor = config.styles.resourcetextshadow;
-			cv.Boardlayer.fillText(this.resource.substring(1,2), this.center.x - 20 + cv.Offset.x, this.center.y + 25 + cv.Offset.y);
+			cv.Boardlayer.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
 			cv.Boardlayer.shadowColor = "transparent";
 		} 
 	},
 
-	
 	clearSlot: function (slot) {
 		this.slots[slot].unit = false;
 	},
