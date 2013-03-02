@@ -28,7 +28,10 @@ SoundClass = Class.extend({
 		this.teleport.responseType = 'arraybuffer';
 		this.teleport.send();
 
-
+		this.doh = new XMLHttpRequest();
+		this.doh.open('GET', '_media/doh.mp3', true );
+		this.doh.responseType = 'arraybuffer';
+		this.doh.send();
 	},
 
 	// TODO: do playMusic and playSound have to be seperate functions?
@@ -61,6 +64,7 @@ SoundClass = Class.extend({
 			console.warn('Web Audio API is not supported in this browser');
 		}
 	},
+
 
 	toggleMute: function () {
 		if( this.mute )
