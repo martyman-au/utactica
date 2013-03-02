@@ -8,10 +8,10 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new UnitClass(0, 'soldier', 'blue', 4) );
-		this.units.push( new UnitClass(1, 'worker', 'blue', 17) );
-		this.units.push( new UnitClass(2, 'worker', 'blue', 12) );
-		this.units.push( new UnitClass(3, 'worker', 'red', 10) );
+		this.units.push( new UnitClass('soldier', 'blue', 4) );
+		this.units.push( new UnitClass('worker', 'blue', 17) );
+		this.units.push( new UnitClass('worker', 'blue', 12) );
+		this.units.push( new UnitClass('worker', 'red', 10) );
 	},
 	
 	render: function () {
@@ -53,25 +53,28 @@ UnitsClass = Class.extend({
 
 UnitClass = Class.extend({
 	// Class that defines an individual unit
-	unitid: null,
 	type: '',
 	side: '',
 	state: 'normal',
+	loseeffect: null,
 	tileid: null,
+	slotid: null,
 	ux: null,
 	uy: null,
 	maxmoves: 1,
+	remainingmoves: 1,
 	slotoffsetx: 0,
 	slotoffsety: 0,
-	spritewidth: 50,
-	spriteheight: 50,
-	activeAnim: {},
+	spritewidth: 50,	// TODO: hardcoded
+	spriteheight: 50,	// TODO: hardcoded
 	
-	init: function (unitid, type, side, tile) {
-		this.unitid = unitid;
+	init: function (type, side, tile) {
 		this.type = type;
 		this.side = side;
 		this.tileid = tile;
+		this.slotid = this.findSlot();		// Find which slot on the tile is available
+		if(this.type == 'soldier') this.loseeffect = 'explosion';
+		else this.loseeffect = 'teleport';
 	},
 	
 	toggle: function () {
@@ -111,9 +114,9 @@ UnitClass = Class.extend({
 		var newtile = board.checkmove(tgt); // check if the deired move corresponds to a tile
 		if( newtile != null ) 
 		{
-//			board.tiles[this.tileid].remUnit(this.unitid); // Clear slot on board
+			board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board
 			this.tileid = newtile; 	// Set unit to new tile location
-			this.findSlot();		// Find which slot on the tile is available
+			this.slotid = this.findSlot();		// Find which slot on the tile is available
 			this.redraw();			// Wipe and redraw in new location
 			effects.deleteAnimation('active');
 			effects.renderEffect('active', this.ux, this.uy);
@@ -121,66 +124,58 @@ UnitClass = Class.extend({
 	},
 
 	wipe: function (dir) {
+		// wipe the units canvas to clear this unit off the board
 		cv.Unitslayer.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
 	},
 	
 	render: function () {
+		// render this unit to the units canvas
 		var spriteimg = this.side+'-'+this.type+'.png';
 		drawSprite(spriteimg, cv.Unitslayer, this.ux, this.uy)
 	},
 	
 	calcPos: function () {
-
-		this.slotoffsetx = 0; // reset to centered on the tile
-		this.slotoffsety = 0;
-
+		// calculate the x,y position of the unit from the tile and slot
 		var slots = board.tiles[this.tileid].slots;
-		var i = null;
-		
-		for( i in slots){
-			if(slots[i].unit == this.unitid)
-			{
-				this.slotoffsetx = Math.max( -50, Math.min(50, slots[i].xoffset*(this.spritewidth*0.75)));
-				this.slotoffsety = Math.max( -50, Math.min(50, slots[i].yoffset*(this.spritewidth*0.75)));
-			}
-		}
+		this.slotoffsetx = Math.max( -50, Math.min(50, slots[this.slotid].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+		this.slotoffsety = Math.max( -50, Math.min(50, slots[this.slotid].yoffset*(this.spritewidth*0.75)));
 		this.ux = board.tiles[this.tileid].center.x + cv.Offset.x + this.slotoffsetx;
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
 	
 	findSlot: function () {
+		// Find an available slot on a tile for the unit
 		var slots = board.tiles[this.tileid].slots;
 		var i = null;
 		for( i in slots){		
-			if( slots[i].unit == null )
+			if( ! slots[i].unit )
 			{
-				slots[i].unit = this.unitid;
-				return;
+				slots[i].unit = true;
+				return i;
 			}
 		}
+		return null;
 	},
 	
 	clickHit: function (x,y) {
+		// Return true if a click (x,y) hits this unit
 		var sx = this.spritewidth/2;
 		var sy = this.spriteheight/2;
-		
 		if (( x > ( this.ux - sx )) && ( x < this.ux + sx ) && ( y > (this.uy - sy ) ) && ( y < this.uy + sy ) ) return true;
 		else return false;
 	},
 	
-	explode: function () {
-		effects.deleteAnimation('active');
-		units.activeUnit = null;
-		effects.renderEffect('explosion', this.ux, this.uy)
-		this.wipe();
-		return 'delete';
+	lose: function () {
+		// Deal with the unit losing a battle
+		if(this.state == 'active') // if this was the active unit deactivate it
+		{
+			effects.deleteAnimation('active');
+			units.activeUnit = null;
+		}
+		effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
+		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board		
+		this.wipe(); 		// wide the unit from the units cavas
+		return 'delete';	// return 'delete' to trigger unit deletion
 	},
 	
-	teleport: function () {
-		effects.deleteAnimation('active');
-		units.activeUnit = null;
-		effects.renderEffect('teleport', this.ux, this.uy)
-		this.wipe();
-		return 'delete';
-	}
 });

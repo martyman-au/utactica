@@ -63,19 +63,19 @@ TileClass = Class.extend({
 	center: {x: null, y: null},		// position of the center of the tile (in scaled pixels)
 	resource: null,					// resource location on the tile
 	slots: {						// slots that can hold units on a tile TODO: seems messy
-		slot0: { unit: null,
+		slot0: { unit: false,
 				xoffset: -1,
 				yoffset: -1},
-		slot1: { unit: null,
+		slot1: { unit: false,
 				xoffset: 1,
 				yoffset: -1},
-		slot2: { unit: null,
+		slot2: { unit: false,
 				xoffset: -1,
 				yoffset: 1},
-		slot3: { unit: null,
+		slot3: { unit: false,
 				xoffset: 1,
 				yoffset: 1},
-		slot4: { unit: null,
+		slot4: { unit: false,
 				xoffset: 0,
 				yoffset: 0}
 		},
@@ -109,14 +109,9 @@ TileClass = Class.extend({
 			cv.Boardlayer.shadowColor = "transparent";
 		} 
 	},
+
 	
-	remUnit: function (unitid) {
-		// remove reference to a unit from a tile slot location
-		// TODO: this seems messy
-		var i = null;
-		for( i in this.slots )
-		{
-			if(this.slots[i].unit == unitid) this.slots[i].unit = null;
-		}
-	}
+	clearSlot: function (slot) {
+		this.slots[slot].unit = false;
+	},
 });

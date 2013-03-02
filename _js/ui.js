@@ -126,14 +126,7 @@ UIClass = Class.extend({
 		if( code == 'kc88' )
 		{
 			var unit = units.activeUnit;
-			if( units.units[units.activeUnit].type == 'soldier')
-			{
-				if(units.units[unit].explode()) delete units.units[unit];   // "x" will explode the active unit (for testing)
-			}
-			else
-			{
-				if(units.units[unit].teleport()) delete units.units[unit];   // "x" will teleport the active unit (for testing)
-			}
+			if(units.units[unit].lose() == 'delete') delete units.units[unit];   // "x" will explode the active unit (for testing)
 		}
 	},
 	
