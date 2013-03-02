@@ -74,3 +74,25 @@ Object.keys = function(obj) {
   return a;
 };
 */
+
+function loadfonts() {
+	// Google font loader code
+	WebFontConfig = {
+		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
+		fontactive: function(fontFamily, fontDescription) {
+			if(fontFamily == 'Roboto Condensed')
+			{
+				game.redraw(); // redraw everything once font is available to make sure the canvas is rendered correctly
+			}
+		}
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+		'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})(); 
+};
