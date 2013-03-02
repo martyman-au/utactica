@@ -8,15 +8,19 @@ var colours = {
 	orange: '#CC5422',
 	brightorange: '#EE6030',
 	white: '#FFFFFF',
-	greyout: 'rgba(0,0,0,0.3)'
+	greyout: 'rgba(0,0,0,0.3)',
+	blue: '#0000E0',
+	red: '#E00000'
 }
 
 //config stores game configuration options
 var config = {
 	// styles configure which of our defined colours are used for each element (mainly UI stuff)
 	styles: {
-		resourcetextshaddow: colours.darkgrey,
+		resourcetextshadow: colours.darkgrey,
 		resourcetext: colours.white,
+		cashtextshadow: colours.darkgrey,
+		cashtext: colours.white,
 		bannerbg: colours.grey,
 		bannerhigh1: colours.brightorange,
 		bannerhigh2: colours.white,

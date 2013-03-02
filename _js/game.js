@@ -1,4 +1,7 @@
 gameClass = Class.extend({
+	turn: null,
+	foodcash: [100,100],
+	sciencecash: [100,100],
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -19,6 +22,9 @@ gameClass = Class.extend({
 
 	setupGame: function () {
 		// Create objects to look after game output, data and logic
+
+		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
+
 		cv = new CanvasClass();  						// canvas layers and contexts
 		board = new BoardClass(config.boardPattern);	// board and tiles
 		units = new UnitsClass();						// units
@@ -29,17 +35,30 @@ gameClass = Class.extend({
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
+		
+	},
+	
+	endTurn: function () {
+		// Perform actions required to end a players turn
+		// Deactivate current unit, collect resources
+		// TODO: collect resources
+		units.deactivate();
+		for( i in units.units )
+		{
+			if(units.units[i].side == this.turn) units.units[i].remainingmoves = units.units[i].maxmoves;
+		}
+		if(this.turn) this.turn = 0;
+		else this.turn = 1;
+		this.redraw();
 	},
 	
 	setupListners: function () {
 		window.onkeydown = ui.keypress;	// TODO: best place for this?
-
 		
 		window.onresize = function(event) {  // on resize we should reset the canvas size and scale and redraw the board, ui and units
-			cv.setScale();
-			board.render();
-			units.render();
-			ui.render();
+			cv.setScale();		// Scale canvases
+			game.redraw();		// redraw canvases
+			if(units.activeUnit) units.units[units.activeUnit].deactivate();  // Deactivate active unit on resize to avoid misplaced "active" effect
 		}
 	},
 	

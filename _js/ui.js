@@ -20,25 +20,26 @@ UIClass = Class.extend({
 		this.widgets.speaker = new ButtonClass( {left:40,bottom:50}, ['speaker.png', 'speaker_mute.png']);
 		this.widgets.speaker.action = function (){this.toggleState(); sound.toggleMute(); };
 
-		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png']);	
+		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
+		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 
 		this.widgets.upright = new ButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
-		this.widgets.upright.action = function (){ units.move('kc33');  this.pulse() };
+		this.widgets.upright.action = function (){ units.move('kc33'); this.pulse(150) };
 
 		this.widgets.up = new ButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
-		this.widgets.up.action = function (){ units.move('kc38');  this.pulse() };
+		this.widgets.up.action = function (){ units.move('kc38'); this.pulse(150) };
 
 		this.widgets.upleft = new ButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
-		this.widgets.upleft.action = function (){ units.move('kc36');  this.pulse() };
+		this.widgets.upleft.action = function (){ units.move('kc36'); this.pulse(150) };
 
 		this.widgets.downright = new ButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
-		this.widgets.downright.action = function (){ units.move('kc34');  this.pulse() };
+		this.widgets.downright.action = function (){ units.move('kc34'); this.pulse(150) };
 
 		this.widgets.down = new ButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
-		this.widgets.down.action = function (){ units.move('kc40');  this.pulse() };
+		this.widgets.down.action = function (){ units.move('kc40'); this.pulse(150) };
 
 		this.widgets.downleft = new ButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
-		this.widgets.downleft.action = function (){ units.move('kc35');  this.pulse() };
+		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
 	},
 	
 	render: function () {
@@ -46,8 +47,12 @@ UIClass = Class.extend({
 		if(cv.screenMode == 'landscape') this.bannerheight = 100;
 		else this.bannerheight = 200;
 		
+		this.wipe();
+		this.renderPlayerTurn();
+		this.renderGameTitle();
 		this.renderBanner();
 		this.renderArrows();
+//		cv.UIlayer.fill();
 	},
 	
 	redraw: function () {
@@ -66,11 +71,66 @@ UIClass = Class.extend({
 		cv.UIlayer.fillStyle = config.styles.bannerbg; // set banner colour
 		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight);  // now fill the canvas
 		cv.UIlayer.fillStyle = config.styles.bannerhigh1; // set banner colour
-		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, this.bannerheight/20);  // now fill the canvas
+		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, 6);  // now fill the canvas
 		cv.UIlayer.fillStyle = config.styles.bannerhigh2; // set banner colour
-		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight/80);  // now fill the canvas
+		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, 2);  // now fill the canvas
+//		cv.UIlayer.fillStyle = '#0000FF'; // set banner colour
+//		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight + 6, window.innerWidth, 2);  // now fill the canvas
 		this.widgets.endturn.render();
 		this.widgets.speaker.render();
+		
+		this.renderCash();
+	},
+	
+	renderPlayerTurn: function () {
+		cv.UIlayer.font = "normal 400 40px 'Roboto Condensed'";
+		if(game.turn)
+		{
+			cv.UIlayer.fillStyle = colours.blue;  // TODO: hardcoded
+			var text = 'Blue turn';
+		}
+		else
+		{
+			cv.UIlayer.fillStyle = colours.red;  // TODO: hardcoded
+			var text = 'Red turn';
+		}
+		cv.UIlayer.shadowOffsetX = 0;
+		cv.UIlayer.shadowOffsetY = 0;
+		cv.UIlayer.shadowBlur = 5;
+		cv.UIlayer.shadowColor = '#552222';  // TODO: hardcoded
+		cv.UIlayer.shadowColor = '#FFFFFF';  // TODO: hardcoded
+		var x = 13;
+		var y = 140;
+		cv.UIlayer.fillText(text, x, y);		
+		cv.UIlayer.shadowColor = "transparent";
+	},
+	
+	renderGameTitle: function () {
+		cv.UIlayer.fillStyle = colours.white;  // TODO: hardcoded
+		cv.UIlayer.font = "normal 400 90px 'Roboto Condensed'";
+		cv.UIlayer.shadowOffsetX = 0;
+		cv.UIlayer.shadowOffsetY = 0;
+		cv.UIlayer.shadowBlur = 6;
+		cv.UIlayer.shadowColor = '#552222';  // TODO: hardcoded
+		var x = 13;
+		var y = 90;
+		cv.UIlayer.fillText('UTACTICA', x, y);		
+		cv.UIlayer.shadowColor = "transparent";		
+	},
+	
+	renderCash: function () {
+		cv.UIlayer.font = "normal 400 20px 'Roboto Condensed'";
+		cv.UIlayer.fillStyle = config.styles.cashtext; 
+		cv.UIlayer.shadowOffsetX = 0;
+		cv.UIlayer.shadowOffsetY = 1;
+		cv.UIlayer.shadowBlur = 6;
+		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
+		var x = 70;
+		var y = window.innerHeight - 55;
+		cv.UIlayer.fillText('Food resources: '+game.foodcash[game.turn], x, y);
+		var y = window.innerHeight - 30;
+		cv.UIlayer.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
+		cv.UIlayer.shadowColor = "transparent";
 	},
 	
 	renderArrows: function () {
@@ -198,10 +258,10 @@ ButtonClass = Class.extend({
 		ui.redraw(); 			// TODO: need to chaneg this to only wipe and redraw the button
 	},
 	
-	pulse: function () {
+	pulse: function (time) {
 		this.toggleState();
 		var tmp = this;
-		window.setTimeout( function(){tmp.toggleState()}, 150);
+		window.setTimeout( function(){tmp.toggleState()}, time);
 	},
 	
 	clickhit: function (x,y) {

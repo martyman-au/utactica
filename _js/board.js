@@ -104,7 +104,7 @@ TileClass = Class.extend({
 			cv.Boardlayer.shadowOffsetX = 2;
 			cv.Boardlayer.shadowOffsetY = 2;
 			cv.Boardlayer.shadowBlur = 10;
-			cv.Boardlayer.shadowColor = config.styles.resourcetextshaddow;
+			cv.Boardlayer.shadowColor = config.styles.resourcetextshadow;
 			cv.Boardlayer.fillText(this.resource.substring(1,2), this.center.x - 20 + cv.Offset.x, this.center.y + 25 + cv.Offset.y);
 			cv.Boardlayer.shadowColor = "transparent";
 		} 

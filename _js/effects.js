@@ -35,7 +35,7 @@ EffectsClass = Class.extend({
 			this.active.push(frames[i]); // TODO: hardcoded
 		}
 		
-		this.animTimer = setInterval( function(){effects.animFrame();}, 30);
+		this.animTimer = setInterval( function(){effects.animFrame();}, 10); // Create a permamently running animation timer
 	},
 
 	wipe: function () {
@@ -63,6 +63,7 @@ EffectsClass = Class.extend({
 	},
 	
 	deleteAnimation: function (name) {
+		// delete a running animation
 		for( i in this.animations )
 		{
 			if(this.animations[i].name == name) delete this.animations[i];

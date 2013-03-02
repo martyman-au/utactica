@@ -8,14 +8,14 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new UnitClass('soldier', 'blue', 0) );
-		this.units.push( new UnitClass('soldier', 'blue', 0) );
-		this.units.push( new UnitClass('worker', 'blue', 0) );
-		this.units.push( new UnitClass('worker', 'blue', 0) );
-		this.units.push( new UnitClass('soldier', 'red', 40) );
-		this.units.push( new UnitClass('soldier', 'red', 40) );
-		this.units.push( new UnitClass('worker', 'red', 40) );
-		this.units.push( new UnitClass('worker', 'red', 40) );
+		this.units.push( new UnitClass('soldier', 0, 0) );
+		this.units.push( new UnitClass('soldier', 0, 0) );
+		this.units.push( new UnitClass('worker', 0, 0) );
+		this.units.push( new UnitClass('worker', 0, 0) );
+		this.units.push( new UnitClass('soldier', 1, 40) );
+		this.units.push( new UnitClass('soldier', 1, 40) );
+		this.units.push( new UnitClass('worker', 1, 40) );
+		this.units.push( new UnitClass('worker', 1, 40) );
 	},
 	
 	render: function () {
@@ -33,12 +33,12 @@ UnitsClass = Class.extend({
 		// Deal with a click by checking if it hits any units
 		var i = null;
 		var unit = null;
-		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
+		this.deactivate();
 		this.activeUnit = null;
 		for( i in this.units )
 		{
 			unit = this.units[i];
-			if( unit.clickHit(x,y))
+			if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0)
 				{
 					unit.activate();
 					this.activeUnit = i;
@@ -50,7 +50,11 @@ UnitsClass = Class.extend({
 		console.log(keycode);
 		if( this.activeUnit == null ) return;
 		else this.units[this.activeUnit].move(keycode);
-	}
+	},
+	
+	deactivate: function () {
+		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
+	},
 
 });
 
@@ -59,6 +63,7 @@ UnitClass = Class.extend({
 	// Class that defines an individual unit
 	type: '',
 	side: '',
+	colour: '',
 	state: 'normal',
 	loseeffect: null,
 	tileid: null,
@@ -75,6 +80,8 @@ UnitClass = Class.extend({
 	init: function (type, side, tile) {
 		this.type = type;
 		this.side = side;
+		if(this.side) this.colour = 'blue'; // Side 1 has blue units
+		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
 		this.slotid = this.findSlot();		// Find which slot on the tile is available
 		if(this.type == 'soldier') this.loseeffect = 'explosion';
@@ -102,6 +109,7 @@ UnitClass = Class.extend({
 	deactivate: function () {
 		this.state = 'normal';
 		this.redraw();
+		units.activeUnit = null;
 		effects.deleteAnimation('active');
 	},
 	
@@ -116,14 +124,14 @@ UnitClass = Class.extend({
 		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
 		tgt.y = parseInt(board.tiles[this.tileid].grididx.y) + config.movekeys[code].y;
 		var newtile = board.checkmove(tgt); // check if the deired move corresponds to a tile
-		if( newtile != null ) 
+		if( newtile != null ) // check if we are moving towards an existing tile
 		{
-			board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board
 			this.tileid = newtile; 	// Set unit to new tile location
 			this.slotid = this.findSlot();		// Find which slot on the tile is available
 			this.redraw();			// Wipe and redraw in new location
 			effects.deleteAnimation('active');
 			effects.renderEffect('active', this.ux, this.uy);
+			if( --this.remainingmoves < 1) this.deactivate();
 		}
 	},
 
@@ -134,7 +142,9 @@ UnitClass = Class.extend({
 	
 	render: function () {
 		// render this unit to the units canvas
-		var spriteimg = this.side+'-'+this.type+'.png';
+		var spriteimg = this.colour+'-'+this.type
+		if(this.remainingmoves == 0 || this.side != game.turn) spriteimg = spriteimg+'-grey';
+		spriteimg = spriteimg+'.png';
 		drawSprite(spriteimg, cv.Unitslayer, this.ux, this.uy)
 	},
 	
