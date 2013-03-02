@@ -68,11 +68,16 @@ CanvasClass = Class.extend({
 	
 	setScale: function () {
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
-		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / 1210)); // Scale needed to fit board in canvas
+		
+		var boardheight = config.boardPattern.length * 91;
+		
+//		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / 1210)); // Scale needed to fit board in canvas
+		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / boardheight)); // Scale needed to fit board in canvas
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
 		this.Offset.x = ((window.innerWidth - (1385 * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
-		this.Offset.y = Math.max( 0, ( (window.innerHeight - ui.bannerheight) /this.Scale - 1210 ));	// Offset needed to center board in canvas Y
+//		this.Offset.y = Math.max( 0, ( (window.innerHeight - ui.bannerheight) /this.Scale - 1210 ));	// Offset needed to center board in canvas Y
+		this.Offset.y = Math.max( 0, ( (window.innerHeight - ui.bannerheight) /this.Scale - boardheight ));	// Offset needed to center board in canvas Y
 		
 		this.setSize( window.innerWidth, window.innerHeight ); // canvas = full window size
 		

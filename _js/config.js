@@ -50,6 +50,8 @@ var config = {
 	// TODO: should this be made into an array with simple 0 or 1 at each grid index?
 	boardPattern: [
 		[4],
+		[],
+		[4],
 		[3,5],
 		[2,4,6],
 		[1,3,5,7],
@@ -61,9 +63,12 @@ var config = {
 		[1,3,5,7],
 		[2,4,6],
 		[3,5],
+		[4],
+		[],
 		[4]
 		],
-	
+
+		
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
 	

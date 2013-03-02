@@ -8,10 +8,14 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new UnitClass('soldier', 'blue', 4) );
-		this.units.push( new UnitClass('worker', 'blue', 17) );
-		this.units.push( new UnitClass('worker', 'blue', 12) );
-		this.units.push( new UnitClass('worker', 'red', 10) );
+		this.units.push( new UnitClass('soldier', 'blue', 0) );
+		this.units.push( new UnitClass('soldier', 'blue', 0) );
+		this.units.push( new UnitClass('worker', 'blue', 0) );
+		this.units.push( new UnitClass('worker', 'blue', 0) );
+		this.units.push( new UnitClass('soldier', 'red', 40) );
+		this.units.push( new UnitClass('soldier', 'red', 40) );
+		this.units.push( new UnitClass('worker', 'red', 40) );
+		this.units.push( new UnitClass('worker', 'red', 40) );
 	},
 	
 	render: function () {
