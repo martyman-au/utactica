@@ -136,6 +136,7 @@ UnitClass = Class.extend({
 				var newslot = this.findSlot(newtile);		// Find which slot on the tile is available
 				if( newslot )
 				{
+					board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 					this.tileid = newtile; 	// Set unit to new tile location
 					this.slotid = newslot;	// set unit to new tile slot
 					this.redraw();			// Wipe and redraw in new location
@@ -181,7 +182,7 @@ UnitClass = Class.extend({
 		// Find an available slot on a tile for the unit
 		var slots = board.tiles[tile].slots;
 		var i = null;
-		for( i in slots){		
+		for( i in slots){
 			if( ! slots[i].unit )
 			{
 				slots[i].unit = true;
@@ -206,26 +207,29 @@ UnitClass = Class.extend({
 			effects.deleteAnimation('active');
 			units.activeUnit = null;
 		}
-		effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
 		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 		this.wipe(); 		// wide the unit from the units cavas
-		if( this.loseeffect == 'teleport')
+		if( this.loseeffect == 'teleport')			// If it is a worker we will try to teleport home
 		{
-			var tile = config.homeTile[this.side];
-			var slot = this.findSlot(tile);
+			var tile = config.homeTile[this.side];	// target for teleport
+			var slot = this.findSlot(tile);			// find slot at target
 			if( slot )
 			{
+				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
 				this.tileid = tile;
 				this.slotid = slot;
+				this.redraw();
+				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
 			}
 			else
 			{
+				effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion or teleport effect
 				return 'delete';
 			}
 		}
 		else
 		{
-		console.log('return delete');
+			effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
 			return 'delete';	// return 'delete' to trigger unit deletion
 		}
 	},
