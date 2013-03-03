@@ -55,8 +55,8 @@ gameClass = Class.extend({
 		// re-draw all of the game layers
 		// TODO: should we be wiping here, or calling built in redraw funcitons?
 		board.render(); // render the playing board
-		units.render(); // render the playing board
-		ui.render();	// render the user interface	
+		units.redraw(); // render the playing board
+		ui.redraw();	// render the user interface	
 	},
 	
 	endTurn: function () {

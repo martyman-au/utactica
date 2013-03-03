@@ -20,10 +20,20 @@ UnitsClass = Class.extend({
 		this.units.push( new UnitClass('soldier', 1, 1) );
 	},
 	
+	redraw: function () {
+		this.destroy();
+		this.wipe();
+		this.render();
+	},
+	
 	render: function () {
 		// Render all of the units on the board
-		cv.Unitslayer.clearRect(0, 0, cv.cnvUnits.width / cv.Scale, cv.cnvUnits.height / cv.Scale); // clear all of units layer
 		for( i in this.units ) this.units[i].render(); // render every unit
+	},
+
+	wipe: function () {
+		// wipe the units layer
+		cv.Unitslayer.clearRect(0, 0, cv.cnvUnits.width / cv.Scale, cv.cnvUnits.height / cv.Scale); // clear all of units layer
 	},
 	
 	scale: function () {
@@ -58,8 +68,11 @@ UnitsClass = Class.extend({
 		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
 	},
 
-	destroy: function (unit) {
-		if(units.units[unit].lose() == 'delete') delete units.units[unit];
+	destroy: function () {
+		for( i in this.units )
+		{
+			if(units.units[i].dead ) delete units.units[i];
+		}
 	}
 });
 
@@ -151,8 +164,36 @@ UnitClass = Class.extend({
 	},
 	
 	attack: function (tile, enemies) {
-		console.log('attack');
-		for( i in enemies )	units.destroy(enemies[i]);
+		this.remainingmoves--;
+		var attack = Math.floor((Math.random()*100)+1); // roll for attackers
+		var defend = Math.floor((Math.random()*100)+1); // roll for defenders
+		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];
+		console.log('attack result: '+result);
+		if( result >= -15 && result <= 15 )
+		{
+			console.log('DRAW');
+		}
+		else if( result < 0 )
+		{
+			this.lose();
+		}
+		else if( result > 0 )
+		{
+			// must mark one dead
+			for( i in enemies )	units.units[enemies[i]].lose();
+			var enemies = [];
+			for( i in units.units ) // count how many enemies exist in the target tile
+			{
+				if( units.units[i].tileid == tile && units.units[i].side != this.side ) enemies.push( i ); // if the new tile has enemies on it collect them
+			}
+			if( enemies.length < 1 )
+			{
+				this.tileid = tile;
+				this.slotid = this.findSlot(tile);
+				this.deactivate();
+				this.redraw();
+			}
+		}
 		
 	},
 
@@ -224,13 +265,17 @@ UnitClass = Class.extend({
 			else
 			{
 				effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion or teleport effect
-				return 'delete';
+				this.dead = true;
+				units.redraw();
+//				return 'delete';
 			}
 		}
 		else
 		{
 			effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
-			return 'delete';	// return 'delete' to trigger unit deletion
+			this.dead = true;
+			units.redraw();
+//			return 'delete';	// return 'delete' to trigger unit deletion
 		}
 	},
 	
