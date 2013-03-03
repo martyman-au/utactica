@@ -1,0 +1,30 @@
+Tiles can hold up to 4 units.
+There is a maximum of 4 workers and 10 soldiers allowed per side.
+Workers will automatically teleport home when attacked (if there is room).
+A base may have a maximum of 2 defence turrets, and may not may taken by the enemy until all turrets are destoyed.
+
+Upgrade Costs
+
+Worker Upgrades
+Stage 1 workers produce 120% production : 100 science
+Stage 2 workers produce 140% production : 100 science
+Stage 3 workers produce 160% production : 100 science
+Stage 4 workers produce 180% production : 100 science
+Stage 5 workers produce 200% production : 100 science
+Stage 6 workers produce 220% production : 100 science
+Stage 7 workers produce 240% production : 100 science
+Stage 8 workers produce 260% production : 100 science
+Stage 9 workers produce 280% production : 100 science
+Stage 10 workers produce 300% production : 100 science
+
+Soldier Upgrades
+Stage 1 soldiers attack and defend at 110% : 100 science
+Stage 2 soldiers attack and defend at 120% : 100 science
+Stage 3 soldiers attack and defend at 130% : 100 science
+Stage 4 soldiers attack and defend at 140% : 100 science
+Stage 5 soldiers attack and defend at 150% : 100 science
+Stage 6 soldiers attack and defend at 160% : 100 science
+Stage 7 soldiers attack and defend at 170% : 100 science
+Stage 8 soldiers attack and defend at 180% : 100 science
+Stage 9 soldiers attack and defend at 190% : 100 science
+Stage 10 soldiers attack and defend at 200% : 100 science
