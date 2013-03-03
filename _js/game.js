@@ -79,6 +79,8 @@ gameClass = Class.extend({
 	},
 	
 	collectResource: function (resource) {
+		// Allocate any occupied resources to that team
+		// TODO: trigger resource collection animation
 		if( resource.substring(0,1) == 'f') this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
 		else if( resource.substring(0,1) == 's') this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
 	},

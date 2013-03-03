@@ -119,6 +119,7 @@ UIClass = Class.extend({
 	},
 	
 	renderCash: function () {
+		// render the current resource 
 		cv.UIlayer.font = "normal 400 20px 'Roboto Condensed'";
 		cv.UIlayer.fillStyle = config.styles.cashtext; 
 		cv.UIlayer.shadowOffsetX = 0;
@@ -134,6 +135,7 @@ UIClass = Class.extend({
 	},
 	
 	renderArrows: function () {
+		// Render movement control icons to the screen
 		this.widgets.upright.render();
 		this.widgets.up.render();
 		this.widgets.upleft.render();
@@ -168,47 +170,50 @@ UIClass = Class.extend({
 
 	
 	keypress: function (e) {
-		// deal with all keypresses here
-		if(this.popup) // If there is a popup then close it and exit
+		// Deal with keypresses
+		if(this.popup)	// If there is a popup then close it and exit
 		{
 			this.popup = false;
 			this.redraw();
 			return;
 		}	
 		var code = 'kc'+e.keyCode;
-		if( code in config.movekeys )
+		console.log(code);
+		if( code in config.movekeys )	// This is a move command
 		{
-			// animate on screen arrow?
-			ui.moveIconFlash(code);
-			units.move(code); 				// This is a move command
+			ui.moveIconFlash(code);		// Animate on screen arrow button
+			units.move(code); 			// attempt to move the active unit
 		}
-		if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
-		if( code == 'kc88' )
+		else if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
+		else if( code == 'kc88' )
 		{
 			var unit = units.activeUnit;
 			if(units.units[unit].lose() == 'delete') delete units.units[unit];   // "x" will explode the active unit (for testing)
 		}
+		else if (code == 'kc32' ) game.endTurn();	// Space bar ends turn
+		else if (code == 'kc77' ) ui.widgets.speaker.action();	// Toogle mute status
 	},
 	
 	moveIconFlash: function (code) {
-//			console.log(config.movekeys[code]);
-			x = config.movekeys[code].x;
-			y = config.movekeys[code].y;
-			if(y == 1)
-			{
-				if( x == 1 ) this.widgets.downright.pulse();
-				else this.widgets.downleft.pulse();
-			}
-			else if( y == -1 )
-			{
-				if( x == 1 ) this.widgets.upright.pulse();
-				else this.widgets.upleft.pulse();
-			}
-			else if( y == -2) this.widgets.up.pulse();
-			else this.widgets.down.pulse();
+		// Flash the appropriate move icon when a move is attempted
+		x = config.movekeys[code].x;
+		y = config.movekeys[code].y;
+		if(y == 1)
+		{
+			if( x == 1 ) this.widgets.downright.pulse();
+			else this.widgets.downleft.pulse();
+		}
+		else if( y == -1 )
+		{
+			if( x == 1 ) this.widgets.upright.pulse();
+			else this.widgets.upleft.pulse();
+		}
+		else if( y == -2) this.widgets.up.pulse();
+		else this.widgets.down.pulse();
 	},
 	
 	renderpopup: function (name) {
+		// Darw a test popup window
 		var popheight = 300;
 		var popwidth = 500;
 		var radius = 30;
@@ -226,7 +231,6 @@ UIClass = Class.extend({
 
 ButtonClass = Class.extend({
 	// Used to create buttons for the UTACTICA UI
-	// TODO: need to extend this class into specific button classes for specific functionality?
 	position: {top: null, right: null, bottom: null, left: null},
 	artwork: new Array(),
 	state: 0,
@@ -234,12 +238,13 @@ ButtonClass = Class.extend({
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
 	
 	init: function (position, artwork) {
+		// Initialise a new button
 		this.position = position;
 		this.artwork = artwork;
 	},
 	
 	render: function () {
-		//Renders the button to the screen in it's defined location (position need to be recalculated to take into account screen resizing)
+		//Renders this button to the screen in it's defined location (position need to be recalculated to take into account screen resizing)
 		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
@@ -253,18 +258,21 @@ ButtonClass = Class.extend({
 	},
 	
 	toggleState: function () {
+		// Toggle this button between it's two first states
 		if( this.state == 0) this.state = 1;
 		else this.state = 0;
 		ui.redraw(); 			// TODO: need to chaneg this to only wipe and redraw the button
 	},
 	
 	pulse: function (time) {
+		// Toggle this button for a period of time
 		this.toggleState();
 		var tmp = this;
 		window.setTimeout( function(){tmp.toggleState()}, time);
 	},
 	
 	clickhit: function (x,y) {
+		// return true if a click location corresponds to this button
 		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
 		{
 			return true;

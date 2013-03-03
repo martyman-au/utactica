@@ -8,14 +8,16 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new UnitClass('soldier', 0, 0) );
-		this.units.push( new UnitClass('soldier', 0, 0) );
-		this.units.push( new UnitClass('worker', 0, 0) );
-		this.units.push( new UnitClass('worker', 0, 0) );
-		this.units.push( new UnitClass('soldier', 1, 40) );
-		this.units.push( new UnitClass('soldier', 1, 40) );
-		this.units.push( new UnitClass('worker', 1, 40) );
-		this.units.push( new UnitClass('worker', 1, 40) );
+		this.units.push( new UnitClass('soldier', 0, config.homeTile[0]) );
+		this.units.push( new UnitClass('soldier', 0, config.homeTile[0]) );
+		this.units.push( new UnitClass('worker', 0, config.homeTile[0]) );
+		this.units.push( new UnitClass('worker', 0, config.homeTile[0]) );
+		this.units.push( new UnitClass('soldier', 1, config.homeTile[1]) );
+		this.units.push( new UnitClass('soldier', 1, config.homeTile[1]) );
+		this.units.push( new UnitClass('worker', 1, config.homeTile[1]) );
+		this.units.push( new UnitClass('worker', 1, config.homeTile[1]) );
+		this.units.push( new UnitClass('worker', 1, 1) );
+		this.units.push( new UnitClass('soldier', 1, 1) );
 	},
 	
 	render: function () {
@@ -56,6 +58,9 @@ UnitsClass = Class.extend({
 		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
 	},
 
+	destroy: function (unit) {
+		if(units.units[unit].lose() == 'delete') delete units.units[unit];
+	}
 });
 
 
@@ -87,13 +92,7 @@ UnitClass = Class.extend({
 		if(this.type == 'soldier') this.loseeffect = 'explosion';
 		else this.loseeffect = 'teleport';
 	},
-/*	
-	toggle: function () {  // NOT USED ANY MORE??
-		// toggle unit to being active state
-		if(this.state == 'normal') this.state = 'active';
-		else if(this.state == 'active') this.state = 'normal';
-	},
-*/
+
 	activate: function () {
 		this.state = 'active';
 		this.redraw();
@@ -118,21 +117,42 @@ UnitClass = Class.extend({
 		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
 		tgt.y = parseInt(board.tiles[this.tileid].grididx.y) + config.movekeys[code].y;
 		var newtile = board.checkmove(tgt); // find the ID of the deired tile
-		if( newtile ) // if the desired tile exists
+		
+		if( newtile ) // if the desired tile exists check if this is a move or attack
 		{
-			var newslot = this.findSlot(newtile);		// Find which slot on the tile is available
-			if( newslot )
+			var enemies = [];
+			for( i in units.units ) // count how many enemies exist in the target tile
 			{
-				this.tileid = newtile; 	// Set unit to new tile location
-				this.slotid = newslot;	// set unit to new tile slot
-				this.redraw();			// Wipe and redraw in new location
-				effects.deleteAnimation('active');
-				effects.renderEffect('active', this.ux, this.uy);
-				if( --this.remainingmoves < 1) this.deactivate();
+				if( units.units[i].tileid == newtile && units.units[i].side != this.side ) enemies.push( i ); // if the new tile has enemies on it collect them
 			}
-			else sound.playSound(sound['doh']);
+			if(enemies.length > 0) // if there was at least one enemy on the target tile
+			{
+				if( this.type == 'soldier' ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
+				else sound.playSound(sound['doh']);					// If this unit is worker don't move
+			}
+			else	// There was no enemies lets see if we can move there
+			{
+				console.log('no enemies, try move');
+				var newslot = this.findSlot(newtile);		// Find which slot on the tile is available
+				if( newslot )
+				{
+					this.tileid = newtile; 	// Set unit to new tile location
+					this.slotid = newslot;	// set unit to new tile slot
+					this.redraw();			// Wipe and redraw in new location
+					effects.deleteAnimation('active');
+					effects.renderEffect('active', this.ux, this.uy);
+					if( --this.remainingmoves < 1) this.deactivate();
+				}
+				else sound.playSound(sound['doh']);
+			}
 		}
 		else sound.playSound(sound['doh']);
+	},
+	
+	attack: function (tile, enemies) {
+		console.log('attack');
+		for( i in enemies )	units.destroy(enemies[i]);
+		
 	},
 
 	wipe: function (dir) {
@@ -187,9 +207,27 @@ UnitClass = Class.extend({
 			units.activeUnit = null;
 		}
 		effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
-		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board		
+		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 		this.wipe(); 		// wide the unit from the units cavas
-		return 'delete';	// return 'delete' to trigger unit deletion
+		if( this.loseeffect == 'teleport')
+		{
+			var tile = config.homeTile[this.side];
+			var slot = this.findSlot(tile);
+			if( slot )
+			{
+				this.tileid = tile;
+				this.slotid = slot;
+			}
+			else
+			{
+				return 'delete';
+			}
+		}
+		else
+		{
+		console.log('return delete');
+			return 'delete';	// return 'delete' to trigger unit deletion
+		}
 	},
 	
 });

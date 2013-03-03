@@ -72,6 +72,7 @@ var config = {
 		[4]
 		],
 
+	homeTile: [0,40],
 		
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
@@ -80,8 +81,8 @@ var config = {
 	resources: ['f10','f10','f20','f30','s10','s10','s20','s30','','','','','','','','','','','','',''],
 	
 	animations: {
-		explosion: { playback: 'once', sound: true, rate: 2 },
-		teleport: { playback: 'once', sound: true, rate: 1 },
+		explosion: { playback: 'once', sound: true, rate: 5 },
+		teleport: { playback: 'once', sound: true, rate: 2 },
 		active: { playback: 'bounce', sound: false, rate: 3 }
 	},
 	
