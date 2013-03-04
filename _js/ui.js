@@ -52,7 +52,6 @@ UIClass = Class.extend({
 		this.renderGameTitle();
 		this.renderBanner();
 		this.renderArrows();
-//		cv.UIlayer.fill();
 	},
 	
 	redraw: function () {
@@ -153,7 +152,6 @@ UIClass = Class.extend({
 			this.redraw();
 			return true;
 		}		
-//		else if( y > (window.innerHeight - this.bannerheight)) console.log('banner click');
 		
 		// Check if the click hits any widgets
 		var i = null;
@@ -191,7 +189,9 @@ UIClass = Class.extend({
 			if(units.units[unit].lose() == 'delete') delete units.units[unit];   // "x" will explode the active unit (for testing)
 		}
 		else if (code == 'kc32' ) game.endTurn();	// Space bar ends turn
-		else if (code == 'kc77' ) ui.widgets.speaker.action();	// Toogle mute status
+		else if (code == 'kc77' ) ui.widgets.speaker.action();	// "m" Toogle mute status
+		else if (code == 'kc84' ) units.units[units.activeUnit].teleport();	// "t" Teleport a unit home
+
 	},
 	
 	moveIconFlash: function (code) {

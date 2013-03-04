@@ -64,6 +64,20 @@ UnitsClass = Class.extend({
 		else this.units[this.activeUnit].move(keycode);
 	},
 	
+	getEnemies: function (tile) {
+		var enemies = { units: [], soldier: 0, worker: 0};
+		for( i in units.units ) // count how many soldiers exist on a tile
+		{
+			if( units.units[i].tileid == tile && units.units[i].side != game.turn )
+			{
+				enemies.units.push( i ); 
+				enemies[units.units[i].type]++; // if the tile has soldiers
+			}
+		}
+		console.log(enemies);
+		return enemies;
+	},
+	
 	deactivate: function () {
 		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
 	},
@@ -71,7 +85,7 @@ UnitsClass = Class.extend({
 	destroy: function () {
 		for( i in this.units )
 		{
-			if(units.units[i].dead ) delete units.units[i];
+			if(units.units[i].state == 'dead' ) delete units.units[i];
 		}
 	}
 });
@@ -113,10 +127,13 @@ UnitClass = Class.extend({
 	},
 	
 	deactivate: function () {
-		this.state = 'normal';
-		this.redraw();
-		units.activeUnit = null;
-		effects.deleteAnimation('active');
+		if(this.state == 'active')
+		{
+			this.state = 'normal';
+			this.redraw();
+			units.activeUnit = null;
+			effects.deleteAnimation('active');
+		}
 	},
 	
 	redraw: function () {
@@ -133,12 +150,13 @@ UnitClass = Class.extend({
 		
 		if( newtile ) // if the desired tile exists check if this is a move or attack
 		{
-			var enemies = [];
-			for( i in units.units ) // count how many enemies exist in the target tile
-			{
-				if( units.units[i].tileid == newtile && units.units[i].side != this.side ) enemies.push( i ); // if the new tile has enemies on it collect them
-			}
-			if(enemies.length > 0) // if there was at least one enemy on the target tile
+			var enemies =  units.getEnemies(newtile);
+
+//			for( i in units.units ) // count how many enemies exist in the target tile
+//			{
+//				if( units.units[i].tileid == newtile && units.units[i].side != this.side ) enemies.push( i ); // if the new tile has enemies on it collect them
+//			}
+			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
 			{
 				if( this.type == 'soldier' ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
 				else sound.playSound(sound['doh']);					// If this unit is worker don't move
@@ -167,26 +185,21 @@ UnitClass = Class.extend({
 		this.remainingmoves--;
 		var attack = Math.floor((Math.random()*100)+1); // roll for attackers
 		var defend = Math.floor((Math.random()*100)+1); // roll for defenders
+		if( enemies.soldier == 0 ) defend = -1000; // Workers get no defence
 		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];
 		console.log('attack result: '+result);
 		if( result >= -15 && result <= 15 )
 		{
 			console.log('DRAW');
 		}
-		else if( result < 0 )
-		{
-			this.lose();
-		}
-		else if( result > 0 )
+		else if( result < -15 ) this.lose();
+		else if( result > 15 )
 		{
 			// must mark one dead
-			for( i in enemies )	units.units[enemies[i]].lose();
-			var enemies = [];
-			for( i in units.units ) // count how many enemies exist in the target tile
-			{
-				if( units.units[i].tileid == tile && units.units[i].side != this.side ) enemies.push( i ); // if the new tile has enemies on it collect them
-			}
-			if( enemies.length < 1 )
+			for( i in enemies.units ) units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers
+			
+			enemies = units.getEnemies(tile); // count the new number of enemies
+			if( enemies.units.length == 0 )
 			{
 				this.tileid = tile;
 				this.slotid = this.findSlot(tile);
@@ -243,11 +256,7 @@ UnitClass = Class.extend({
 	
 	lose: function () {
 		// Deal with the unit losing a battle
-		if(this.state == 'active') // if this was the active unit deactivate it
-		{
-			effects.deleteAnimation('active');
-			units.activeUnit = null;
-		}
+		this.deactivate();
 		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 		this.wipe(); 		// wide the unit from the units cavas
 		if( this.loseeffect == 'teleport')			// If it is a worker we will try to teleport home
@@ -256,30 +265,41 @@ UnitClass = Class.extend({
 			var slot = this.findSlot(tile);			// find slot at target
 			if( slot )
 			{
-				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
-				var start = { x: this.ux, y: this.uy };
-				this.tileid = tile;
-				this.slotid = slot;
-				this.redraw();
-				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
-				var end = { x: this.ux, y: this.uy };
-				effects.renderVector('beam',start,end);
+				this.teleport();
 			}
 			else
 			{
 				effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion or teleport effect
-				this.dead = true;
+				this.state = 'dead';
 				units.redraw();
-//				return 'delete';
 			}
 		}
 		else
 		{
 			effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
-			this.dead = true;
+			this.state = 'dead';
 			units.redraw();
-//			return 'delete';	// return 'delete' to trigger unit deletion
 		}
 	},
 	
+	teleport: function () {
+		var tile = config.homeTile[this.side];	// target for teleport
+		var slot = this.findSlot(tile);			// find slot at target
+		if( slot )
+		{
+			this.deactivate();
+			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
+			var start = { x: this.ux, y: this.uy };
+			this.tileid = tile;
+			this.slotid = slot;
+			this.redraw();
+			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
+			var end = { x: this.ux, y: this.uy };
+			effects.renderVector('beam',start,end);
+		}
+		else
+		{
+			sound.playSound(sound['doh']);
+		}
+	},
 });
