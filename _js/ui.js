@@ -20,8 +20,8 @@ UIClass = Class.extend({
 		this.widgets.speaker = new ButtonClass( {left:40,bottom:50}, ['speaker.png', 'speaker_mute.png']);
 		this.widgets.speaker.action = function (){this.toggleState(); sound.toggleMute(); };
 
-		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
-		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
+//		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
+//		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 
 		this.widgets.upright = new ButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
 		this.widgets.upright.action = function (){ units.move('kc33'); this.pulse(150) };
@@ -49,6 +49,9 @@ UIClass = Class.extend({
 
 		this.widgets.upgrades = new VectorButtonClass( {left:580,bottom:60}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ this.pulse(150) };
+
+		this.widgets.endturn = new VectorButtonClass( {left:720,bottom:60}, 'End turn', 110);
+		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 	},
 	
 	render: function () {
