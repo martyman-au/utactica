@@ -287,6 +287,7 @@ UnitClass = Class.extend({
 		var slot = this.findSlot(tile);			// find slot at target
 		if( slot )
 		{
+			board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 			this.deactivate();
 			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
 			var start = { x: this.ux, y: this.uy };
