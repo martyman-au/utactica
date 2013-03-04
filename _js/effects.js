@@ -43,6 +43,7 @@ EffectsClass = Class.extend({
 		// TODO: would it be better to just clear the required area?
 		// TODO: this should query the locations of all of the current effects and clear them
 		cv.Effectslayer.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
+//		cv.Effectslayer.Children.Remove();
 	},
 
 	animFrame: function () {
@@ -60,6 +61,12 @@ EffectsClass = Class.extend({
 		// Create an effect using AnimationClass
 		if( config.animations[name].sound ) sound.playSound(sound[name]);
 		this.animations.push( new AnimationClass(name, this[name] ,x ,y ) );
+	},
+
+	renderVector: function (name,start,end) {
+		// Create an effect using VectorClass
+		if( config.animations[name].sound ) sound.playSound(sound[name]);
+		this.animations.push( new VectorClass(name,start,end) );
 	},
 	
 	deleteAnimation: function (name) {
@@ -82,7 +89,7 @@ AnimationClass = Class.extend({
 	count: 0,
 	inc: 1,
 	
-	init: function (name, frames, x, y) {x
+	init: function (name, frames, x, y) {
 		this.name = name;
 		this.frames = frames;
 		this.x = x;
@@ -99,4 +106,51 @@ AnimationClass = Class.extend({
 
 		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);
 	},
+});
+
+VectorClass = Class.extend({
+	// Class defining an instance of a vector animation effect
+	start: {x:0,y:0},
+	end: {x:0,y:0},
+	count: 0,
+	length: 0,
+	ctx: null,
+	
+	init: function (name, start, end) {
+		this.start = start;
+		this.end = end;
+		this.ctx = cv.Effectslayer;
+		if(name == 'beam')
+		{
+			this.length = 20;
+			this.drawFrame = function () {
+				this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');
+				this.drawcircle(this.interpolate(start,end,(this.count / this.length)), 20, 'rgba(255,255,56,0.3)');
+				if(this.count++ > this.length) return 'done';			
+			};
+		}
+	},
+	
+	interpolate: function (start, end, distance) {
+		var x = start.x + (end.x - start.x) * distance;
+		var y = start.y + (end.y - start.y) * distance;
+		return { x: x, y: y};
+	},
+	
+	drawline: function (start,end,width,color) {
+		this.ctx.beginPath();
+		this.ctx.moveTo(start.x,start.y);
+		this.ctx.lineTo(end.x,end.y);
+		this.ctx.lineWidth = width;
+		this.ctx.strokeStyle = color;
+		this.ctx.stroke();
+	},
+	
+	drawcircle: function (point, diameter, color) {
+		this.ctx.beginPath();
+		this.ctx.arc(point.x, point.y, diameter, 0, 2 * Math.PI, false);
+		this.ctx.fillStyle = color;
+		this.ctx.fill();
+	},
+	
 });

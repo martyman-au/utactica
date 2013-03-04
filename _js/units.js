@@ -257,10 +257,13 @@ UnitClass = Class.extend({
 			if( slot )
 			{
 				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
+				var start = { x: this.ux, y: this.uy };
 				this.tileid = tile;
 				this.slotid = slot;
 				this.redraw();
 				effects.renderEffect(this.loseeffect, this.ux, this.uy)	// render an explosion or teleport effect
+				var end = { x: this.ux, y: this.uy };
+				effects.renderVector('beam',start,end);
 			}
 			else
 			{

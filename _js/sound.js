@@ -23,10 +23,10 @@ SoundClass = Class.extend({
 		this.explosion.responseType = 'arraybuffer';
 		this.explosion.send();
 
-		this.teleport = new XMLHttpRequest();
-		this.teleport.open('GET', '_media/teleport.mp3', true );
-		this.teleport.responseType = 'arraybuffer';
-		this.teleport.send();
+		this.beam = new XMLHttpRequest();
+		this.beam.open('GET', '_media/teleport.mp3', true );
+		this.beam.responseType = 'arraybuffer';
+		this.beam.send();
 
 		this.doh = new XMLHttpRequest();
 		this.doh.open('GET', '_media/doh.mp3', true );

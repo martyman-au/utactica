@@ -82,7 +82,8 @@ var config = {
 	
 	animations: {
 		explosion: { playback: 'once', sound: true, rate: 8 },
-		teleport: { playback: 'once', sound: true, rate: 8 },
+		teleport: { playback: 'once', sound: false, rate: 8 },
+		beam: { playback: null, sound: true, rate: 8 },
 		active: { playback: 'bounce', sound: false, rate: 3 }
 	},
 	
