@@ -41,8 +41,14 @@ UIClass = Class.extend({
 		this.widgets.downleft = new ButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
 		
-		this.widgets.test = new VectorButtonClass( {left:300,bottom:60}, 'teleport');
-		this.widgets.test.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
+		this.widgets.teleport = new VectorButtonClass( {left:300,bottom:60}, 'Teleport', 110);
+		this.widgets.teleport.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
+
+		this.widgets.buyunits = new VectorButtonClass( {left:440,bottom:60}, 'Buy Units', 110);
+		this.widgets.buyunits.action = function (){ this.pulse(150) };
+
+		this.widgets.upgrades = new VectorButtonClass( {left:580,bottom:60}, 'Upgrades', 110);
+		this.widgets.upgrades.action = function (){ this.pulse(150) };
 	},
 	
 	render: function () {
@@ -55,7 +61,9 @@ UIClass = Class.extend({
 		this.renderGameTitle();
 		this.renderBanner();
 		this.renderArrows();
-		this.widgets.test.render();
+		this.widgets.teleport.render();
+		this.widgets.buyunits.render();
+		this.widgets.upgrades.render();
 	},
 	
 	redraw: function () {
@@ -292,12 +300,13 @@ VectorButtonClass = Class.extend({
 	text: '',
 	size: {w: 0, h: 0},
 	
-	init: function (position, text) {
+	init: function (position, text, width) {
 		// Initialise a new button
 		this.position = position;
 		this.text = text;
-		this.size.w = this.text.length * 11;
-		this.size.h = 30;
+		if( typeof width === "undefined" ) this.size.w = this.text.length * 12;
+		else this.size.w = width;
+		this.size.h = 35;
 	},
 	
 	render:  function () {
@@ -305,28 +314,43 @@ VectorButtonClass = Class.extend({
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
-		
-		cv.UIlayer.fillStyle = '#F0D0B0';
-		cv.UIlayer.strokeStyle = '#CC5422';
-		cv.UIlayer.lineWidth = 10;
 
-		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 7, true, true )
+		cv.UIlayer.shadowOffsetX = 2;
+		cv.UIlayer.shadowOffsetY = 2;
+		cv.UIlayer.shadowBlur = 12;
+		cv.UIlayer.shadowColor = '#222222';
 		
-		cv.UIlayer.font = "normal 400 25px 'Roboto Condensed'";
-		cv.UIlayer.fillStyle = config.styles.cashtext; 
-		cv.UIlayer.shadowOffsetX = 0;
-		cv.UIlayer.shadowOffsetY = 1;
-		cv.UIlayer.shadowBlur = 6;
-		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
-		var x = this.position.x + 5;
-		var y = this.position.y + this.size.h/2 + 8;
-		cv.UIlayer.fillText(this.text, x, y);
+		cv.UIlayer.fillStyle = '#E0D4B0';
+		cv.UIlayer.strokeStyle = '#FFFFFF';
+		cv.UIlayer.lineWidth = 12;
+		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+
 		cv.UIlayer.shadowColor = "transparent";
 		
-		this.edges.top = this.position.y - this.size.h/2;		//calculate edges for click hit matching
-		this.edges.bottom = this.position.y + this.size.h/2;
-		this.edges.left = this.position.x - this.size.w/2;
-		this.edges.right = this.position.x + this.size.w/2;
+		cv.UIlayer.strokeStyle = colours.brightorange;
+		cv.UIlayer.lineWidth = 7;		
+		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		
+		cv.UIlayer.font = "normal 400 25px 'Roboto Condensed'";
+		cv.UIlayer.textAlign = 'center';
+//		cv.UIlayer.textBaseline = 'center';
+		cv.UIlayer.fillStyle = '#222222';
+//		cv.UIlayer.fillStyle = config.styles.cashtext; 
+//		cv.UIlayer.shadowOffsetX = 0;
+//		cv.UIlayer.shadowOffsetY = 1;
+//		cv.UIlayer.shadowBlur = 6;
+//		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
+		var x = this.position.x + this.size.w/2;
+		var y = this.position.y + this.size.h/2 + 8;
+		cv.UIlayer.fillText(this.text, x, y);
+//		cv.UIlayer.shadowColor = "transparent";
+		cv.UIlayer.textAlign = 'start';
+
+		
+		this.edges.top = this.position.y - 5 ;		//calculate edges for click hit matching
+		this.edges.bottom = this.position.y + this.size.h + 5;
+		this.edges.left = this.position.x - 5;
+		this.edges.right = this.position.x + this.size.w + 5;
 	},
 
 	pulse: function (time) {
