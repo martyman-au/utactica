@@ -80,11 +80,14 @@ var config = {
 	//resources are the resources to be distributed should be hte sam enumber as the resourcedTiles above  TODO: auto pad to length
 	resources: ['f10','f10','f20','f30','s10','s10','s20','s30','','','','','','','','','','','','',''],
 	
-	animations: {
-		explosion: { playback: 'once', sound: true, rate: 60 },
-		teleport: { playback: 'once', sound: false, rate: 60 },
-		beam: { playback: null, sound: true, rate: 60 },
-		active: { playback: 'bounce', sound: false, rate: 15 }
+	animsf: {
+		explosion: { playback: 'once', sound: true, rate: 20 },
+		teleport: { playback: 'once', sound: false, rate: 40 },
+		active: { playback: 'bounce', sound: false, rate: 20 }
+	},
+	
+	animsv: {
+		beam: { playback: null, sound: true, length: 300 },
 	},
 	
 };

@@ -3,9 +3,7 @@ EffectsClass = Class.extend({
 	explosion: Array(), 	// stores the frames used to animate explosions
 	teleport: Array(), 		// stores the frames used to animate teleports
 	active: Array(), 		// stores the frames used to animate the active unit
-	animTimer: {},			// Stores the setInterval timer used to run the effect animations (only one at once)
 	animations: new Array(),// Array of AnimationClasses populated and cleared before and after each effect
-//	animstart: null,
 	
 	init: function () {
 		// Initialise efffects
@@ -36,8 +34,6 @@ EffectsClass = Class.extend({
 			this.active.push(frames[i]); // TODO: hardcoded
 		}
 		
-//		this.animTimer = setInterval( function(){effects.animFrame();}, 10); // Create a permamently running animation timer
-//		this.start = Date.now();
 		requestAnimationFrame( function(){effects.animFrame();} );
 	},
 
@@ -46,7 +42,6 @@ EffectsClass = Class.extend({
 		// TODO: would it be better to just clear the required area?
 		// TODO: this should query the locations of all of the current effects and clear them
 		cv.Effectslayer.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
-//		cv.Effectslayer.Children.Remove();
 	},
 
 	animFrame: function () {
@@ -62,13 +57,13 @@ EffectsClass = Class.extend({
 
 	renderEffect: function (name, x, y) {
 		// Create an effect using AnimationClass
-		if( config.animations[name].sound ) sound.playSound(sound[name]);
+		if( config.animsf[name].sound ) sound.playSound(sound[name]);
 		this.animations.push( new AnimationClass(name, this[name] ,x ,y ) );
 	},
 
 	renderVector: function (name,start,end) {
 		// Create an effect using VectorClass
-		if( config.animations[name].sound ) sound.playSound(sound[name]);
+		if( config.animsv[name].sound ) sound.playSound(sound[name]);
 		this.animations.push( new VectorClass(name,start,end) );
 	},
 	
@@ -96,12 +91,13 @@ AnimationClass = Class.extend({
 	lastframe: 0,
 	
 	init: function (name, frames, x, y) {
+		// Initialise a new vector animation effect
 		this.name = name;
 		this.frames = frames;
 		this.x = x;
 		this.y = y;
-		this.rate = config.animations[this.name].rate;
-		this.playback = config.animations[this.name].playback;
+		this.rate = config.animsf[this.name].rate;
+		this.playback = config.animsf[this.name].playback;
 	},
 	
 	drawFrame: function () {
@@ -112,44 +108,50 @@ AnimationClass = Class.extend({
 			this.lastframe = now;
 			this.frame = this.frame + this.inc;
 		}
-		console.log(this.frame);
-		if( this.frame >= this.frames.length && this.playback == 'once' ) return 'done';
-		else if(( this.frame >= (this.frames.length - 1)) && this.playback == 'bounce') this.inc = -1;  // TODO: still bugs in the franme rate code 
-		else if(( this.frame <= 0 ) && this.playback == 'bounce') this.inc = 1;  // TODO: still bugs in the franme rate code 
-		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);
+		if( this.frame >= this.frames.length && this.playback == 'once' ) return 'done';				// signal the deletion of this animation
+		else if(( this.frame >= (this.frames.length - 1)) && this.playback == 'bounce') this.inc = -1;  // start counting back down
+		else if(( this.frame <= 0 ) && this.playback == 'bounce') this.inc = 1;  						// start counting back up
+		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);						// render the current frame to the canvas
 	},
 });
 
 VectorClass = Class.extend({
 	// Class defining an instance of a vector animation effect
-	start: {x:0,y:0},
-	end: {x:0,y:0},
-	count: 0,
-	length: 0,
-	ctx: null,
+	name: '',			// name of vector animation type
+	start: {x:0,y:0},	// starting position of vector
+	end: {x:0,y:0},		// end position of vector
+	length: 0,			// Duration of vector animation in milliseconds
+	ctx: null,			// reference to the effect canvas context
+	animstart: null,	// time the the vector animation started playing
 	
 	init: function (name, start, end) {
+		// initialise a vector animation
+		this.name = name;
 		this.start = start;
 		this.end = end;
 		this.ctx = cv.Effectslayer;
-		if(name == 'beam')
+		this.animstart = Date.now();	// grab current time for the begining of the animation
+		this.length = config.animsv[this.name].length;	// load animation duration from config
+		if(this.name == 'beam')
 		{
-			this.length = 20;
-			this.drawFrame = function () {
-				this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');
-				this.drawcircle(this.interpolate(start,end,(this.count / this.length)), 20, 'rgba(255,255,56,0.3)');
-				if(this.count++ > this.length) return 'done';			
+			this.drawFrame = function () { // define drawFrame() for 'beam' animation
+				var percent = ((Date.now()-this.animstart) / this.length)		// calculate how far through the animation we are
+				this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');	// render a line from teh starting to the ending point
+				this.drawcircle(this.interpolate(start,end,percent), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
+				if(percent >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
 			};
 		}
 	},
 	
-	interpolate: function (start, end, distance) {
-		var x = start.x + (end.x - start.x) * distance;
-		var y = start.y + (end.y - start.y) * distance;
+	interpolate: function (start, end, fraction) {
+		// Simple linear interpolation a "fraction" of the distance between two points
+		var x = start.x + (end.x - start.x) * fraction;
+		var y = start.y + (end.y - start.y) * fraction;
 		return { x: x, y: y};
 	},
 	
 	drawline: function (start,end,width,color) {
+		// Render a line on the effects canvas
 		this.ctx.beginPath();
 		this.ctx.moveTo(start.x,start.y);
 		this.ctx.lineTo(end.x,end.y);
@@ -159,6 +161,7 @@ VectorClass = Class.extend({
 	},
 	
 	drawcircle: function (point, diameter, color) {
+		// Render a circle on the effects canvas
 		this.ctx.beginPath();
 		this.ctx.arc(point.x, point.y, diameter, 0, 2 * Math.PI, false);
 		this.ctx.fillStyle = color;
