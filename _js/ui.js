@@ -40,6 +40,9 @@ UIClass = Class.extend({
 
 		this.widgets.downleft = new ButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
+		
+		this.widgets.test = new VectorButtonClass( {left:300,bottom:60}, 'teleport');
+		this.widgets.test.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
 	},
 	
 	render: function () {
@@ -52,6 +55,7 @@ UIClass = Class.extend({
 		this.renderGameTitle();
 		this.renderBanner();
 		this.renderArrows();
+		this.widgets.test.render();
 	},
 	
 	redraw: function () {
@@ -272,6 +276,63 @@ ButtonClass = Class.extend({
 	},
 	
 	clickhit: function (x,y) {
+		// return true if a click location corresponds to this button
+		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
+		{
+			return true;
+		}
+	},
+});
+
+VectorButtonClass = Class.extend({
+	// Used to create procedural ui buttons
+	position: {top: null, right: null, bottom: null, left: null, x:0, y:0},
+	edges: {top: 0, bottom: 0, right: 0, left: 0},
+	state: 0,
+	text: '',
+	size: {w: 0, h: 0},
+	
+	init: function (position, text) {
+		// Initialise a new button
+		this.position = position;
+		this.text = text;
+		this.size.w = this.text.length * 11;
+		this.size.h = 30;
+	},
+	
+	render:  function () {
+		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
+		else this.position.x = window.innerWidth-this.position.right;
+		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
+		else this.position.y = window.innerHeight-this.position.bottom;		
+		
+		cv.UIlayer.fillStyle = '#F0D0B0';
+		cv.UIlayer.strokeStyle = '#CC5422';
+		cv.UIlayer.lineWidth = 10;
+
+		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 7, true, true )
+		
+		cv.UIlayer.font = "normal 400 25px 'Roboto Condensed'";
+		cv.UIlayer.fillStyle = config.styles.cashtext; 
+		cv.UIlayer.shadowOffsetX = 0;
+		cv.UIlayer.shadowOffsetY = 1;
+		cv.UIlayer.shadowBlur = 6;
+		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
+		var x = this.position.x + 5;
+		var y = this.position.y + this.size.h/2 + 8;
+		cv.UIlayer.fillText(this.text, x, y);
+		cv.UIlayer.shadowColor = "transparent";
+		
+		this.edges.top = this.position.y - this.size.h/2;		//calculate edges for click hit matching
+		this.edges.bottom = this.position.y + this.size.h/2;
+		this.edges.left = this.position.x - this.size.w/2;
+		this.edges.right = this.position.x + this.size.w/2;
+	},
+
+	pulse: function (time) {
+	},
+	
+	clickhit: function (x,y) { // TODO: there is a bug in this!!
 		// return true if a click location corresponds to this button
 		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
 		{
