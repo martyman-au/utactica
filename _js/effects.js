@@ -1,42 +1,34 @@
 EffectsClass = Class.extend({
 	// Class for effect display and generation (mainly visual animations) sound is triggered from here but runs from SoundClass
+	frames: {},
 	explosion: Array(), 	// stores the frames used to animate explosions
 	teleport: Array(), 		// stores the frames used to animate teleports
 	active: Array(), 		// stores the frames used to animate the active unit
 	animations: new Array(),// Array of AnimationClasses populated and cleared before and after each effect
 	
 	init: function () {
-		// Initialise efffects
+		// Initialise efffects object
 		// Load effect sprites into local arrays
 		// Start animation timer
-		var i = null;
-		var version = null;
-		var index = null;
-
-		var frames = sprites.getType('explosions');
-		for( i in Object.keys(frames) )
-		{
-			index = frames[i].id.substring( 22, 24 );
-			this.explosion.push(frames[i]); // TODO: hardcoded
-		}
-		
-		var frames = sprites.getType('teleport');
-		for( i in Object.keys(frames) )
-		{
-			index = frames[i].id.substring( 10, 12 );
-			this.teleport.push(frames[i]); // TODO: hardcoded
-		}
-
-		var frames = sprites.getType('active');
-		for( i in Object.keys(frames) )
-		{
-			index = frames[i].id.substring( 7, 9 );
-			this.active.push(frames[i]); // TODO: hardcoded
-		}
-		
+		this.loadFrames();
 		requestAnimationFrame( function(){effects.animFrame();} );
 	},
 
+	loadFrames: function () {
+		// Load the frames defined in config.js into this.frames
+		for( i in config.animsf )
+		{
+			this.frames[i] = new Array();
+			var id = config.animsf[i].id;
+			var frames = sprites.getType(i);
+			for( j in Object.keys(frames) )
+			{
+//				var index = frames[j].id.substring( id[0], id[1] );
+				this.frames[i].push(frames[j]);
+			}
+		}
+	},
+	
 	wipe: function () {
 		// Clear the effects layer (usually between frames)
 		// TODO: would it be better to just clear the required area?
@@ -58,7 +50,7 @@ EffectsClass = Class.extend({
 	renderEffect: function (name, x, y) {
 		// Create an effect using AnimationClass
 		if( config.animsf[name].sound ) sound.playSound(sound[name]);
-		this.animations.push( new AnimationClass(name, this[name] ,x ,y ) );
+		this.animations.push( new AnimationClass(name, this.frames[name] ,x ,y ) );
 	},
 
 	renderVector: function (name,start,end) {

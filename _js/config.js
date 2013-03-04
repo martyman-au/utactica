@@ -81,9 +81,9 @@ var config = {
 	resources: ['f10','f10','f20','f30','s10','s10','s20','s30','','','','','','','','','','','','',''],
 	
 	animsf: {
-		explosion: { playback: 'once', sound: true, rate: 20 },
-		teleport: { playback: 'once', sound: false, rate: 40 },
-		active: { playback: 'bounce', sound: false, rate: 20 }
+		explosion: { id: [22,24], playback: 'once', sound: true, rate: 20 },
+		teleport: { id: [10,12], playback: 'once', sound: false, rate: 40 },
+		active: { id: [7,9], playback: 'bounce', sound: false, rate: 20 }
 	},
 	
 	animsv: {
