@@ -5,6 +5,7 @@ EffectsClass = Class.extend({
 	active: Array(), 		// stores the frames used to animate the active unit
 	animTimer: {},			// Stores the setInterval timer used to run the effect animations (only one at once)
 	animations: new Array(),// Array of AnimationClasses populated and cleared before and after each effect
+//	animstart: null,
 	
 	init: function () {
 		// Initialise efffects
@@ -35,7 +36,9 @@ EffectsClass = Class.extend({
 			this.active.push(frames[i]); // TODO: hardcoded
 		}
 		
-		this.animTimer = setInterval( function(){effects.animFrame();}, 10); // Create a permamently running animation timer
+//		this.animTimer = setInterval( function(){effects.animFrame();}, 10); // Create a permamently running animation timer
+//		this.start = Date.now();
+		requestAnimationFrame( function(){effects.animFrame();} );
 	},
 
 	wipe: function () {
@@ -48,13 +51,13 @@ EffectsClass = Class.extend({
 
 	animFrame: function () {
 		// Called every 30ms by this.animTimer
-		this.wipe();
-		for( i in this.animations )
+		this.wipe();				// wipe the effects layer
+		for( i in this.animations )	// for all the current animations
 		{
-			if( this.animations[i].drawFrame() == 'done')
-				delete this.animations[i];
+			if( this.animations[i].drawFrame() == 'done') 	// render the animations
+				delete this.animations[i];					// if the animation is done, delete it
 		}
-		
+		requestAnimationFrame( function(){effects.animFrame();} );	// kick off another animation frame request
 	},
 
 	renderEffect: function (name, x, y) {
@@ -87,23 +90,32 @@ AnimationClass = Class.extend({
 	frames: new Array(),
 	name: '',
 	count: 0,
-	inc: 1,
+	inc: 1,		// used for reversing the frame playing direction
+	rate: 0,
+	playback: null,
+	lastframe: 0,
 	
 	init: function (name, frames, x, y) {
 		this.name = name;
 		this.frames = frames;
 		this.x = x;
 		this.y = y;
+		this.rate = config.animations[this.name].rate;
+		this.playback = config.animations[this.name].playback;
 	},
 	
 	drawFrame: function () {
 		// Render the next frame to the screen
-		this.count++;
-		if(!(this.count % config.animations[this.name].rate)) this.frame = this.frame + this.inc;
-		
-		if( this.frame >= this.frames.length && config.animations[this.name].playback == 'once' ) return 'done';
-		else if(( this.frame >= (this.frames.length - 1) || this.frame <= 0 ) && config.animations[this.name].playback == 'bounce') this.inc = this.inc * -1;  // TODO: still bugs in the franme rate code 
-
+		var now = Date.now();
+		if( now - this.lastframe > ( 1000 / this.rate ))
+		{
+			this.lastframe = now;
+			this.frame = this.frame + this.inc;
+		}
+		console.log(this.frame);
+		if( this.frame >= this.frames.length && this.playback == 'once' ) return 'done';
+		else if(( this.frame >= (this.frames.length - 1)) && this.playback == 'bounce') this.inc = -1;  // TODO: still bugs in the franme rate code 
+		else if(( this.frame <= 0 ) && this.playback == 'bounce') this.inc = 1;  // TODO: still bugs in the franme rate code 
 		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);
 	},
 });

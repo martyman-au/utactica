@@ -81,10 +81,10 @@ var config = {
 	resources: ['f10','f10','f20','f30','s10','s10','s20','s30','','','','','','','','','','','','',''],
 	
 	animations: {
-		explosion: { playback: 'once', sound: true, rate: 8 },
-		teleport: { playback: 'once', sound: false, rate: 8 },
-		beam: { playback: null, sound: true, rate: 8 },
-		active: { playback: 'bounce', sound: false, rate: 3 }
+		explosion: { playback: 'once', sound: true, rate: 60 },
+		teleport: { playback: 'once', sound: false, rate: 60 },
+		beam: { playback: null, sound: true, rate: 60 },
+		active: { playback: 'bounce', sound: false, rate: 15 }
 	},
 	
 };
