@@ -1,10 +1,10 @@
 var gameClass = Class.extend({
 	turn: null,
-	foodcash: [250,250],
-	sciencecash: [100,100],
-	production: [1,1],
-	attack: [10,10],
-	defence: [10,10],
+	foodcash: [250, 250],
+	sciencecash: [100, 100],
+	production: [1, 1],
+	attack: [10, 10],
+	defence: [10, 10],
 
 	init: function () {
 		// Start loading sprites, fonts, etc
