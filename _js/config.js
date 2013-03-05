@@ -28,6 +28,13 @@ var config = {
 		popupbg: colours.lightgrey
 	},
 	
+	//Canvas layers defined here
+	layers: [{name:'board',position:'absolute',top:'0px',left:'0px'},
+		{name:'units',position:'absolute',top:'0px',left:'0px'},
+		{name:'effects',position:'absolute',top:'0px',left:'0px'},
+		{name:'ui',position:'absolute',top:'0px',left:'0px'},
+		{name:'unitstab',position:'absolute',top:'0px',left:'0px'}],
+	
 	// keys used for moving and their desired grid offset
 	movekeys: {
 		kc81: { x: -1, y: -1 },

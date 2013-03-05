@@ -33,7 +33,7 @@ UnitsClass = Class.extend({
 
 	wipe: function () {
 		// wipe the units layer
-		cv.Unitslayer.clearRect(0, 0, cv.cnvUnits.width / cv.Scale, cv.cnvUnits.height / cv.Scale); // clear all of units layer
+		cv.layers['units'].context.clearRect(0, 0, cv.layers['units'].canvas.width / cv.Scale, cv.layers['units'].canvas.height / cv.Scale); // clear all of units layer
 	},
 	
 	scale: function () {
@@ -213,7 +213,7 @@ UnitClass = Class.extend({
 
 	wipe: function (dir) {
 		// wipe the units canvas to clear this unit off the board
-		cv.Unitslayer.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
+		cv.layers['units'].context.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
 	},
 	
 	render: function () {
@@ -221,7 +221,7 @@ UnitClass = Class.extend({
 		var spriteimg = this.colour+'-'+this.type
 		if(this.remainingmoves == 0 || this.side != game.turn) spriteimg = spriteimg+'-grey';
 		spriteimg = spriteimg+'.png';
-		drawSprite(spriteimg, cv.Unitslayer, this.ux, this.uy)
+		drawSprite(spriteimg, cv.layers['units'].context, this.ux, this.uy)
 	},
 	
 	calcPos: function () {

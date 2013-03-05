@@ -6,10 +6,10 @@ UIClass = Class.extend({
 	
 	init: function () {
 		//fixes a problem where double clicking causes text to get selected on the canvas
-		cv.cnvUI.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
+		cv.layers['ui'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 		
 		// add a listner for mouse clicks
-		cv.cnvUI.addEventListener('mousedown', function(e) {
+		cv.layers['ui'].canvas.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
 			var uihit = ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
 			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units
@@ -77,19 +77,19 @@ UIClass = Class.extend({
 	
 	wipe: function (dir) {
 		// Clear the UI layer
-		cv.UIlayer.clearRect(0, 0, window.innerWidth, window.innerHeight);
+		cv.layers['ui'].context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	},
 	
 	renderBanner: function () {
 		//Render the ui banner
-		cv.UIlayer.fillStyle = config.styles.bannerbg; // set banner colour
-		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight);  // now fill the canvas
-		cv.UIlayer.fillStyle = config.styles.bannerhigh1; // set banner colour
-		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, 6);  // now fill the canvas
-		cv.UIlayer.fillStyle = config.styles.bannerhigh2; // set banner colour
-		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, 2);  // now fill the canvas
-//		cv.UIlayer.fillStyle = '#0000FF'; // set banner colour
-//		cv.UIlayer.fillRect  (0, window.innerHeight - this.bannerheight + 6, window.innerWidth, 2);  // now fill the canvas
+		cv.layers['ui'].context.fillStyle = config.styles.bannerbg; // set banner colour
+		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight);  // now fill the canvas
+		cv.layers['ui'].context.fillStyle = config.styles.bannerhigh1; // set banner colour
+		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, 6);  // now fill the canvas
+		cv.layers['ui'].context.fillStyle = config.styles.bannerhigh2; // set banner colour
+		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, 2);  // now fill the canvas
+//		cv.layers['ui'].context.fillStyle = '#0000FF'; // set banner colour
+//		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight + 6, window.innerWidth, 2);  // now fill the canvas
 		this.widgets.endturn.render();
 		this.widgets.speaker.render();
 		
@@ -97,55 +97,55 @@ UIClass = Class.extend({
 	},
 	
 	renderPlayerTurn: function () {
-		cv.UIlayer.font = "normal 400 40px 'Roboto Condensed'";
+		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed'";
 		if(game.turn)
 		{
-			cv.UIlayer.fillStyle = colours.blue;  // TODO: hardcoded
+			cv.layers['ui'].context.fillStyle = colours.blue;  // TODO: hardcoded
 			var text = 'Blue turn';
 		}
 		else
 		{
-			cv.UIlayer.fillStyle = colours.red;  // TODO: hardcoded
+			cv.layers['ui'].context.fillStyle = colours.red;  // TODO: hardcoded
 			var text = 'Red turn';
 		}
-		cv.UIlayer.shadowOffsetX = 0;
-		cv.UIlayer.shadowOffsetY = 0;
-		cv.UIlayer.shadowBlur = 5;
-		cv.UIlayer.shadowColor = '#552222';  // TODO: hardcoded
-		cv.UIlayer.shadowColor = '#FFFFFF';  // TODO: hardcoded
+		cv.layers['ui'].context.shadowOffsetX = 0;
+		cv.layers['ui'].context.shadowOffsetY = 0;
+		cv.layers['ui'].context.shadowBlur = 5;
+		cv.layers['ui'].context.shadowColor = '#552222';  // TODO: hardcoded
+		cv.layers['ui'].context.shadowColor = '#FFFFFF';  // TODO: hardcoded
 		var x = 13;
 		var y = 140;
-		cv.UIlayer.fillText(text, x, y);		
-		cv.UIlayer.shadowColor = "transparent";
+		cv.layers['ui'].context.fillText(text, x, y);		
+		cv.layers['ui'].context.shadowColor = "transparent";
 	},
 	
 	renderGameTitle: function () {
-		cv.UIlayer.fillStyle = colours.white;  // TODO: hardcoded
-		cv.UIlayer.font = "normal 400 90px 'Roboto Condensed'";
-		cv.UIlayer.shadowOffsetX = 0;
-		cv.UIlayer.shadowOffsetY = 0;
-		cv.UIlayer.shadowBlur = 6;
-		cv.UIlayer.shadowColor = '#552222';  // TODO: hardcoded
+		cv.layers['ui'].context.fillStyle = colours.white;  // TODO: hardcoded
+		cv.layers['ui'].context.font = "normal 400 90px 'Roboto Condensed'";
+		cv.layers['ui'].context.shadowOffsetX = 0;
+		cv.layers['ui'].context.shadowOffsetY = 0;
+		cv.layers['ui'].context.shadowBlur = 6;
+		cv.layers['ui'].context.shadowColor = '#552222';  // TODO: hardcoded
 		var x = 13;
 		var y = 90;
-		cv.UIlayer.fillText('UTACTICA', x, y);		
-		cv.UIlayer.shadowColor = "transparent";		
+		cv.layers['ui'].context.fillText('UTACTICA', x, y);		
+		cv.layers['ui'].context.shadowColor = "transparent";		
 	},
 	
 	renderCash: function () {
 		// render the current resource 
-		cv.UIlayer.font = "normal 400 20px 'Roboto Condensed'";
-		cv.UIlayer.fillStyle = config.styles.cashtext; 
-		cv.UIlayer.shadowOffsetX = 0;
-		cv.UIlayer.shadowOffsetY = 1;
-		cv.UIlayer.shadowBlur = 6;
-		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
+		cv.layers['ui'].context.font = "normal 400 20px 'Roboto Condensed'";
+		cv.layers['ui'].context.fillStyle = config.styles.cashtext; 
+		cv.layers['ui'].context.shadowOffsetX = 0;
+		cv.layers['ui'].context.shadowOffsetY = 1;
+		cv.layers['ui'].context.shadowBlur = 6;
+		cv.layers['ui'].context.shadowColor = config.styles.cashtextshadow;
 		var x = 70;
 		var y = window.innerHeight - 55;
-		cv.UIlayer.fillText('Food resources: '+game.foodcash[game.turn], x, y);
+		cv.layers['ui'].context.fillText('Food resources: '+game.foodcash[game.turn], x, y);
 		var y = window.innerHeight - 30;
-		cv.UIlayer.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
-		cv.UIlayer.shadowColor = "transparent";
+		cv.layers['ui'].context.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
+		cv.layers['ui'].context.shadowColor = "transparent";
 	},
 	
 	renderArrows: function () {
@@ -236,10 +236,10 @@ UIClass = Class.extend({
 		this.popup = true;
 		this.redraw();
 		
-		cv.UIlayer.fillStyle = config.styles.popupgreyout;
-		cv.UIlayer.fillRect(0,0,window.innerWidth,window.innerHeight);
-		cv.UIlayer.fillStyle = config.styles.popupbg;
-		cv.UIlayer.roundRect((window.innerWidth-popwidth)/2 , (window.innerHeight-popheight)/2, popwidth, popheight, radius, config.styles.bannerbg )
+		cv.layers['ui'].context.fillStyle = config.styles.popupgreyout;
+		cv.layers['ui'].context.fillRect(0,0,window.innerWidth,window.innerHeight);
+		cv.layers['ui'].context.fillStyle = config.styles.popupbg;
+		cv.layers['ui'].context.roundRect((window.innerWidth-popwidth)/2 , (window.innerHeight-popheight)/2, popwidth, popheight, radius, config.styles.bannerbg )
 	}
 });
 
@@ -292,7 +292,7 @@ ImageButtonClass = ButtonClass.extend({
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
-		drawSprite(this.artwork[this.state], cv.UIlayer, this.position.x, this.position.y);	// draw the button sprite at the calculated position
+		drawSprite(this.artwork[this.state], cv.layers['ui'].context, this.position.x, this.position.y);	// draw the button sprite at the calculated position
 		
 		//re-calculate edges for click hit matching
 		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);
@@ -324,32 +324,32 @@ VectorButtonClass = ButtonClass.extend({
 		else this.position.y = window.innerHeight-this.position.bottom;		
 
 		
-		cv.UIlayer.shadowColor = "transparent";
+		cv.layers['ui'].context.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
-			cv.UIlayer.shadowOffsetX = 2;
-			cv.UIlayer.shadowOffsetY = 2;
-			cv.UIlayer.shadowBlur = 12;
-			cv.UIlayer.shadowColor = '#222222';
+			cv.layers['ui'].context.shadowOffsetX = 2;
+			cv.layers['ui'].context.shadowOffsetY = 2;
+			cv.layers['ui'].context.shadowBlur = 12;
+			cv.layers['ui'].context.shadowColor = '#222222';
 		}
 		// White outline
-		cv.UIlayer.fillStyle = '#E0D4B0';
-		cv.UIlayer.strokeStyle = '#FFFFFF';
-		cv.UIlayer.lineWidth = 12;
-		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		cv.layers['ui'].context.fillStyle = '#E0D4B0';
+		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
+		cv.layers['ui'].context.lineWidth = 12;
+		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 
-		cv.UIlayer.shadowColor = "transparent";
+		cv.layers['ui'].context.shadowColor = "transparent";
 		
-		cv.UIlayer.strokeStyle = colours.brightorange;
-		cv.UIlayer.lineWidth = 7;		
-		cv.UIlayer.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		cv.layers['ui'].context.strokeStyle = colours.brightorange;
+		cv.layers['ui'].context.lineWidth = 7;		
+		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 		
-		cv.UIlayer.font = "normal 400 25px 'Roboto Condensed'";
-		cv.UIlayer.textAlign = 'center';
-		cv.UIlayer.fillStyle = '#222222';
+		cv.layers['ui'].context.font = "normal 400 25px 'Roboto Condensed'";
+		cv.layers['ui'].context.textAlign = 'center';
+		cv.layers['ui'].context.fillStyle = '#222222';
 		var x = this.position.x + this.size.w/2;
 		var y = this.position.y + this.size.h/2 + 8;
-		cv.UIlayer.fillText(this.text, x, y);
-		cv.UIlayer.textAlign = 'start';
+		cv.layers['ui'].context.fillText(this.text, x, y);
+		cv.layers['ui'].context.textAlign = 'start';
 
 		//re-calculate edges for click hit matching
 		this.edges.top = this.position.y - 5 ;		

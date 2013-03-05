@@ -92,21 +92,21 @@ TileClass = Class.extend({
 	
 	render: function () {
 		// render a tile and it's resource (if exists)
-		drawSprite('hextile.png', cv.Boardlayer, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
+		drawSprite('hextile.png', cv.layers['board'].context, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
 		if(this.resource)
 		{
 			var resourceimg = '';
 			if(this.resource.substring(0,1) == 'f') resourceimg = 'food-resource.png';
 			else resourceimg = 'science-resource.png';
-			drawSprite(resourceimg, cv.Boardlayer, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
-			cv.Boardlayer.font = "normal 700 50px 'Roboto Condensed'";
-			cv.Boardlayer.fillStyle = config.styles.resourcetext; 
-			cv.Boardlayer.shadowOffsetX = 1;
-			cv.Boardlayer.shadowOffsetY = 1;
-			cv.Boardlayer.shadowBlur = 6;
-			cv.Boardlayer.shadowColor = config.styles.resourcetextshadow;
-			cv.Boardlayer.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
-			cv.Boardlayer.shadowColor = "transparent";
+			drawSprite(resourceimg, cv.layers['board'].context, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
+			cv.layers['board'].context.font = "normal 700 50px 'Roboto Condensed'";
+			cv.layers['board'].context.fillStyle = config.styles.resourcetext; 
+			cv.layers['board'].context.shadowOffsetX = 1;
+			cv.layers['board'].context.shadowOffsetY = 1;
+			cv.layers['board'].context.shadowBlur = 6;
+			cv.layers['board'].context.shadowColor = config.styles.resourcetextshadow;
+			cv.layers['board'].context.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
+			cv.layers['board'].context.shadowColor = "transparent";
 		} 
 	},
 

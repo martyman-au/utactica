@@ -33,7 +33,7 @@ EffectsClass = Class.extend({
 		// Clear the effects layer (usually between frames)
 		// TODO: would it be better to just clear the required area?
 		// TODO: this should query the locations of all of the current effects and clear them
-		cv.Effectslayer.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
+		cv.layers['effects'].context.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
 	},
 
 	animFrame: function () {
@@ -103,7 +103,7 @@ AnimationClass = Class.extend({
 		if( this.frame >= this.frames.length && this.playback == 'once' ) return 'done';				// signal the deletion of this animation
 		else if(( this.frame >= (this.frames.length - 1)) && this.playback == 'bounce') this.inc = -1;  // start counting back down
 		else if(( this.frame <= 0 ) && this.playback == 'bounce') this.inc = 1;  						// start counting back up
-		drawSprite(this.frames[this.frame].id, cv.Effectslayer, this.x, this.y);						// render the current frame to the canvas
+		drawSprite(this.frames[this.frame].id, cv.layers['effects'].context, this.x, this.y);						// render the current frame to the canvas
 	},
 });
 
@@ -121,7 +121,7 @@ VectorClass = Class.extend({
 		this.name = name;
 		this.start = start;
 		this.end = end;
-		this.ctx = cv.Effectslayer;
+		this.ctx = cv.layers['effects'].context;
 		this.animstart = Date.now();	// grab current time for the begining of the animation
 		this.length = config.animsv[this.name].length;	// load animation duration from config
 		if(this.name == 'beam')
