@@ -17,41 +17,41 @@ UIClass = Class.extend({
 		
 		// Initialise User Interface widgets
 		// TODO: fix the fact the positoin does not change when window width or height changes... need to use a html style "left: 50" type notation?
-		this.widgets.speaker = new ButtonClass( {left:40,bottom:50}, ['speaker.png', 'speaker_mute.png']);
+		this.widgets.speaker = new ImageButtonClass( {left:30,bottom:50}, ['speaker.png', 'speaker_mute.png']);
 		this.widgets.speaker.action = function (){this.toggleState(); sound.toggleMute(); };
 
 //		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
 //		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 
-		this.widgets.upright = new ButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
+		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
 		this.widgets.upright.action = function (){ units.move('kc33'); this.pulse(150) };
 
-		this.widgets.up = new ButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
+		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
 		this.widgets.up.action = function (){ units.move('kc38'); this.pulse(150) };
 
-		this.widgets.upleft = new ButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
+		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
 		this.widgets.upleft.action = function (){ units.move('kc36'); this.pulse(150) };
 
-		this.widgets.downright = new ButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
+		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
 		this.widgets.downright.action = function (){ units.move('kc34'); this.pulse(150) };
 
-		this.widgets.down = new ButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
+		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
 		this.widgets.down.action = function (){ units.move('kc40'); this.pulse(150) };
 
-		this.widgets.downleft = new ButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
+		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
 		
-		this.widgets.teleport = new VectorButtonClass( {left:300,bottom:60}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {left:20,top:200}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
 
-		this.widgets.buyunits = new VectorButtonClass( {left:440,bottom:60}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {left:20,top:280}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ this.pulse(150) };
 
-		this.widgets.upgrades = new VectorButtonClass( {left:580,bottom:60}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {left:20,top:360}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ this.pulse(150) };
 
-		this.widgets.endturn = new VectorButtonClass( {left:720,bottom:60}, 'End turn', 110);
-		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
+		this.widgets.endturn = new VectorButtonClass( {left:20,top:440}, 'End turn', 110);
+		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(150) };
 	},
 	
 	render: function () {
@@ -245,31 +245,12 @@ UIClass = Class.extend({
 
 
 ButtonClass = Class.extend({
-	// Used to create buttons for the UTACTICA UI
+	// Base button class for the UTACTICA UI used to create ImageButtonClass and VectorButtonClass
 	position: {top: null, right: null, bottom: null, left: null},
-	artwork: new Array(),
 	state: 0,
-	callback: null,
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
 	
-	init: function (position, artwork) {
-		// Initialise a new button
-		this.position = position;
-		this.artwork = artwork;
-	},
-	
-	render: function () {
-		//Renders this button to the screen in it's defined location (position need to be recalculated to take into account screen resizing)
-		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
-		else this.position.x = window.innerWidth-this.position.right;
-		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
-		else this.position.y = window.innerHeight-this.position.bottom;		
-		drawSprite(this.artwork[this.state], cv.UIlayer, this.position.x, this.position.y);	// draw the button sprite at the calculated position
-		
-		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);		//calculate edges for click hit matching
-		this.edges.bottom = this.position.y + (sprites.getStats(this.artwork[this.state]).h / 2);
-		this.edges.left = this.position.x - (sprites.getStats(this.artwork[this.state]).w / 2);
-		this.edges.right = this.position.x + (sprites.getStats(this.artwork[this.state]).w / 2);
+	init: function () {
 	},
 	
 	toggleState: function () {
@@ -295,11 +276,33 @@ ButtonClass = Class.extend({
 	},
 });
 
-VectorButtonClass = Class.extend({
+ImageButtonClass = ButtonClass.extend({
+	// Used for image based buttons
+	artwork: new Array(),
+	
+	init: function (position, artwork) {
+		// Initialise a new button
+		this.position = position;
+		this.artwork = artwork;
+	},
+	
+	render: function () {
+		//Renders this button to the screen in it's defined location (position need to be recalculated to take into account screen resizing)
+		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
+		else this.position.x = window.innerWidth-this.position.right;
+		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
+		else this.position.y = window.innerHeight-this.position.bottom;		
+		drawSprite(this.artwork[this.state], cv.UIlayer, this.position.x, this.position.y);	// draw the button sprite at the calculated position
+		
+		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);		//calculate edges for click hit matching
+		this.edges.bottom = this.position.y + (sprites.getStats(this.artwork[this.state]).h / 2);
+		this.edges.left = this.position.x - (sprites.getStats(this.artwork[this.state]).w / 2);
+		this.edges.right = this.position.x + (sprites.getStats(this.artwork[this.state]).w / 2);
+	},
+});
+
+VectorButtonClass = ButtonClass.extend({
 	// Used to create procedural ui buttons
-	position: {top: null, right: null, bottom: null, left: null, x:0, y:0},
-	edges: {top: 0, bottom: 0, right: 0, left: 0},
-	state: 0,
 	text: '',
 	size: {w: 0, h: 0},
 	
@@ -318,11 +321,15 @@ VectorButtonClass = Class.extend({
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
 
-		cv.UIlayer.shadowOffsetX = 2;
-		cv.UIlayer.shadowOffsetY = 2;
-		cv.UIlayer.shadowBlur = 12;
-		cv.UIlayer.shadowColor = '#222222';
 		
+		cv.UIlayer.shadowColor = "transparent";
+		if( this.state === 0) { // if normal state add shadow
+			cv.UIlayer.shadowOffsetX = 2;
+			cv.UIlayer.shadowOffsetY = 2;
+			cv.UIlayer.shadowBlur = 12;
+			cv.UIlayer.shadowColor = '#222222';
+		}
+		// White outline
 		cv.UIlayer.fillStyle = '#E0D4B0';
 		cv.UIlayer.strokeStyle = '#FFFFFF';
 		cv.UIlayer.lineWidth = 12;
@@ -336,17 +343,10 @@ VectorButtonClass = Class.extend({
 		
 		cv.UIlayer.font = "normal 400 25px 'Roboto Condensed'";
 		cv.UIlayer.textAlign = 'center';
-//		cv.UIlayer.textBaseline = 'center';
 		cv.UIlayer.fillStyle = '#222222';
-//		cv.UIlayer.fillStyle = config.styles.cashtext; 
-//		cv.UIlayer.shadowOffsetX = 0;
-//		cv.UIlayer.shadowOffsetY = 1;
-//		cv.UIlayer.shadowBlur = 6;
-//		cv.UIlayer.shadowColor = config.styles.cashtextshadow;
 		var x = this.position.x + this.size.w/2;
 		var y = this.position.y + this.size.h/2 + 8;
 		cv.UIlayer.fillText(this.text, x, y);
-//		cv.UIlayer.shadowColor = "transparent";
 		cv.UIlayer.textAlign = 'start';
 
 		
@@ -354,16 +354,6 @@ VectorButtonClass = Class.extend({
 		this.edges.bottom = this.position.y + this.size.h + 5;
 		this.edges.left = this.position.x - 5;
 		this.edges.right = this.position.x + this.size.w + 5;
-	},
+	}
 
-	pulse: function (time) {
-	},
-	
-	clickhit: function (x,y) { // TODO: there is a bug in this!!
-		// return true if a click location corresponds to this button
-		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
-		{
-			return true;
-		}
-	},
 });
