@@ -59,12 +59,14 @@ UnitsClass = Class.extend({
 	},
 	
 	move: function (keycode) {
-		console.log(keycode);
+		// move a unit
+//		console.log(keycode);
 		if( this.activeUnit == null ) return;
 		else this.units[this.activeUnit].move(keycode);
 	},
 	
 	getEnemies: function (tile) {
+		// get array of enemies located on a tile
 		var enemies = { units: [], soldier: 0, worker: 0};
 		for( i in units.units ) // count how many soldiers exist on a tile
 		{
@@ -74,7 +76,6 @@ UnitsClass = Class.extend({
 				enemies[units.units[i].type]++; // if the tile has soldiers
 			}
 		}
-		console.log(enemies);
 		return enemies;
 	},
 	
