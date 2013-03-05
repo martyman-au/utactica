@@ -1,27 +1,27 @@
 // Fisher yates randomising code from http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-var fisherYates = function ( myArray ) {
-  var i = myArray.length, j, tempi, tempj;
-  if ( i == 0 ) return false;
-  while ( --i ) {
-	if (myArray.hasOwnProperty(i))
-	{
-		j = Math.floor( Math.random() * ( i + 1 ) );
-		tempi = myArray[i];
-		tempj = myArray[j];
-		myArray[i] = tempj;
-		myArray[j] = tempi;
+var fisherYates = function (myArray) {
+	"use strict";
+	var i = myArray.length, j, tempi, tempj;
+	if (i === 0) { return false; }
+	while (--i) {
+		if (myArray.hasOwnProperty(i)) {
+			j = Math.floor(Math.random() * (i + 1));
+			tempi = myArray[i];
+			tempj = myArray[j];
+			myArray[i] = tempj;
+			myArray[j] = tempi;
+		}
 	}
-  }
 };
 
 
 // Rounded corner code from http://js-bits.blogspot.com.au/2010/07/canvas-rounded-corner-rectangles.html
-CanvasRenderingContext2D.prototype.roundRect = 
-function(x, y, width, height, radius, fill, stroke) {
-	if (typeof stroke == "undefined" ) {
+CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radius, fill, stroke) {
+	"use strict";
+	if (stroke === undefined) {
 		stroke = true;
 	}
-	if (typeof radius === "undefined") {
+	if (radius === undefined) {
 		radius = 5;
 	}
 	this.beginPath();
@@ -40,26 +40,28 @@ function(x, y, width, height, radius, fill, stroke) {
 	}
 	if (fill) {
 		this.fill();
-	}        
-}
+	}
+};
 
 
 function xhrGet(reqUri, callback, type) {
-    request = new XMLHttpRequest;
+	"use strict";
+    var request = new XMLHttpRequest();
     request.open('GET', reqUri, true);
-    if(type) request.requestType = type;
-    request.onload = function () { callback(request);  };
+    if (type) { request.requestType = type; }
+    request.onload = function () { callback(request); };
     request.send();
-};
+}
 
 // http://www.phpied.com/sleep-in-javascript/
 function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
+	"use strict";
+	var start = new Date().getTime(), i;
+	for (i = 0; i < 1e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds) {
+			break;
+		}
+	}
 }
 
 /*
@@ -77,22 +79,22 @@ Object.keys = function(obj) {
 
 function loadfonts() {
 	// Google font loader code
-	WebFontConfig = {
+	"use strict";
+	var WebFontConfig = {
 		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
-		fontactive: function(fontFamily, fontDescription) {
-			if(fontFamily == 'Roboto Condensed')
-			{
-				game.redraw(); // redraw everything once font is available to make sure the canvas is rendered correctly
+		fontactive: function (fontFamily, fontDescription) {
+			if (fontFamily === 'Roboto Condensed') {
+				game.redraw();  // redraw everything once font is available to make sure the canvas is rendered correctly
+								// TODO: this doesn't seem good
 			}
 		}
 	};
-	(function() {
-		var wf = document.createElement('script');
-		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-		'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+	(function () {
+		var wf = document.createElement('script'), s = document.getElementsByTagName('script')[0];
+		wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
 		wf.type = 'text/javascript';
 		wf.async = 'true';
-		var s = document.getElementsByTagName('script')[0];
 		s.parentNode.insertBefore(wf, s);
-	})(); 
-};
+	}());
+}

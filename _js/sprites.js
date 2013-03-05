@@ -37,7 +37,7 @@ SpriteSheetClass = Class.extend({
 	load: function (imgName) {
 		// Store the URL of the spritesheet we want.
         this.url = imgName;
-        
+
         // Create a new image whose source is at 'imgName'.
 		var img = new Image();
 		img.src = imgName;
@@ -95,7 +95,7 @@ SpriteSheetClass = Class.extend({
         // For each sprite in the parsed JSON,
         // 'chaingun.png', chaingun_impact.png',
         // etc....
-		for(var key in parsed.frames) {
+		for (var key in parsed.frames) {
             // Grab the sprite from the parsed JSON...
 			var sprite = parsed.frames[key];
 

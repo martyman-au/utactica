@@ -16,105 +16,90 @@ Array.prototype.erase = function(item)
 };
 */
 
-Function.prototype.bind = function(bind)
-{
+Function.prototype.bind = function (bind) {
+	"use strict";
 	var self = this;
-	return function()
-	{
+	return function () {
 		var args = Array.prototype.slice.call(arguments);
 		return self.apply(bind || null, args);
 	};
 };
 
-merge = function(original, extended)
-{
-	for (var key in extended)
-	{
-		var ext = extended[key];
-		if (typeof (ext) != 'object' ||
-			ext instanceof Class)
-		{
-			original[key] = ext;
-		}
-		else
-		{
-			if (!original[key] || typeof (original[key]) != 'object')
-			{
-				original[key] = {};
+var merge = function (original, extended) {
+	"use strict";
+	var key, ext;
+	for (key in extended) {
+		if (extended.hasOwnProperty(key)) {
+			ext = extended[key];
+			if (typeof (ext) !== 'object' ||
+					ext instanceof Class) {
+				original[key] = ext;
+			} else {
+				if (!original[key] || typeof (original[key]) !== 'object') {
+					original[key] = {};
+				}
+				merge(original[key], ext);
 			}
-			merge(original[key], ext);
 		}
 	}
 	return original;
 };
- 
-function copy(object) 
-{
-	if (!object || typeof (object) != 'object' ||
-		object instanceof Class)
-	{
+
+function copy(object) {
+	"use strict";
+	var i, c, l;
+	if (!object || typeof (object) !== 'object' ||
+			object instanceof Class) {
 		return object;
 	}
-	else if (object instanceof Array)
-	{
-		var c = [];
-		for (var i = 0, l = object.length; i < l; i++)
-		{
+	if (object instanceof Array) {
+		c = [];
+		for (i = 0, l = object.length; i < l; i++) {
 			c[i] = copy(object[i]);
 		}
 		return c;
 	}
-	else
-	{
-		var c = {};
-		for (var i in object)
-		{
+	c = {};
+	for (i in object) {
+		if (object.hasOwnProperty(i)) {
 			c[i] = copy(object[i]);
 		}
-		return c;
 	}
-};
+	return c;
+}
 
-function ksort(obj)
-{
-	if (!obj || typeof (obj) != 'object')
-	{
+function ksort(obj) {
+	"use strict";
+	var i, keys = [], values = [];
+	if (!obj || typeof (obj) !== 'object') {
 		return [];
 	}
-
-	var keys = [], values = [];
-	for (var i in obj)
-	{
-		keys.push(i);
+	for (i in obj) {
+		if (obj.hasOwnProperty(i)) {
+			keys.push(i);
+		}
 	}
-
 	keys.sort();
-	for (var i = 0; i < keys.length; i++)
-	{
+	for (i = 0; i < keys.length; i++) {
 		values.push(obj[keys[i]]);
 	}
-
 	return values;
-};
-	
+}
+
 // -----------------------------------------------------------------------------
 // Class object based on John Resigs code; inspired by base2 and Prototype
 // http://ejohn.org/blog/simple-javascript-inheritance/
-(function()
-{
-	var initializing = false, fnTest = /xyz/.test(function() { xyz; }) ? /\bparent\b/ : /.*/;
+(function () {
+	var initializing = false, inject, fnTest = /xyz/.test(function () { xyz; }) ? /\bparent\b/ : /.*/;
 
-	this.Class = function() { };
-	var inject = function(prop)
-	{
-		var proto = this.prototype;
-		var parent = {};
-		for (var name in prop)
-		{
+	this.Class = function () {};
+
+	inject = function (prop) {
+		var proto = this.prototype, parent = {};
+		for (var name in prop) {
 			if (typeof (prop[name]) == "function" &&
 				typeof (proto[name]) == "function" &&
-				fnTest.test(prop[name]))
-			{
+				fnTest.test(prop[name])) {
 				parent[name] = proto[name]; // save original function
 				proto[name] = (function(name, fn)
 				{
@@ -135,8 +120,7 @@ function ksort(obj)
 		}
 	};
 
-	this.Class.extend = function(prop)
-	{
+	this.Class.extend = function (prop) {
 		var parent = this.prototype;
 
 		initializing = true;
@@ -167,11 +151,9 @@ function ksort(obj)
 			}
 		}
 
-		function Class()
-		{
+		function Class () {
 			if (!initializing)
 			{
-
 				// If this class has a staticInstantiate method, invoke it
 				// and check if we got something back. If not, the normal
 				// constructor (init) is called.
@@ -209,10 +191,9 @@ function ksort(obj)
 		return Class;
 	};
 
-})();
+}());
 						
-newGuid_short = function()
-{
+newGuid_short = function() {
 	var S4 = function() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };
 	return (S4()).toString();
 };

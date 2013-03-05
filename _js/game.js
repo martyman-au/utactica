@@ -1,4 +1,4 @@
-gameClass = Class.extend({
+var gameClass = Class.extend({
 	turn: null,
 	foodcash: [250,250],
 	sciencecash: [100,100],
