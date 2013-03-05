@@ -287,14 +287,15 @@ ImageButtonClass = ButtonClass.extend({
 	},
 	
 	render: function () {
-		//Renders this button to the screen in it's defined location (position need to be recalculated to take into account screen resizing)
+		//Renders this button to the screen in it's defined location (position is recalculated to take into account screen resizing)
 		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
 		drawSprite(this.artwork[this.state], cv.UIlayer, this.position.x, this.position.y);	// draw the button sprite at the calculated position
 		
-		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);		//calculate edges for click hit matching
+		//re-calculate edges for click hit matching
+		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);
 		this.edges.bottom = this.position.y + (sprites.getStats(this.artwork[this.state]).h / 2);
 		this.edges.left = this.position.x - (sprites.getStats(this.artwork[this.state]).w / 2);
 		this.edges.right = this.position.x + (sprites.getStats(this.artwork[this.state]).w / 2);
@@ -316,6 +317,7 @@ VectorButtonClass = ButtonClass.extend({
 	},
 	
 	render:  function () {
+		// render button to screen in it's defined location (position is recalculated to take into account screen resizing)
 		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
@@ -349,8 +351,8 @@ VectorButtonClass = ButtonClass.extend({
 		cv.UIlayer.fillText(this.text, x, y);
 		cv.UIlayer.textAlign = 'start';
 
-		
-		this.edges.top = this.position.y - 5 ;		//calculate edges for click hit matching
+		//re-calculate edges for click hit matching
+		this.edges.top = this.position.y - 5 ;		
 		this.edges.bottom = this.position.y + this.size.h + 5;
 		this.edges.left = this.position.x - 5;
 		this.edges.right = this.position.x + this.size.w + 5;
