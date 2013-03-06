@@ -33,8 +33,7 @@ var config = {
 		{name:'units',position:'absolute',top:'0px',left:'0px'},
 		{name:'effects',position:'absolute',top:'0px',left:'0px'},
 		{name:'ui',position:'absolute',top:'0px',left:'0px'},
-		{name:'unitstab',position:'absolute',top:'0px',left:'0px'},
-		{name:'io',position:'absolute',top:'0px',left:'0px'}],
+		{name:'unitstab',position:'absolute',top:'0px',left:'0px'}],
 	
 	// keys used for moving and their desired grid offset
 	movekeys: {

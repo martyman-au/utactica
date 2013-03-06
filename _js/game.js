@@ -1,10 +1,10 @@
 var gameClass = Class.extend({
 	turn: null,
-	foodcash: [250, 250],
-	sciencecash: [100, 100],
-	production: [1, 1],
-	attack: [10, 10],
-	defence: [10, 10],
+	foodcash: [250,250],
+	sciencecash: [100,100],
+	production: [1,1],
+	attack: [10,10],
+	defence: [10,10],
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -28,13 +28,13 @@ var gameClass = Class.extend({
 
 		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
 
-		cv = new CanvasClass();  						// canvas layers and contexts
-		board = new BoardClass(config.boardPattern);	// board and tiles
-		units = new UnitsClass();						// units
-		effects = new EffectsClass(sprites); 			// effects (animations, etc)			
-		ui = new UIClass();								// user interface
-		sound = new SoundClass();						// all sound output (music, effects)
-		tab = new TabClass(cv.layers['unitstab'].context);
+		cv = new CanvasClass();  							// canvas layers and contexts
+		board = new BoardClass(config.boardPattern);		// board and tiles
+		units = new UnitsClass();							// units
+		effects = new EffectsClass(sprites); 				// effects (animations, etc)			
+		ui = new UIClass();									// user interface
+		sound = new SoundClass();							// all sound output (music, effects)
+//		tab = new TabClass(cv.layers['unitstab'].context);
 		
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
@@ -57,7 +57,7 @@ var gameClass = Class.extend({
 		board.render(); // render the playing board
 		units.redraw(); // render the playing board
 		ui.redraw();	// render the user interface
-		tab.render();
+//		tab.render();
 	},
 	
 	endTurn: function () {

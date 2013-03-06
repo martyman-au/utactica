@@ -6,10 +6,10 @@ UIClass = Class.extend({
 	
 	init: function () {
 		//fixes a problem where double clicking causes text to get selected on the canvas
-		cv.layers['io'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
+		cv.layers['ui'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 		
 		// add a listner for mouse clicks
-		cv.layers['io'].canvas.addEventListener('mousedown', function(e) {
+		cv.layers['ui'].canvas.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
 			var uihit = ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
 			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units
@@ -47,10 +47,14 @@ UIClass = Class.extend({
 
 		this.widgets.endturn = new VectorButtonClass( {left:20,top:360}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(150) };
+		
+		this.widgets.testtab = new TabClass( {right:35,top:360}, 'Upgrades', 110);
+		this.widgets.testtab.action = function (){ game.endTurn(); this.pulse(150) };
 	},
 	
 	render: function () {
 		// Render UI elements
+		var i;
 		if(cv.screenMode == 'landscape') this.bannerheight = 100;
 		else this.bannerheight = 200;
 		
@@ -59,9 +63,13 @@ UIClass = Class.extend({
 		this.renderGameTitle();
 		this.renderBanner();
 		this.renderArrows();
-		this.widgets.teleport.render();
-		this.widgets.buyunits.render();
-		this.widgets.upgrades.render();
+		for( i in this.widgets)
+		{
+			this.widgets[i].render();
+		}
+		//this.widgets.teleport.render();
+		//this.widgets.buyunits.render();
+		//this.widgets.upgrades.render();
 	},
 	
 	redraw: function () {
@@ -85,7 +93,7 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, 2);  // now fill the canvas
 //		cv.layers['ui'].context.fillStyle = '#0000FF'; // set banner colour
 //		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight + 6, window.innerWidth, 2);  // now fill the canvas
-		this.widgets.endturn.render();
+//		this.widgets.endturn.render();
 		this.widgets.speaker.render();
 		
 		this.renderCash();
@@ -239,8 +247,8 @@ UIClass = Class.extend({
 });
 
 
-ButtonClass = Class.extend({
-	// Base button class for the UTACTICA UI used to create ImageButtonClass and VectorButtonClass
+WidgetClass = Class.extend({
+	// Base widget class for the UTACTICA UI used to create all widget types
 	position: {top: null, right: null, bottom: null, left: null},
 	state: 0,
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
@@ -269,6 +277,11 @@ ButtonClass = Class.extend({
 			return true;
 		}
 	},
+});
+
+ButtonClass = WidgetClass.extend({
+	// Base button class for the UTACTICA UI used to create ImageButtonClass and VectorButtonClass
+	
 });
 
 ImageButtonClass = ButtonClass.extend({
@@ -352,5 +365,76 @@ VectorButtonClass = ButtonClass.extend({
 		this.edges.left = this.position.x - 5;
 		this.edges.right = this.position.x + this.size.w + 5;
 	}
+});
 
+var TabClass = WidgetClass.extend({
+	// Define a tab used to display pages of info in the game
+	ctx: null,
+	text: '',
+	size: {w: 0, h: 0},
+	
+	init: function (position, text) {
+		this.ctx = cv.layers['ui'].context;
+		this.position = position;
+		this.text = text;
+		if( typeof width === "undefined" ) this.size.w = this.text.length * 12;
+		else this.size.w = width;
+		this.size.h = 35;
+	},
+	
+	render:  function () {
+		// render button to screen in it's defined location (position is recalculated to take into account screen resizing)
+		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
+		else this.position.x = window.innerWidth-this.position.right;
+		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
+		else this.position.y = window.innerHeight-this.position.bottom;		
+
+		console.log(this.position);
+
+		this.ctx.save();
+		this.ctx.translate(this.position.x, this.position.y);
+		this.ctx.rotate(-Math.PI/2);
+		
+		this.ctx.shadowColor = "transparent";
+		if( this.state === 0) { // if normal state add shadow
+			this.ctx.shadowOffsetX = 2;
+			this.ctx.shadowOffsetY = 2;
+			this.ctx.shadowBlur = 12;
+			this.ctx.shadowColor = '#222222';
+		}
+		// White outline
+		this.ctx.fillStyle = '#E0D4B0';
+		this.ctx.strokeStyle = '#FFFFFF';
+		this.ctx.lineWidth = 12;
+		this.ctx.roundRect(0, 0, this.size.w, this.size.h, 9, true, true )
+
+		this.ctx.shadowColor = "transparent";
+		
+		this.ctx.strokeStyle = colours.brightorange;
+		this.ctx.lineWidth = 7;		
+		this.ctx.roundRect(0, 0, this.size.w, this.size.h, 9, true, true )
+		
+		this.ctx.font = "normal 400 25px 'Roboto Condensed'";
+		this.ctx.textAlign = 'center';
+		this.ctx.fillStyle = '#222222';
+		var x = this.size.w/2;
+		var y = this.size.h/2 + 8;
+		this.ctx.fillText(this.text, x, y);
+		this.ctx.textAlign = 'start';
+		
+//		this.ctx.restore();
+		//re-calculate edges for click hit matching
+		this.edges.top = this.position.y - 5 ;		
+		this.edges.bottom = this.position.y + this.size.h + 5;
+		this.edges.left = this.position.x - 5;
+		this.edges.right = this.position.x + this.size.w + 5;
+	},
+	
+	clickhit: function (x,y) {
+		// return true if a click location corresponds to this button
+		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
+		{
+			return true;
+		} 
+	},
 });

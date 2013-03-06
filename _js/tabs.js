@@ -4,7 +4,7 @@ var TabClass = Class.extend({
 	text: '',
 	size: {w: 0, h: 0},
 	
-	init: function (ctx) {
+	init: function () {
 		this.ctx = ctx;
 		this.position = {left:200,top:200};
 		this.text = 'test';
@@ -20,6 +20,10 @@ var TabClass = Class.extend({
 		else this.position.y = window.innerHeight-this.position.bottom;		
 
 		console.log(this.position);
+
+		this.ctx.save();
+		this.ctx.translate(this.position.x, this.position.y);
+		this.ctx.rotate(-Math.PI/2);
 		
 		this.ctx.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
@@ -32,22 +36,23 @@ var TabClass = Class.extend({
 		this.ctx.fillStyle = '#E0D4B0';
 		this.ctx.strokeStyle = '#FFFFFF';
 		this.ctx.lineWidth = 12;
-		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		this.ctx.roundRect(0, 0, this.size.w, this.size.h, 9, true, true )
 
 		this.ctx.shadowColor = "transparent";
 		
 		this.ctx.strokeStyle = colours.brightorange;
 		this.ctx.lineWidth = 7;		
-		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		this.ctx.roundRect(0, 0, this.size.w, this.size.h, 9, true, true )
 		
 		this.ctx.font = "normal 400 25px 'Roboto Condensed'";
 		this.ctx.textAlign = 'center';
 		this.ctx.fillStyle = '#222222';
-		var x = this.position.x + this.size.w/2;
-		var y = this.position.y + this.size.h/2 + 8;
+		var x = this.size.w/2;
+		var y = this.size.h/2 + 8;
 		this.ctx.fillText(this.text, x, y);
 		this.ctx.textAlign = 'start';
-
+		
+		this.ctx.restore();
 		//re-calculate edges for click hit matching
 //		this.edges.top = this.position.y - 5 ;		
 //		this.edges.bottom = this.position.y + this.size.h + 5;
