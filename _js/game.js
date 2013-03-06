@@ -34,11 +34,11 @@ var gameClass = Class.extend({
 		effects = new EffectsClass(sprites); 			// effects (animations, etc)			
 		ui = new UIClass();								// user interface
 		sound = new SoundClass();						// all sound output (music, effects)
+		tab = new TabClass(cv.layers['unitstab'].context);
 		
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
-		
 	},
 	
 	setupListners: function () {
@@ -56,7 +56,8 @@ var gameClass = Class.extend({
 		// TODO: should we be wiping here, or calling built in redraw funcitons?
 		board.render(); // render the playing board
 		units.redraw(); // render the playing board
-		ui.redraw();	// render the user interface	
+		ui.redraw();	// render the user interface
+		tab.render();
 	},
 	
 	endTurn: function () {

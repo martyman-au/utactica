@@ -60,7 +60,6 @@ UnitsClass = Class.extend({
 	
 	move: function (keycode) {
 		// move a unit
-//		console.log(keycode);
 		if( this.activeUnit == null ) return;
 		else this.units[this.activeUnit].move(keycode);
 	},

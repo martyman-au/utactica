@@ -6,10 +6,10 @@ UIClass = Class.extend({
 	
 	init: function () {
 		//fixes a problem where double clicking causes text to get selected on the canvas
-		cv.layers['ui'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
+		cv.layers['io'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 		
 		// add a listner for mouse clicks
-		cv.layers['ui'].canvas.addEventListener('mousedown', function(e) {
+		cv.layers['io'].canvas.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
 			var uihit = ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
 			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units
@@ -25,32 +25,27 @@ UIClass = Class.extend({
 
 		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
 		this.widgets.upright.action = function (){ units.move('kc33'); this.pulse(150) };
-
 		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
 		this.widgets.up.action = function (){ units.move('kc38'); this.pulse(150) };
-
 		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
 		this.widgets.upleft.action = function (){ units.move('kc36'); this.pulse(150) };
-
 		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
 		this.widgets.downright.action = function (){ units.move('kc34'); this.pulse(150) };
-
 		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
 		this.widgets.down.action = function (){ units.move('kc40'); this.pulse(150) };
-
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
 		
-		this.widgets.teleport = new VectorButtonClass( {left:20,top:200}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {left:20,top:180}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
 
-		this.widgets.buyunits = new VectorButtonClass( {left:20,top:280}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {left:20,top:240}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ this.pulse(150) };
 
-		this.widgets.upgrades = new VectorButtonClass( {left:20,top:360}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {left:20,top:300}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ this.pulse(150) };
 
-		this.widgets.endturn = new VectorButtonClass( {left:20,top:440}, 'End turn', 110);
+		this.widgets.endturn = new VectorButtonClass( {left:20,top:360}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(150) };
 	},
 	

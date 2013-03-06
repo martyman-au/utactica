@@ -32,14 +32,12 @@ CanvasClass = Class.extend({
 	
 	setSize: function (width, height) {
 		// Sets the size of all of the cavases to the window size
-		this.layers['board'].context.canvas.width = width;
-		this.layers['board'].context.canvas.height = height;
-		this.layers['units'].context.canvas.width = width;
-		this.layers['units'].context.canvas.height = height;
-		this.layers['effects'].context.canvas.width = width;
-		this.layers['effects'].context.canvas.height = height;
-		this.layers['ui'].context.canvas.width = width;
-		this.layers['ui'].context.canvas.height = height;
+		var i;
+		for( i in config.layers )
+		{
+			this.layers[config.layers[i].name].canvas.width = width;
+			this.layers[config.layers[i].name].canvas.height = height;
+		}
 	},
 	
 	setScale: function () {
