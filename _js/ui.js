@@ -11,42 +11,51 @@ UIClass = Class.extend({
 		// add a listner for mouse clicks
 		cv.layers['ui'].canvas.addEventListener('mousedown', function(e) {
 			var mouse = cv.getMouse(e);
-			var uihit = ui.click(mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units
+			var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
 		});
+		
+		cv.layers['ui'].canvas.addEventListener('mouseup', function(e) {
+			var mouse = cv.getMouse(e);
+			var uihit = ui.mouse('mouseup',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+			//if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+		});		
 		
 		// Initialise User Interface widgets
 		// TODO: fix the fact the positoin does not change when window width or height changes... need to use a html style "left: 50" type notation?
-		this.widgets.speaker = new ImageButtonClass( {left:30,bottom:50}, ['speaker.png', 'speaker_mute.png']);
-		this.widgets.speaker.action = function (){this.toggleState(); sound.toggleMute(); };
+		this.widgets.speaker = new ImageButtonClass( {left:30,bottom:50}, ['speaker.png', 'speaker_mute.png'], true);
+		this.widgets.speaker.action = function (){sound.toggleMute(); };
 
 //		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
 //		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 
 		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
-		this.widgets.upright.action = function (){ units.move('kc33'); this.pulse(150) };
+		this.widgets.upright.action = function (){ units.move('kc33'); };
 		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
-		this.widgets.up.action = function (){ units.move('kc38'); this.pulse(150) };
+		this.widgets.up.action = function (){ units.move('kc38'); };
 		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
-		this.widgets.upleft.action = function (){ units.move('kc36'); this.pulse(150) };
+		this.widgets.upleft.action = function (){ units.move('kc36'); };
 		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
-		this.widgets.downright.action = function (){ units.move('kc34'); this.pulse(150) };
+		this.widgets.downright.action = function (){ units.move('kc34'); };
 		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
-		this.widgets.down.action = function (){ units.move('kc40'); this.pulse(150) };
+		this.widgets.down.action = function (){ units.move('kc40'); };
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
-		this.widgets.downleft.action = function (){ units.move('kc35'); this.pulse(150) };
+		this.widgets.downleft.action = function (){ units.move('kc35'); };
 		
 		this.widgets.teleport = new VectorButtonClass( {left:20,top:180}, 'Teleport', 110);
-		this.widgets.teleport.action = function (){ units.units[units.activeUnit].teleport(); this.pulse(150) };
+		this.widgets.teleport.action = function (){
+			if(units.activeUnit !== null) units.units[units.activeUnit].teleport();
+			else sound.playSound(sound['doh']);
+		};
 
 		this.widgets.buyunits = new VectorButtonClass( {left:20,top:240}, 'Buy Units', 110);
-		this.widgets.buyunits.action = function (){ this.pulse(150) };
+		this.widgets.buyunits.action = function (){  };
 
 		this.widgets.upgrades = new VectorButtonClass( {left:20,top:300}, 'Upgrades', 110);
-		this.widgets.upgrades.action = function (){ this.pulse(150) };
+		this.widgets.upgrades.action = function (){  };
 
 		this.widgets.endturn = new VectorButtonClass( {left:20,top:360}, 'End turn', 110);
-		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(150) };
+		this.widgets.endturn.action = function (){ game.endTurn(); };
 	},
 	
 	render: function () {
@@ -59,14 +68,12 @@ UIClass = Class.extend({
 		this.renderPlayerTurn();
 		this.renderGameTitle();
 		this.renderBanner();
-		this.renderArrows();
-		for( i in this.widgets)
+//		this.renderArrows();
+		for( i in this.widgets) // render all widgets
 		{
 			this.widgets[i].render();
 		}
-		//this.widgets.teleport.render();
-		//this.widgets.buyunits.render();
-		//this.widgets.upgrades.render();
+
 	},
 	
 	redraw: function () {
@@ -181,6 +188,28 @@ UIClass = Class.extend({
 		return false;
 	},
 
+		mouse: function (event,x,y,sx,sy) {
+		// Deal with a click by checking if it hits any UI elements
+//		console.log(x,y);
+		if(this.popup) // If there is a popup then close it and exit
+		{
+			this.popup = false;
+			this.redraw();
+			return true;
+		}
+		
+		// Check if the click hits any widgets
+		var i = null;
+		for( i in this.widgets )
+		{
+			if( this.widgets[i].clickhit(x,y) )
+			{
+				this.widgets[i].mouse(event,x,y);
+				return true;
+			}
+		}
+		return false;
+	},
 	
 	keypress: function (e) {
 		// Deal with keypresses
@@ -203,7 +232,11 @@ UIClass = Class.extend({
 			var unit = units.activeUnit;
 			if(units.units[unit].lose() == 'delete') delete units.units[unit];   // "x" will explode the active unit (for testing)
 		}
-		else if (code == 'kc32' ) game.endTurn();	// Space bar ends turn
+		else if (code == 'kc32' ) // Space bar ends turn
+		{
+			ui.widgets.endturn.pulse(200);
+			game.endTurn();	
+		}
 		else if (code == 'kc77' ) ui.widgets.speaker.action();	// "m" Toogle mute status
 		else if (code == 'kc84' ) units.units[units.activeUnit].teleport();	// "t" Teleport a unit home
 
@@ -215,16 +248,16 @@ UIClass = Class.extend({
 		y = config.movekeys[code].y;
 		if(y == 1)
 		{
-			if( x == 1 ) this.widgets.downright.pulse();
-			else this.widgets.downleft.pulse();
+			if( x == 1 ) this.widgets.downright.pulse(200);
+			else this.widgets.downleft.pulse(200);
 		}
 		else if( y == -1 )
 		{
-			if( x == 1 ) this.widgets.upright.pulse();
-			else this.widgets.upleft.pulse();
+			if( x == 1 ) this.widgets.upright.pulse(200);
+			else this.widgets.upleft.pulse(200);
 		}
-		else if( y == -2) this.widgets.up.pulse();
-		else this.widgets.down.pulse();
+		else if( y == -2) this.widgets.up.pulse(200);
+		else this.widgets.down.pulse(200);
 	},
 	
 	renderpopup: function (name) {
@@ -278,17 +311,33 @@ WidgetClass = Class.extend({
 
 ButtonClass = WidgetClass.extend({
 	// Base button class for the UTACTICA UI used to create ImageButtonClass and VectorButtonClass
+	toggleOnMouse: false,
 	
+	
+	mouse: function (event,x,y) {
+		// Deal with mouse events, normally this would just mean actioning a click and toggling the button state
+		if ( event == 'mousedown' ) { 
+			if(this.toggleOnMouse) this.toggleState(); 
+			else this.state = 1;
+			this.action();
+			
+		}
+		else if ( event == 'mouseup' ) {
+			if(!this.toggleOnMouse) this.state = 0;
+		}
+		ui.redraw();
+	}
 });
 
 ImageButtonClass = ButtonClass.extend({
 	// Used for image based buttons
 	artwork: new Array(),
 	
-	init: function (position, artwork) {
+	init: function (position, artwork, toggleOnMouse) {
 		// Initialise a new button
 		this.position = position;
 		this.artwork = artwork;
+		this.toggleOnMouse = toggleOnMouse;
 	},
 	
 	render: function () {
@@ -327,7 +376,11 @@ VectorButtonClass = ButtonClass.extend({
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
-
+		
+		if( this.state === 1) {
+			this.position.x = this.position.x + 1;
+			this.position.y = this.position.y + 2;
+		}
 		
 		cv.layers['ui'].context.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
