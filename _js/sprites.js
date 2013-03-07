@@ -19,6 +19,9 @@ SpriteSheetClass = Class.extend({
     // The Image object that we created for our
     // atlas.
 	img: null,
+	
+	fullyLoaded: false,
+	fullyParsed: false,
 
     // The URL path that we grabbed our atlas
     // from.
@@ -40,6 +43,7 @@ SpriteSheetClass = Class.extend({
 
         // Create a new image whose source is at 'imgName'.
 		var img = new Image();
+        img.onload = function () { sprites.fullyLoaded = true; };
 		img.src = imgName;
 
         // Store the Image object in the img parameter.
@@ -99,49 +103,18 @@ SpriteSheetClass = Class.extend({
             // Grab the sprite from the parsed JSON...
 			var sprite = parsed.frames[key];
 
-			// Define the center of the sprite as an offset
-            // (hence the negative).
-            // We don't want to have to calculate these
-            // values every single time we want to draw a
-            // sprite! It adds up!
 			var cx = -sprite.frame.w * 0.5;
 			var cy = -sprite.frame.h * 0.5;
 
-            // Check if the sprite is trimmed based on the
-            // 'trimmed' parameter in the parsed JSON. Look
-            // through the provided JSON if you're unsure
-            // where this is.
-            // If it is trimmed, then we need to update the
-            // center offset based upon how much data has
-            // been trimmed off of it.
-            //
-            // This will be based on the 'spriteSourceSize'
-            // and 'sourceSize' fields of the sprite.
-            //
-            // 'spriteSourceSize' defines:
-            //
-            // 1)
-            //
-            // 'sourceSize' defines:
-            //
-            // 1)
-			//
-            // This shouldn't be much code, but it's a bit of
-            // tricky math, so you might have to think about
-            // this for a bit. If it's done right, you shouldn't
-            // have to change any other code at all!
-            //
-            // YOUR CODE HERE
             if( sprite.trimmed )
             {
                 cx = sprite.spriteSourceSize.x - sprite.sourceSize.w * 0.5;
                 cy = sprite.spriteSourceSize.y - sprite.sourceSize.h * 0.5;
             }
             
-			// Define the sprite for this sheet by calling
-            // defSprite to store it into the 'sprites' Array.
 			this.defSprite(key, sprite.frame.x, sprite.frame.y, sprite.frame.w, sprite.frame.h, cx, cy);
 		}
+		this.fullyParsed = true;
 	},
 
 	//-----------------------------------------

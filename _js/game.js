@@ -5,22 +5,30 @@ var gameClass = Class.extend({
 	production: [1,1],
 	attack: [10,10],
 	defence: [10,10],
+	initcheck: null,
 
 	init: function () {
 		// Start loading sprites, fonts, etc
-		loadfonts();		
+//		loadfonts();		
 		sprites = new SpriteSheetClass();
-		sprites.load('http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.png');
+		sprites.load('/~martin/utactica/_media/sprites.png');
+		
 
 		// now load json defining the sprite sheet
 		var spritejson = new XMLHttpRequest();
-		jsonURL = 'http://people.physics.anu.edu.au/~martin/utactica/_media/sprites.json';
+		jsonURL = '/~martin/utactica/_media/sprites.json';
 		spritejson.open("GET", jsonURL, true);
 		spritejson.onload = function() {
 						sprites.parseAtlasDefinition(this.responseText);
-						game.setupGame();							// TODO: Probably not the best spot to be calling this code?
 					};
 		spritejson.send();
+		
+		this.initcheck = setInterval( function () {
+				if ( sprites.fullyLoaded && sprites.fullyParsed ) {
+					game.setupGame();
+					window.clearInterval(game.initcheck);
+				}
+			}, 20 );
 	},
 
 	setupGame: function () {
