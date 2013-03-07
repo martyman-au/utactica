@@ -4,6 +4,8 @@ SoundClass = Class.extend({
 	context: null,			// audio context
 	mainNode: null, 
 	mute: false,
+	music: null,
+	sounds: [],
 	
 	init: function () {
 		// Load in the audio files
@@ -11,49 +13,22 @@ SoundClass = Class.extend({
 		this.mainNode = this.context.createGainNode(0);
 		this.mainNode.connect(this.context.destination);
 
-		// TODO: can we deduplicate this?
-		this.mmmRequest = new XMLHttpRequest();
-		this.mmmRequest.open('GET', '_media/Man-Made Messiah v0_8.mp3', true );
-		this.mmmRequest.responseType = 'arraybuffer';
-		this.mmmRequest.send();
-		this.mmmRequest.onload = function () { sound.playMusic(sound.mmmRequest); } // Start music as soon as it is loaded
+		for( i in config.soundeffects ) {
+			this.sounds[config.soundeffects[i]] = new XMLHttpRequest();
+			this.sounds[config.soundeffects[i]].open('GET', '_media/'+config.soundeffects[i]+'.mp3', true );
+			this.sounds[config.soundeffects[i]].responseType = 'arraybuffer';
+			this.sounds[config.soundeffects[i]].send();
+		}		
+		
+		this.music = new Audio('_media/Man-Made Messiah v0_8.mp3');
+		this.music.play();
 
-		this.explosion = new XMLHttpRequest();
-		this.explosion.open('GET', '_media/boom.mp3', true );
-		this.explosion.responseType = 'arraybuffer';
-		this.explosion.send();
-
-		this.beam = new XMLHttpRequest();
-		this.beam.open('GET', '_media/teleport.mp3', true );
-		this.beam.responseType = 'arraybuffer';
-		this.beam.send();
-
-		this.doh = new XMLHttpRequest();
-		this.doh.open('GET', '_media/doh.mp3', true );
-		this.doh.responseType = 'arraybuffer';
-		this.doh.send();
 	},
 
-	// TODO: do playMusic and playSound have to be seperate functions?
-	playMusic: function (file) {
-		try {
-		var clip = this.context.createBufferSource();
-		this.context.decodeAudioData(file.response, function (buffer) {
-				clip.buffer = buffer;
-				clip.connect(sound.mainNode);
-				clip.loop = true;
-				clip.noteOn(0);
-			}, function (data) {});
-		}
-		catch(e) {
-			console.warn('Web Audio API is not supported in this browser');
-		}
-	},
-	
 	playSound: function (file) {
 		try {
 		var clip = this.context.createBufferSource();
-		this.context.decodeAudioData(file.response, function (buffer) {
+		this.context.decodeAudioData(this.sounds[file].response, function (buffer) {
 				clip.buffer = buffer;
 				clip.connect(sound.mainNode);
 				clip.loop = false;
@@ -71,11 +46,13 @@ SoundClass = Class.extend({
 		{
 			this.mute = false;
 			this.mainNode.gain.value = 1.0;
+			this.music.muted = false;
 		}
 		else
 		{
 			this.mute = true;
 			this.mainNode.gain.value = 0.0;
+			this.music.muted = true;
 		}
 	}
 });

@@ -159,7 +159,7 @@ UnitClass = Class.extend({
 			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
 			{
 				if( this.type == 'soldier' ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
-				else sound.playSound(sound['doh']);					// If this unit is worker don't move
+				else sound.playSound('doh');					// If this unit is worker don't move
 			}
 			else	// There was no enemies lets see if we can move there
 			{
@@ -175,10 +175,10 @@ UnitClass = Class.extend({
 					effects.renderEffect('active', this.ux, this.uy);
 					if( --this.remainingmoves < 1) this.deactivate();
 				}
-				else sound.playSound(sound['doh']);
+				else sound.playSound('doh');
 			}
 		}
-		else sound.playSound(sound['doh']);
+		else sound.playSound('doh');
 	},
 	
 	attack: function (tile, enemies) {
@@ -188,11 +188,15 @@ UnitClass = Class.extend({
 		if( enemies.soldier == 0 ) defend = -1000; // Workers get no defence
 		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];
 		console.log('attack result: '+result);
+		sound.playSound('battle');
 		if( result >= -15 && result <= 15 )
 		{
 			console.log('DRAW');
 		}
-		else if( result < -15 ) this.lose();
+		else if( result < -15 ) {
+			sleep(1500);
+			this.lose();
+		}
 		else if( result > 15 )
 		{
 			// must mark one dead
@@ -300,7 +304,7 @@ UnitClass = Class.extend({
 		}
 		else
 		{
-			sound.playSound(sound['doh']);
+			sound.playSound('doh');
 		}
 	},
 });

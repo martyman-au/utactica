@@ -49,13 +49,13 @@ EffectsClass = Class.extend({
 
 	renderEffect: function (name, x, y) {
 		// Create an effect using AnimationClass
-		if( config.animsf[name].sound ) sound.playSound(sound[name]);
+		if( config.animsf[name].sound ) sound.playSound(name);
 		this.animations.push( new AnimationClass(name, this.frames[name] ,x ,y ) );
 	},
 
 	renderVector: function (name,start,end) {
 		// Create an effect using VectorClass
-		if( config.animsv[name].sound ) sound.playSound(sound[name]);
+		if( config.animsv[name].sound ) sound.playSound(name);
 		this.animations.push( new VectorClass(name,start,end) );
 	},
 	

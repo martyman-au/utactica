@@ -77,6 +77,7 @@ Object.keys = function(obj) {
 };
 */
 
+/*
 function loadfonts() {
 	// Google font loader code
 	"use strict";
@@ -98,3 +99,4 @@ function loadfonts() {
 		s.parentNode.insertBefore(wf, s);
 	}());
 }
+*/
