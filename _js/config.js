@@ -97,6 +97,6 @@ var config = {
 		beam: { playback: null, sound: true, length: 300 },
 	},
 	
-	soundeffects: ['battle', 'explosion', 'doh', 'teleport', 'doh']
+	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh']
 	
 };

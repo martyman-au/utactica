@@ -11,12 +11,12 @@ var gameClass = Class.extend({
 		// Start loading sprites, fonts, etc
 //		loadfonts();		
 		sprites = new SpriteSheetClass();
-		sprites.load('/~martin/utactica/_media/sprites.png');
+		sprites.load('_media/sprites.png');
 		
 
 		// now load json defining the sprite sheet
 		var spritejson = new XMLHttpRequest();
-		jsonURL = '/~martin/utactica/_media/sprites.json';
+		jsonURL = '_media/sprites.json';
 		spritejson.open("GET", jsonURL, true);
 		spritejson.onload = function() {
 						sprites.parseAtlasDefinition(this.responseText);

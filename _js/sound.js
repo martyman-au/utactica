@@ -20,7 +20,7 @@ SoundClass = Class.extend({
 			this.sounds[config.soundeffects[i]].send();
 		}		
 		
-		this.music = new Audio('_media/Man-Made Messiah v0_8.mp3');
+		this.music = new Audio('_media/mmm.mp3');
 		this.music.play();
 
 	},
