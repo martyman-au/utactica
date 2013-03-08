@@ -55,7 +55,7 @@ BoardClass = Class.extend({
 		return null;	// else return null
 	},
 
-	findSlot: function (tile) {
+	allocateSlot: function (tile) {
 		// Find an available slot on a tile for the unit
 		var slots = this.tiles[tile].slots;
 		var i = null;
@@ -68,6 +68,7 @@ BoardClass = Class.extend({
 		}
 		return null;
 	}
+
 });
 
 TileClass = Class.extend({
