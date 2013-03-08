@@ -10,7 +10,10 @@
 		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
 		fontactive: function (fontFamily, fontDescription) {
 			if (fontFamily === 'Roboto Condensed') {
-				if(game !== undefined) game.redraw();  // TODO: fix game ready check  // redraw everything once font is available to make sure the canvas is rendered correctly
+				if(game.ready==true) {
+					console.log(game);
+					game.redraw();  // TODO: fix game ready check  // redraw everything once font is available to make sure the canvas is rendered correctly
+				}
 			}
 		}
 	};

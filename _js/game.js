@@ -1,4 +1,5 @@
 var gameClass = Class.extend({
+	ready: false,
 	turn: null,
 	foodcash: [250,250],
 	sciencecash: [100,100],
@@ -47,6 +48,7 @@ var gameClass = Class.extend({
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
+		this.ready = true;
 	},
 	
 	setupListners: function () {
