@@ -43,13 +43,15 @@ CanvasClass = Class.extend({
 	setScale: function () {
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
 		
-		var boardheight = config.boardPattern.length * 92;
+		var boardheight = config.boardPattern.length * 91.5;
 		
-		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / boardheight)); // Scale needed to fit board in canvas
+//		this.Scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / boardheight)); // Scale needed to fit board in canvas
+		this.Scale = Math.min(window.innerWidth / 1385, window.innerHeight / boardheight); // Scale needed to fit board in canvas
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
 		this.Offset.x = ((window.innerWidth - (1385 * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
-		this.Offset.y = (((window.innerHeight - ui.bannerheight) - (boardheight * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
+//		this.Offset.y = (((window.innerHeight - ui.bannerheight) - (boardheight * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
+		this.Offset.y = ((window.innerHeight - (boardheight * this.Scale))/2)/this.Scale; 						// Offset needed to center board in canvas X
 
 //		this.Offset.y = Math.max( 0, ( (window.innerHeight - ui.bannerheight) /this.Scale - boardheight ));	// Offset needed to center board in canvas Y
 		
@@ -59,9 +61,10 @@ CanvasClass = Class.extend({
 		this.layers['board'].context.scale(this.Scale,this.Scale);
 		this.layers['units'].context.scale(this.Scale,this.Scale);
 		this.layers['effects'].context.scale(this.Scale,this.Scale);
-		
-		if( this.screenRatio < 0.7 ) this.screenMode = 'portrait';
-		else this.screenMode = 'landscape'
+
+// TODO: do we want to adapt for portrait and landscape windows?		
+//		if( this.screenRatio < 0.7 ) this.screenMode = 'portrait';
+//		else this.screenMode = 'landscape'
 		
 		units.scale();	// calculate new unit positions
 		

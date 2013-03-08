@@ -147,11 +147,11 @@ UnitClass = Class.extend({
 		
 		if( newtile ) // if the desired tile exists check if this is a move or attack
 		{
-			var enemies =  units.getEnemies(newtile);
+			var enemies = units.getEnemies(newtile);
 
 			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
 			{
-				if( this.type == 'soldier' ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
+				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
 				else sound.playSound('doh');					// If this unit is worker don't move
 			}
 			else	// There was no enemies lets see if we can move there

@@ -22,12 +22,8 @@ UIClass = Class.extend({
 		});		
 		
 		// Initialise User Interface widgets
-		// TODO: fix the fact the positoin does not change when window width or height changes... need to use a html style "left: 50" type notation?
-		this.widgets.speaker = new ImageButtonClass( {left:30,bottom:50}, ['speaker.png', 'speaker_mute.png'], true);
+		this.widgets.speaker = new ImageButtonClass( {left:25,bottom:30}, ['speaker.png', 'speaker_mute.png'], true);
 		this.widgets.speaker.action = function (){sound.toggleMute(); };
-
-//		this.widgets.endturn = new ButtonClass( {right:122,bottom:50}, ['end-turn-button.png', 'end-turn-button-active.png']);	
-//		this.widgets.endturn.action = function (){ game.endTurn(); this.pulse(250) };
 
 		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
 		this.widgets.upright.action = function (){ units.move('kc33'); };
@@ -42,32 +38,36 @@ UIClass = Class.extend({
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('kc35'); };
 		
-		this.widgets.teleport = new VectorButtonClass( {left:20,top:180}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {left:15,top:190}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){
 			if(units.activeUnit !== null) units.units[units.activeUnit].teleport();
 			else sound.playSound(sound['doh']);
 		};
 
-		this.widgets.buyunits = new VectorButtonClass( {left:20,top:240}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {left:15,top:250}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){  };
 
-		this.widgets.upgrades = new VectorButtonClass( {left:20,top:300}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {left:15,top:310}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){  };
 
-		this.widgets.endturn = new VectorButtonClass( {left:20,top:360}, 'End turn', 110);
+		this.widgets.endturn = new VectorButtonClass( {left:15,top:370}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
 	},
 	
 	render: function () {
 		// Render UI elements
 		var i;
-		if(cv.screenMode == 'landscape') this.bannerheight = 100;
-		else this.bannerheight = 200;
+//		if(cv.screenMode == 'landscape') this.bannerheight = 100;
+//		else this.bannerheight = 200;
 		
 		this.wipe();
 		this.renderPlayerTurn();
 		this.renderGameTitle();
-		this.renderBanner();
+//		this.renderBanner();
+		this.widgets.speaker.render();
+		
+		this.renderCash();		
+		
 //		this.renderArrows();
 		for( i in this.widgets) // render all widgets
 		{
@@ -120,8 +120,8 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.shadowBlur = 5;
 		cv.layers['ui'].context.shadowColor = '#552222';  // TODO: hardcoded
 		cv.layers['ui'].context.shadowColor = '#FFFFFF';  // TODO: hardcoded
-		var x = 13;
-		var y = 140;
+		var x = 10;
+		var y = 125;
 		cv.layers['ui'].context.fillText(text, x, y);		
 		cv.layers['ui'].context.shadowColor = "transparent";
 	},
@@ -133,8 +133,8 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.shadowOffsetY = 0;
 		cv.layers['ui'].context.shadowBlur = 6;
 		cv.layers['ui'].context.shadowColor = '#552222';  // TODO: hardcoded
-		var x = 13;
-		var y = 90;
+		var x = 10;
+		var y = 80;
 		cv.layers['ui'].context.fillText('UTACTICA', x, y);		
 		cv.layers['ui'].context.shadowColor = "transparent";		
 	},
@@ -147,10 +147,10 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.shadowOffsetY = 1;
 		cv.layers['ui'].context.shadowBlur = 6;
 		cv.layers['ui'].context.shadowColor = config.styles.cashtextshadow;
-		var x = 70;
-		var y = window.innerHeight - 55;
+		var x = 10;
+		var y = 150;
 		cv.layers['ui'].context.fillText('Food resources: '+game.foodcash[game.turn], x, y);
-		var y = window.innerHeight - 30;
+		var y = 170;
 		cv.layers['ui'].context.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
 		cv.layers['ui'].context.shadowColor = "transparent";
 	},
