@@ -2,6 +2,7 @@ body {
 	border:0px;
 	overflow:hidden;
 	background: #CC5422;
+	font-family: 'Roboto Condensed','Trebuchet MS',sans-serif;
 }
 
-canvas { font-family: 'roboto condensed' }
+canvas { font-family: 'Roboto Condensed','Trebuchet MS',sans-serif }

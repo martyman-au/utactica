@@ -5,15 +5,12 @@
 <link rel="stylesheet" type="text/css" href="_styles/style.css">
 
 <script type="text/javascript">
-function loadfonts() {
 	// Google font loader code
-	"use strict";
 	var WebFontConfig = {
 		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
 		fontactive: function (fontFamily, fontDescription) {
 			if (fontFamily === 'Roboto Condensed') {
-				game.redraw();  // redraw everything once font is available to make sure the canvas is rendered correctly
-								// TODO: this doesn't seem good
+				game.redraw();  // redraw everything once font is available to make sure the canvas is rendered correctly 
 			}
 		}
 	};
@@ -25,8 +22,6 @@ function loadfonts() {
 		wf.async = 'true';
 		s.parentNode.insertBefore(wf, s);
 	}());
-};
-loadfonts();
 </script>
 
 <script type="text/javascript" src="_js/config.js"></script>

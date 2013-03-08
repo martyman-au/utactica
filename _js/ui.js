@@ -104,7 +104,7 @@ UIClass = Class.extend({
 	},
 	
 	renderPlayerTurn: function () {
-		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed'";
+		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		if(game.turn)
 		{
 			cv.layers['ui'].context.fillStyle = colours.blue;  // TODO: hardcoded
@@ -128,7 +128,7 @@ UIClass = Class.extend({
 	
 	renderGameTitle: function () {
 		cv.layers['ui'].context.fillStyle = colours.white;  // TODO: hardcoded
-		cv.layers['ui'].context.font = "normal 400 90px 'Roboto Condensed'";
+		cv.layers['ui'].context.font = "normal 400 90px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		cv.layers['ui'].context.shadowOffsetX = 0;
 		cv.layers['ui'].context.shadowOffsetY = 0;
 		cv.layers['ui'].context.shadowBlur = 6;
@@ -141,7 +141,7 @@ UIClass = Class.extend({
 	
 	renderCash: function () {
 		// render the current resource 
-		cv.layers['ui'].context.font = "normal 400 20px 'Roboto Condensed'";
+		cv.layers['ui'].context.font = "normal 400 20px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		cv.layers['ui'].context.fillStyle = config.styles.cashtext; 
 		cv.layers['ui'].context.shadowOffsetX = 0;
 		cv.layers['ui'].context.shadowOffsetY = 1;
@@ -401,7 +401,7 @@ VectorButtonClass = ButtonClass.extend({
 		cv.layers['ui'].context.lineWidth = 7;		
 		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 		
-		cv.layers['ui'].context.font = "normal 400 25px 'Roboto Condensed'";
+		cv.layers['ui'].context.font = "normal 400 25px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		cv.layers['ui'].context.textAlign = 'center';
 		cv.layers['ui'].context.fillStyle = '#222222';
 		var x = this.position.x + this.size.w/2;
