@@ -40,7 +40,7 @@ UIClass = Class.extend({
 		this.widgets.teleport = new VectorButtonClass( {left:15,top:190}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){
 			if(units.activeUnit !== null) units.units[units.activeUnit].teleport();
-			else sound.playSound(sound['doh']);
+			else sound.playSound('doh');
 		};
 
 		this.widgets.buyunits = new VectorButtonClass( {left:15,top:250}, 'Buy Units', 110);
@@ -88,17 +88,8 @@ UIClass = Class.extend({
 	},
 	
 	renderPlayerTurn: function () {
-		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		if(game.turn)
-		{
-			cv.layers['ui'].context.fillStyle = colours.blue;  // TODO: hardcoded
-			var text = 'Blue turn';
-		}
-		else
-		{
-			cv.layers['ui'].context.fillStyle = colours.red;  // TODO: hardcoded
-			var text = 'Red turn';
-		}
+		var text = config.sides[game.turn].name + 's';
+		cv.layers['ui'].context.fillStyle = colours[config.sides[game.turn].colour];
 		cv.layers['ui'].context.shadowOffsetX = 0;
 		cv.layers['ui'].context.shadowOffsetY = 0;
 		cv.layers['ui'].context.shadowBlur = 5;
@@ -106,6 +97,7 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.shadowColor = '#FFFFFF';  // TODO: hardcoded
 		var x = 10;
 		var y = 125;
+		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		cv.layers['ui'].context.fillText(text, x, y);		
 		cv.layers['ui'].context.shadowColor = "transparent";
 	},
@@ -133,9 +125,9 @@ UIClass = Class.extend({
 		cv.layers['ui'].context.shadowColor = config.styles.cashtextshadow;
 		var x = 10;
 		var y = 150;
-		cv.layers['ui'].context.fillText('Food resources: '+game.foodcash[game.turn], x, y);
+		cv.layers['ui'].context.fillText(config.sides[game.turn].name+' food resources: '+game.foodcash[game.turn], x, y);
 		var y = y + 20;
-		cv.layers['ui'].context.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
+		cv.layers['ui'].context.fillText(config.sides[game.turn].name+' tech resources: '+game.sciencecash[game.turn], x, y);
 		cv.layers['ui'].context.shadowColor = "transparent";
 	},
 	

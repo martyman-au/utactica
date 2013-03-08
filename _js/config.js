@@ -82,6 +82,8 @@ var config = {
 		],
 
 	homeTile: [0,40],
+	
+	sides:[{name:'Mecritian', colour: 'red'}, {name:'Riveckian', colour:'blue'}],
 		
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
