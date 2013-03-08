@@ -53,6 +53,20 @@ BoardClass = Class.extend({
 			}
 		}
 		return null;	// else return null
+	},
+
+	findSlot: function (tile) {
+		// Find an available slot on a tile for the unit
+		var slots = this.tiles[tile].slots;
+		var i = null;
+		for( i in slots){
+			if( ! slots[i].unit )
+			{
+				slots[i].unit = true;
+				return i;
+			}
+		}
+		return null;
 	}
 });
 
