@@ -8,16 +8,16 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new UnitClass('soldier', 0, config.homeTile[0]) );
-		this.units.push( new UnitClass('soldier', 0, config.homeTile[0]) );
-		this.units.push( new UnitClass('worker', 0, config.homeTile[0]) );
-		this.units.push( new UnitClass('worker', 0, config.homeTile[0]) );
-		this.units.push( new UnitClass('soldier', 1, config.homeTile[1]) );
-		this.units.push( new UnitClass('soldier', 1, config.homeTile[1]) );
-		this.units.push( new UnitClass('worker', 1, config.homeTile[1]) );
-		this.units.push( new UnitClass('worker', 1, config.homeTile[1]) );
-		this.units.push( new UnitClass('worker', 1, 1) );
-		this.units.push( new UnitClass('soldier', 1, 1) );
+		this.units.push( new SoldierUnitClass('soldier', 0, config.homeTile[0]) );
+		this.units.push( new SoldierUnitClass('soldier', 0, config.homeTile[0]) );
+		this.units.push( new WorkerUnitClass('worker', 0, config.homeTile[0]) );
+		this.units.push( new WorkerUnitClass('worker', 0, config.homeTile[0]) );
+		this.units.push( new SoldierUnitClass('soldier', 1, config.homeTile[1]) );
+		this.units.push( new SoldierUnitClass('soldier', 1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass('worker', 1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass('worker', 1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass('worker', 1, 1) );
+		this.units.push( new SoldierUnitClass('soldier', 1, 1) );
 	},
 	
 	redraw: function () {
@@ -307,4 +307,16 @@ UnitClass = Class.extend({
 			sound.playSound('doh');
 		}
 	},
+});
+	
+SoldierUnitClass = UnitClass.extend({
+	// Class for soldier units
+	canDefend: true,
+	canAttack: true,
+});
+
+WorkerUnitClass = UnitClass.extend({
+	// Class for worker units
+	canDefend: false,
+	canAttack: false,
 });
