@@ -10,7 +10,8 @@ var colours = {
 	white: '#FFFFFF',
 	greyout: 'rgba(0,0,0,0.3)',
 	blue: '#0000E0',
-	red: '#E00000'
+	red: '#E00000',
+	beige: '#E0E0B0'
 }
 
 //config stores game configuration options
@@ -25,7 +26,8 @@ var config = {
 		bannerhigh1: colours.brightorange,
 		bannerhigh2: colours.white,
 		popupgreyout: colours.greyout,
-		popupbg: colours.lightgrey
+		popupbg: colours.white,
+		buttonbg: colours.beige
 	},
 	
 	//Canvas layers defined here

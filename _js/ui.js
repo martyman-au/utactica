@@ -1,7 +1,6 @@
 UIClass = Class.extend({
 	tiles: new Array(),
-	bannerheight: 100,
-	popup: false,
+	popup: null,
 	widgets: {},
 	
 	init: function () {
@@ -45,35 +44,36 @@ UIClass = Class.extend({
 		};
 
 		this.widgets.buyunits = new VectorButtonClass( {left:15,top:250}, 'Buy Units', 110);
-		this.widgets.buyunits.action = function (){  };
+		this.widgets.buyunits.action = function (){ ui.widgets.buyunitspopup.render(); };
 
 		this.widgets.upgrades = new VectorButtonClass( {left:15,top:310}, 'Upgrades', 110);
-		this.widgets.upgrades.action = function (){  };
+		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
 		this.widgets.endturn = new VectorButtonClass( {left:15,top:370}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
+		
+		this.widgets.upgradespopup = new PopupClass( 'Upgrades' );
+		this.widgets.buyunitspopup = new PopupClass( 'Buy Units' );
+		this.widgets.helppopup = new PopupClass( 'Help' );
 	},
 	
 	render: function () {
 		// Render UI elements
 		var i;
-//		if(cv.screenMode == 'landscape') this.bannerheight = 100;
-//		else this.bannerheight = 200;
 		
 		this.wipe();
 		this.renderPlayerTurn();
 		this.renderGameTitle();
-//		this.renderBanner();
 		this.widgets.speaker.render();
 		
 		this.renderCash();		
 		
-//		this.renderArrows();
 		for( i in this.widgets) // render all widgets
 		{
-			this.widgets[i].render();
+			if(this.widgets[i].display) this.widgets[i].render();
 		}
-
+		
+		if(this.popup) this.popup.render(); // Render a popup if there is a current one
 	},
 	
 	redraw: function () {
@@ -85,22 +85,6 @@ UIClass = Class.extend({
 	wipe: function (dir) {
 		// Clear the UI layer
 		cv.layers['ui'].context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	},
-	
-	renderBanner: function () {
-		//Render the ui banner
-		cv.layers['ui'].context.fillStyle = config.styles.bannerbg; // set banner colour
-		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, this.bannerheight);  // now fill the canvas
-		cv.layers['ui'].context.fillStyle = config.styles.bannerhigh1; // set banner colour
-		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth / cv.Scale, 6);  // now fill the canvas
-		cv.layers['ui'].context.fillStyle = config.styles.bannerhigh2; // set banner colour
-		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight, window.innerWidth, 2);  // now fill the canvas
-//		cv.layers['ui'].context.fillStyle = '#0000FF'; // set banner colour
-//		cv.layers['ui'].context.fillRect  (0, window.innerHeight - this.bannerheight + 6, window.innerWidth, 2);  // now fill the canvas
-//		this.widgets.endturn.render();
-		this.widgets.speaker.render();
-		
-		this.renderCash();
 	},
 	
 	renderPlayerTurn: function () {
@@ -150,7 +134,7 @@ UIClass = Class.extend({
 		var x = 10;
 		var y = 150;
 		cv.layers['ui'].context.fillText('Food resources: '+game.foodcash[game.turn], x, y);
-		var y = 170;
+		var y = y + 20;
 		cv.layers['ui'].context.fillText('Tech resources: '+game.sciencecash[game.turn], x, y);
 		cv.layers['ui'].context.shadowColor = "transparent";
 	},
@@ -165,50 +149,33 @@ UIClass = Class.extend({
 		this.widgets.downleft.render();
 	},
 
-	click: function (x,y,sx,sy) {
+	mouse: function (event,x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
 //		console.log(x,y);
-		if(this.popup) // If there is a popup then close it and exit
-		{
-			this.popup = false;
-			this.redraw();
-			return true;
-		}		
 		
-		// Check if the click hits any widgets
-		var i = null;
-		for( i in this.widgets )
-		{
-			if( this.widgets[i].clickhit(x,y) )
+		if(this.popup && this.popup.clickhit(x,y)) { // if it is a popup click
+			// TODO: deal with the popup click
+		}
+		else {
+			if(event=='mousedown' && this.popup) // If there is a popup then close it and exit
 			{
-				this.widgets[i].action();
+				this.popup = false;
+				this.redraw();
 				return true;
 			}
-		}
-		return false;
-	},
-
-		mouse: function (event,x,y,sx,sy) {
-		// Deal with a click by checking if it hits any UI elements
-//		console.log(x,y);
-		if(this.popup) // If there is a popup then close it and exit
-		{
-			this.popup = false;
-			this.redraw();
-			return true;
-		}
-		
-		// Check if the click hits any widgets
-		var i = null;
-		for( i in this.widgets )
-		{
-			if( this.widgets[i].clickhit(x,y) )
+			// Check if the click hits any widgets
+			var i = null;
+			for( i in this.widgets )
 			{
-				this.widgets[i].mouse(event,x,y);
-				return true;
+				var widget = this.widgets[i]
+				if( widget.display && widget.clickhit(x,y) )
+				{
+					widget.mouse(event,x,y);
+					return true;
+				}
 			}
+			return false;
 		}
-		return false;
 	},
 	
 	keypress: function (e) {
@@ -220,25 +187,25 @@ UIClass = Class.extend({
 			return;
 		}	
 		var code = 'kc'+e.keyCode;
-		console.log(code);
+//		console.log(code);
 		if( code in config.movekeys )	// This is a move command
 		{
 			ui.moveIconFlash(code);		// Animate on screen arrow button
 			units.move(code); 			// attempt to move the active unit
 		}
-		else if( code == 'kc72' ) ui.renderpopup('blank');   				// "h" will bring up a popup
+		else if( code == 'kc72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
 		else if( code == 'kc88' )
 		{
 			var unit = units.activeUnit;
-			if(units.units[unit].lose() == 'delete') delete units.units[unit];   // "x" will explode the active unit (for testing)
+			if(units.units[unit].lose() == 'delete') delete units.units[unit];	// "x" will explode the active unit (for testing)
 		}
 		else if (code == 'kc32' ) // Space bar ends turn
 		{
 			ui.widgets.endturn.pulse(200);
 			game.endTurn();	
 		}
-		else if (code == 'kc77' ) ui.widgets.speaker.action();	// "m" Toogle mute status
-		else if (code == 'kc84' ) units.units[units.activeUnit].teleport();	// "t" Teleport a unit home
+		else if (code == 'kc77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
+		else if (code == 'kc84' ) units.units[units.activeUnit].teleport();		// "t" Teleport a unit home
 
 	},
 	
@@ -260,20 +227,6 @@ UIClass = Class.extend({
 		else this.widgets.down.pulse(200);
 	},
 	
-	renderpopup: function (name) {
-		// Darw a test popup window
-		var popheight = 300;
-		var popwidth = 500;
-		var radius = 30;
-		
-		this.popup = true;
-		this.redraw();
-		
-		cv.layers['ui'].context.fillStyle = config.styles.popupgreyout;
-		cv.layers['ui'].context.fillRect(0,0,window.innerWidth,window.innerHeight);
-		cv.layers['ui'].context.fillStyle = config.styles.popupbg;
-		cv.layers['ui'].context.roundRect((window.innerWidth-popwidth)/2 , (window.innerHeight-popheight)/2, popwidth, popheight, radius, config.styles.bannerbg )
-	}
 });
 
 
@@ -282,6 +235,7 @@ WidgetClass = Class.extend({
 	position: {top: null, right: null, bottom: null, left: null},
 	state: 0,
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
+	display: true,
 	
 	init: function () {
 	},
@@ -290,7 +244,7 @@ WidgetClass = Class.extend({
 		// Toggle this button between it's two first states
 		if( this.state == 0) this.state = 1;
 		else this.state = 0;
-		ui.redraw(); 			// TODO: need to chaneg this to only wipe and redraw the button
+		ui.redraw(); 			// TODO: need to change this to only wipe and redraw the button
 	},
 	
 	pulse: function (time) {
@@ -320,7 +274,6 @@ ButtonClass = WidgetClass.extend({
 			if(this.toggleOnMouse) this.toggleState(); 
 			else this.state = 1;
 			this.action();
-			
 		}
 		else if ( event == 'mouseup' ) {
 			if(!this.toggleOnMouse) this.state = 0;
@@ -377,7 +330,7 @@ VectorButtonClass = ButtonClass.extend({
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
 		
-		if( this.state === 1) {
+		if( this.state === 1) { // add an offset if the button is currently clicked
 			this.position.x = this.position.x + 1;
 			this.position.y = this.position.y + 2;
 		}
@@ -390,7 +343,7 @@ VectorButtonClass = ButtonClass.extend({
 			cv.layers['ui'].context.shadowColor = '#222222';
 		}
 		// White outline
-		cv.layers['ui'].context.fillStyle = '#E0D4B0';
+		cv.layers['ui'].context.fillStyle = config.styles.buttonbg;
 		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
 		cv.layers['ui'].context.lineWidth = 12;
 		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
@@ -415,4 +368,66 @@ VectorButtonClass = ButtonClass.extend({
 		this.edges.left = this.position.x - 5;
 		this.edges.right = this.position.x + this.size.w + 5;
 	}
+});
+
+PopupClass = WidgetClass.extend({
+	// Display popup information
+	display: false,
+	size: {w: 0, h: 0},
+	radius: 0,
+
+	init: function (title) {
+		// Is this where we should set all of the popup's contents?
+		this.size.h = 600;
+		this.size.w = 800;
+		this.radius = 30;
+		this.title = title;
+	},
+	
+	render: function () {
+		// Renders this popup to the screen
+
+		this.position.x = (window.innerWidth-this.size.w)/2;
+		this.position.y = (window.innerHeight-this.size.h)/2;
+		//re-calculate edges for click hit matching
+		this.edges.top = this.position.y - 10 ;		
+		this.edges.bottom = this.position.y + this.size.h + 10;
+		this.edges.left = this.position.x - 10;
+		this.edges.right = this.position.x + this.size.w + 10;		
+		
+		ui.popup = this;
+	
+		cv.layers['ui'].context.fillStyle = config.styles.popupgreyout;
+		cv.layers['ui'].context.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
+		cv.layers['ui'].context.shadowOffsetX = 1;
+		cv.layers['ui'].context.shadowOffsetY = 1;
+		cv.layers['ui'].context.shadowBlur = 25;
+		cv.layers['ui'].context.shadowColor = '#222222';
+
+		cv.layers['ui'].context.fillStyle = '#E0E0B0';
+		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
+		cv.layers['ui'].context.lineWidth = 15;
+		cv.layers['ui'].context.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
+		
+		cv.layers['ui'].context.strokeStyle = colours.brightorange;
+		cv.layers['ui'].context.lineWidth = 7;		
+		cv.layers['ui'].context.fillStyle = config.styles.popupbg;
+		cv.layers['ui'].context.shadowColor = "transparent";
+		cv.layers['ui'].context.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
+		
+		this.renderTitle();
+	},
+	
+	renderTitle: function () {
+		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		cv.layers['ui'].context.textAlign = 'center';
+		cv.layers['ui'].context.fillStyle = '#222222';
+		var x = this.position.x + this.size.w/2;
+		var y = this.position.y + 40;
+		cv.layers['ui'].context.fillText(this.title, x, y);
+		cv.layers['ui'].context.textAlign = 'start';
+	}
+
+
 });

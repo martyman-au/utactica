@@ -43,7 +43,6 @@ var gameClass = Class.extend({
 		effects = new EffectsClass(sprites); 				// effects (animations, etc)			
 		ui = new UIClass();									// user interface
 		sound = new SoundClass();							// all sound output (music, effects)
-//		tab = new TabClass(cv.layers['unitstab'].context);
 		
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
