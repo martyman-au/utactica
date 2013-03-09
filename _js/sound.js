@@ -1,58 +1,44 @@
 SoundClass = Class.extend({
-	
-	mmmRequest: null,		// The XMLHttp request object for the game music
-	context: null,			// audio context
-	mainNode: null, 
 	mute: false,
-	music: null,
-	sounds: [],
+	sounds: {},
+	music: {},
 	
 	init: function () {
-		// Load in the audio files
-		this.context = new webkitAudioContext();
-		this.mainNode = this.context.createGainNode(0);
-		this.mainNode.connect(this.context.destination);
-
+		// load in all our sound effects
 		for( i in config.soundeffects ) {
-			this.sounds[config.soundeffects[i]] = new XMLHttpRequest();
-			this.sounds[config.soundeffects[i]].open('GET', '_media/'+config.soundeffects[i]+'.mp3', true );
-			this.sounds[config.soundeffects[i]].responseType = 'arraybuffer';
-			this.sounds[config.soundeffects[i]].send();
-		}		
-		
-		this.music = new Audio('_media/mmm.mp3');
-		this.music.play();
-
-	},
-
-	playSound: function (file) {
-		try {
-		var clip = this.context.createBufferSource();
-		this.context.decodeAudioData(this.sounds[file].response, function (buffer) {
-				clip.buffer = buffer;
-				clip.connect(sound.mainNode);
-				clip.loop = false;
-				clip.noteOn(0);
-			}, function (data) {});
+			var name = config.soundeffects[i]
+			this.sounds[name] = new Howl({
+				urls: ['_media/'+name+'.mp3', '_media/'+name+'.ogg'],
+				loop: false
+			});
 		}
-		catch(e) {
-			console.warn('Web Audio API is not supported in this browser');
+		// load in our music files
+		for( i in config.music ) {
+			var name = config.music[i]
+			this.music[name] = new Howl({
+				urls: ['_media/'+name+'.mp3', '_media/'+name+'.ogg'],
+				loop: false,
+				volume:0.7
+			});
 		}
+		this.music['mmm'].play(); // Start the music playing
 	},
-
+	
+	playSound: function (name) {
+		this.sounds[name].play();
+	},
 
 	toggleMute: function () {
 		if( this.mute )
 		{
 			this.mute = false;
-			this.mainNode.gain.value = 1.0;
-			this.music.muted = false;
+			Howler.unmute();
 		}
 		else
 		{
 			this.mute = true;
-			this.mainNode.gain.value = 0.0;
-			this.music.muted = true;
+			Howler.mute();
 		}
 	}
+
 });
