@@ -2,6 +2,7 @@ SoundClass = Class.extend({
 	mute: false,
 	sounds: {},
 	music: {},
+	track: 0,
 	
 	init: function () {
 		// load in all our sound effects
@@ -18,14 +19,21 @@ SoundClass = Class.extend({
 			this.music[name] = new Howl({
 				urls: ['_media/'+name+'.mp3', '_media/'+name+'.ogg'],
 				loop: false,
-				volume:0.7
+				volume:0.7,
+				onend: function () {sound.nextTrack()}
 			});
 		}
-		this.music['mmm'].play(); // Start the music playing
+		this.music[config.music[this.track]].play(); // Start the music playing
 	},
 	
 	playSound: function (name) {
 		this.sounds[name].play();
+	},
+	
+	nextTrack: function () {
+		this.track += 1;
+		if(this.track > (config.music.length-1)) this.track = 0
+		this.music[config.music[this.track]].play();
 	},
 
 	toggleMute: function () {
