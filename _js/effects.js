@@ -32,7 +32,7 @@ EffectsClass = Class.extend({
 		// Clear the effects layer (usually between frames)
 		// TODO: would it be better to just clear the required area?
 		// TODO: this should query the locations of all of the current effects and clear them
-		cv.layers['effects'].context.clearRect(0, 0, window.innerWidth / cv.Scale, window.innerHeight / cv.Scale);
+		cv.layers['effects'].context.clearRect(0, 0, window.innerWidth / cv.scale, window.innerHeight / cv.scale);
 	},
 
 	animFrame: function () {
@@ -43,7 +43,6 @@ EffectsClass = Class.extend({
 			if( this.animations[i].drawFrame() == 'done') 	// render the animations
 				delete this.animations[i];					// if the animation is done, delete it
 		}
-//		requestAnimationFrame( function(){effects.animFrame();} );	// kick off another animation frame request
 	},
 
 	renderEffect: function (name, x, y) {
@@ -62,6 +61,10 @@ EffectsClass = Class.extend({
 		// Create a teleport beam effect
 		sound.playSound('beam');
 		this.animations.push( new BeamEffectClass('beam',start,end) );
+	},
+	
+	renderText: function (text,position) {
+		this.animations.push( new TextEffectClass(text,position));
 	},
 	
 	deleteAnimation: function (name) {
@@ -126,7 +129,7 @@ VectorEffectClass = Class.extend({
 		this.name = name;
 		this.start = start;
 		this.end = end;
-		this.ctx = cv.layers['effects'].context;
+		this.ctx = cv.layers['effects'].context; // TODO: hardcoded?
 		this.animstart = Date.now();	// grab current time for the begining of the animation
 		this.length = config.animsv[this.name].length;	// load animation duration from config
 	},
@@ -160,7 +163,41 @@ VectorEffectClass = Class.extend({
 
 TextEffectClass = Class.extend({
 	// Render a text effect to the screen
+	text: 'Test Text',
+	position: {x:0,y:0},	// starting position of vector
+	ctx: null,
+	length: 120,
+	count: 0,
+	size: 80,
+	colour: colours.white,
 	
+	init: function (text,position) {
+		this.ctx = cv.layers['effects'].context; // TODO: hardcoded?
+		this.text = text;
+		if(position.center) {
+			this.position.x = (window.innerWidth/2)/cv.scale;
+			this.position.y = (window.innerHeight/2)/cv.scale;
+		}
+		else {
+			this.position.x = position.x/cv.scale;
+			this.position.y = position.y/cv.scale;
+		};
+	},
+	
+	drawFrame: function () {
+	console.log(this);
+		this.ctx.fillStyle = colours.white;
+		this.ctx.textAlign = 'center';
+		this.ctx.shadowOffsetX = 0;
+		this.ctx.shadowOffsetY = 0;
+		this.ctx.shadowBlur = 5;
+		this.ctx.shadowColor = '#222222';  // TODO: hardcoded
+		this.ctx.font = "normal 400 "+this.size+"px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.fillText(this.text, this.position.x, this.position.y);		
+		this.ctx.shadowColor = "transparent";
+		this.ctx.textAlign = 'start';
+		if(++this.count > this.length) return 'done';
+	}
 });
 
 	

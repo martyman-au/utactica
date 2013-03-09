@@ -37,7 +37,7 @@ UnitsClass = Class.extend({
 
 	wipe: function () {
 		// wipe the units layer
-		cv.layers['units'].context.clearRect(0, 0, cv.layers['units'].canvas.width / cv.Scale, cv.layers['units'].canvas.height / cv.Scale); // clear all of units layer
+		cv.layers['units'].context.clearRect(0, 0, cv.layers['units'].canvas.width / cv.scale, cv.layers['units'].canvas.height / cv.scale); // clear all of units layer
 	},
 	
 	scale: function () {
@@ -246,16 +246,19 @@ SoldierUnitClass = UnitClass.extend({
 		sound.playSound('battle');				// play attack sound effect
 		if( result >= -15 && result <= 15 )	
 		{
-			console.log('DRAW');
+			console.log('THE BATTLE IS A DRAW');
+			effects.renderText('THE BATTLE IS A DRAW',{center:true});
 			this.deactivate();
 			this.redraw();
 			game.controlLock = false;
 		}
 		else if( result < -15 ) {
+			effects.renderText('YOU LOST THE BATTLE',{center:true});
 			setTimeout( function () {units.units[units.activeUnit].lose(); game.controlLock = false; }, 1500 );
 		}
 		else if( result > 15 )
 		{
+			effects.renderText('YOU WON THE BATTLE',{center:true});
 			// TODO: mark only one soldier dead
 			setTimeout( function () {
 				for( i in enemies.units ) units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers

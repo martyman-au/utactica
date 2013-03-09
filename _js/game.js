@@ -49,7 +49,14 @@ var gameClass = Class.extend({
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
 		this.ready = true;
-		requestAnimationFrame( cv.animFrame );
+		requestAnimationFrame( game.animFrame );
+	},
+	
+
+	animFrame: function(){
+		requestAnimationFrame( game.animFrame );
+		effects.animFrame();
+		units.animFrame();
 	},
 	
 	setupListners: function () {
@@ -68,13 +75,11 @@ var gameClass = Class.extend({
 		board.render(); // render the playing board
 		units.redraw(); // render the playing board
 		ui.redraw();	// render the user interface
-//		tab.render();
 	},
 	
 	endTurn: function () {
 		// Perform actions required to end a players turn
 		// Deactivate current unit, collect resources
-		// TODO: collect resources
 		units.deactivate();
 		for( i in units.units )
 		{
@@ -92,7 +97,7 @@ var gameClass = Class.extend({
 	
 	collectResource: function (resource) {
 		// Allocate any occupied resources to that team
-		// TODO: trigger resource collection animation
+		// TODO: trigger resource collection animation "text effect"
 		if( resource.substring(0,1) == 'f') this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
 		else if( resource.substring(0,1) == 's') this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
 	},
