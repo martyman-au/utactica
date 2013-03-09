@@ -39,24 +39,24 @@ var config = {
 	
 	// keys used for moving and their desired grid offset
 	movekeys: {
-		kc81: { x: -1, y: -1 },
-		kc103: { x: -1, y: -1 },
-		kc36: { x: -1, y: -1 },
-		kc87: { x: 0, y: -2 },
-		kc104: { x: 0, y: -2 },
-		kc38: { x: 0, y: -2 },
-		kc69: { x: 1, y: -1 },
-		kc105: { x: 1, y: -1 },
-		kc33: { x: 1, y: -1 },
-		kc65: { x: -1, y: 1 },
-		kc97: { x: -1, y: 1 },
-		kc35: { x: -1, y: 1 },
-		kc83: { x: 0, y: 2 },
-		kc98: { x: 0, y: 2 },
-		kc40: { x: 0, y: 2 },
-		kc68: { x: 1, y: 1 },
-		kc99: { x: 1, y: 1 },
-		kc34: { x: 1, y: 1 }
+		81: { x: -1, y: -1 },
+		103: { x: -1, y: -1 },
+		36: { x: -1, y: -1 },
+		87: { x: 0, y: -2 },
+		104: { x: 0, y: -2 },
+		38: { x: 0, y: -2 },
+		69: { x: 1, y: -1 },
+		105: { x: 1, y: -1 },
+		33: { x: 1, y: -1 },
+		65: { x: -1, y: 1 },
+		97: { x: -1, y: 1 },
+		35: { x: -1, y: 1 },
+		83: { x: 0, y: 2 },
+		98: { x: 0, y: 2 },
+		40: { x: 0, y: 2 },
+		68: { x: 1, y: 1 },
+		99: { x: 1, y: 1 },
+		34: { x: 1, y: 1 }
 	},
 	
 	//boardPattern hold an array of rows, each row has entries for which columns contain a tile
@@ -106,3 +106,5 @@ var config = {
 	music: ['mmm']
 	
 };
+
+console.log(config.movekeys);

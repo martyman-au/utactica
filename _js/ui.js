@@ -180,26 +180,26 @@ UIClass = Class.extend({
 			this.redraw();
 			return;
 		}	
-		var code = 'kc'+e.keyCode;
+		var code = e.keyCode;
 //		console.log(code);
 		if( code in config.movekeys )	// This is a move command
 		{
 			ui.moveIconFlash(code);		// Animate on screen arrow button
 			units.move(code); 			// attempt to move the active unit
 		}
-		else if( code == 'kc72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
-		else if( code == 'kc88' )
+		else if( code == '72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
+		else if( code == '88' )
 		{
 			var unit = units.activeUnit;
 			if(units.units[unit].lose() == 'delete') delete units.units[unit];	// "x" will explode the active unit (for testing)
 		}
-		else if (code == 'kc32' ) // Space bar ends turn
+		else if (code == '32' ) // Space bar ends turn
 		{
 			ui.widgets.endturn.pulse(200);
 			game.endTurn();	
 		}
-		else if (code == 'kc77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
-		else if (code == 'kc84' ) units.units[units.activeUnit].teleport();		// "t" Teleport a unit home
+		else if (code == '77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
+		else if (code == '84' ) units.units[units.activeUnit].teleport();		// "t" Teleport a unit home
 
 	},
 	
