@@ -11,7 +11,6 @@ EffectsClass = Class.extend({
 		// Load effect sprites into local arrays
 		// Start animation timer
 		this.loadFrames();
-		requestAnimationFrame( function(){effects.animFrame();} );
 	},
 
 	loadFrames: function () {
@@ -44,19 +43,25 @@ EffectsClass = Class.extend({
 			if( this.animations[i].drawFrame() == 'done') 	// render the animations
 				delete this.animations[i];					// if the animation is done, delete it
 		}
-		requestAnimationFrame( function(){effects.animFrame();} );	// kick off another animation frame request
+//		requestAnimationFrame( function(){effects.animFrame();} );	// kick off another animation frame request
 	},
 
 	renderEffect: function (name, x, y) {
 		// Create an effect using AnimationClass
 		if( config.animsf[name].sound ) sound.playSound(name);
-		this.animations.push( new AnimationClass(name, this.frames[name] ,x ,y ) );
+		this.animations.push( new AnimationEffectClass(name, this.frames[name] ,x ,y ) );
 	},
 
 	renderVector: function (name,start,end) {
 		// Create an effect using VectorClass
 		if( config.animsv[name].sound ) sound.playSound(name);
-		this.animations.push( new VectorClass(name,start,end) );
+		this.animations.push( new VectorEffectClass(name,start,end) );
+	},
+
+	renderBeam: function (name,start,end) {
+		// Create a teleport beam effect
+		sound.playSound('beam');
+		this.animations.push( new BeamEffectClass('beam',start,end) );
 	},
 	
 	deleteAnimation: function (name) {
@@ -69,7 +74,7 @@ EffectsClass = Class.extend({
 });
 
 
-AnimationClass = Class.extend({
+AnimationEffectClass = Class.extend({
 	// Class defining an instance of an animation effect
 	x: null,
 	y: null,
@@ -107,7 +112,7 @@ AnimationClass = Class.extend({
 	},
 });
 
-VectorClass = Class.extend({
+VectorEffectClass = Class.extend({
 	// Class defining an instance of a vector animation effect
 	name: '',			// name of vector animation type
 	start: {x:0,y:0},	// starting position of vector
@@ -124,15 +129,6 @@ VectorClass = Class.extend({
 		this.ctx = cv.layers['effects'].context;
 		this.animstart = Date.now();	// grab current time for the begining of the animation
 		this.length = config.animsv[this.name].length;	// load animation duration from config
-		if(this.name == 'beam')
-		{
-			this.drawFrame = function () { // define drawFrame() for 'beam' animation
-				var percent = ((Date.now()-this.animstart) / this.length)		// calculate how far through the animation we are
-				this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');	// render a line from teh starting to the ending point
-				this.drawcircle(this.interpolate(start,end,percent), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
-				if(percent >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
-			};
-		}
 	},
 	
 	interpolate: function (start, end, fraction) {
@@ -159,5 +155,21 @@ VectorClass = Class.extend({
 		this.ctx.fillStyle = color;
 		this.ctx.fill();
 	},
+});
+
+
+TextEffectClass = Class.extend({
+	// Render a text effect to the screen
 	
+});
+
+	
+BeamEffectClass = VectorEffectClass.extend({
+	// Teleport beam class extends vector class
+	drawFrame: function () { // define drawFrame() for 'beam' animation
+		var percent = ((Date.now()-this.animstart) / this.length)		// calculate how far through the animation we are
+		this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');	// render a line from teh starting to the ending point
+		this.drawcircle(this.interpolate(this.start,this.end,this.percent), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
+		if(percent >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
+	},
 });

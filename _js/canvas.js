@@ -22,6 +22,12 @@ CanvasClass = Class.extend({
 			this.layers[name].context = this.layers[name].canvas.getContext('2d');
 		}
 	},
+
+	animFrame: function(){
+		requestAnimationFrame( cv.animFrame );
+		effects.animFrame();
+		units.animFrame();
+	},
 	
 	getMouse: function(e) {
 		// return an object with sx and sy being the X and Y position of the click on the scaled canvases and x and y being the unscaled canvas click location

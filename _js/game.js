@@ -7,6 +7,7 @@ var gameClass = Class.extend({
 	attack: [10,10],
 	defence: [10,10],
 	initcheck: null,
+	controlLock: false,
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -48,6 +49,7 @@ var gameClass = Class.extend({
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
 		this.ready = true;
+		requestAnimationFrame( cv.animFrame );
 	},
 	
 	setupListners: function () {

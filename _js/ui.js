@@ -9,15 +9,18 @@ UIClass = Class.extend({
 		
 		// add a listner for mouse clicks
 		cv.layers['ui'].canvas.addEventListener('mousedown', function(e) {
-			var mouse = cv.getMouse(e);
-			var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-			if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+			if(!game.controlLock) {
+				var mouse = cv.getMouse(e);
+				var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+				if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+			}
 		});
 		
 		cv.layers['ui'].canvas.addEventListener('mouseup', function(e) {
-			var mouse = cv.getMouse(e);
-			var uihit = ui.mouse('mouseup',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-			//if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+			if(!game.controlLock) {
+				var mouse = cv.getMouse(e);
+				var uihit = ui.mouse('mouseup',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+			}
 		});		
 		
 		// Initialise User Interface widgets

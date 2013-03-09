@@ -20,6 +20,10 @@ UnitsClass = Class.extend({
 		this.units.push( new SoldierUnitClass('soldier', 1, 1) );
 	},
 	
+	animFrame: function () {
+		this.redraw();
+	},
+	
 	redraw: function () {
 		this.destroy(); // delete dead units
 		this.wipe();	// clear the board
@@ -167,7 +171,6 @@ UnitClass = Class.extend({
 					effects.deleteAnimation('active');
 					effects.renderEffect('active', this.ux, this.uy);
 					if( --this.remainingmoves < 1) this.deactivate();
-					console.log(board);
 				}
 				else sound.playSound('doh');
 			}
@@ -220,7 +223,7 @@ UnitClass = Class.extend({
 			this.redraw();
 			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
 			var end = { x: this.ux, y: this.uy };
-			effects.renderVector('beam',start,end);
+			effects.renderBeam('beam',start,end);
 		}
 		else { sound.playSound('doh'); } // No free slot means we can't teleport home 
 	},
@@ -232,6 +235,7 @@ SoldierUnitClass = UnitClass.extend({
 	canAttack: true,
 
 	attack: function (tile, enemies) {
+		game.controlLock = true;										// Lock control input TODO: Need to make this more formalized and robust
 		this.remainingmoves--;
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
@@ -239,13 +243,16 @@ SoldierUnitClass = UnitClass.extend({
 		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];	// Apply upgrade multipliers
 		// TODO: multi unit defence bonus, home base defence bonus
 		console.log('attack result: '+result);	// DEBUG: output attack result
-		sound.playSound('battle');	// play attack sound effect
+		sound.playSound('battle');				// play attack sound effect
 		if( result >= -15 && result <= 15 )	
 		{
 			console.log('DRAW');
+			this.deactivate();
+			this.redraw();
+			game.controlLock = false;
 		}
 		else if( result < -15 ) {
-			setTimeout( function () {units.units[units.activeUnit].lose() }, 1500 );
+			setTimeout( function () {units.units[units.activeUnit].lose(); game.controlLock = false; }, 1500 );
 		}
 		else if( result > 15 )
 		{
@@ -261,7 +268,8 @@ SoldierUnitClass = UnitClass.extend({
 						unit.tileid = tile;
 						unit.slotid = board.allocateSlot(tile);
 						unit.deactivate();
-						unit.redraw()
+						unit.redraw();
+						game.controlLock = false;
 					}, 400 );
 				}
 			}, 1500 );
@@ -273,7 +281,7 @@ SoldierUnitClass = UnitClass.extend({
 		// Deal with the unit losing a battle
 		this.deactivate();
 		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
-		this.wipe(); 		// wide the unit from the units cavas
+		this.wipe(); 		// wipe the unit from the units cavas
 
 		effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion
 		this.state = 'dead';
@@ -288,17 +296,17 @@ WorkerUnitClass = UnitClass.extend({
 	
 	lose: function () {
 		// Deal with the unit losing a battle
+		var slot;
 		var hometile = config.homeTile[this.side];	// target for teleport
 		
 		this.deactivate();
 		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 		this.wipe(); 		// wide the unit from the units cavas
 		
-		if(this.tileid !== hometile) {
-			var slot = board.allocateSlot(hometile);	// find slot at target
-			if( slot ) this.teleport(slot);
-		}
-		else
+		if(this.tileid !== hometile) { slot = board.allocateSlot(hometile); }	// If we aren't already home see if we can find a slot to teleport to
+		
+		if( slot ) this.teleport(slot); // if there is a free home slot teleport there
+		else	// else die
 		{
 			effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion or teleport effect
 			this.state = 'dead';
