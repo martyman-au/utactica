@@ -64,7 +64,11 @@ UnitsClass = Class.extend({
 	
 	move: function (keycode) {
 		// move a unit
-		if( this.activeUnit == null ) return;
+		if( this.activeUnit == null ) {
+			sound.playSound('doh');
+			effects.renderText('NO UNIT SELECTED',{center:true});
+			return;
+		}
 		else this.units[this.activeUnit].move(keycode);
 	},
 	

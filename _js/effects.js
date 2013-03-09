@@ -168,7 +168,7 @@ TextEffectClass = Class.extend({
 	ctx: null,
 	length: 120,
 	count: 0,
-	size: 80,
+	size: 70,
 	colour: colours.white,
 	
 	init: function (text,position) {
@@ -185,14 +185,13 @@ TextEffectClass = Class.extend({
 	},
 	
 	drawFrame: function () {
-	console.log(this);
-		this.ctx.fillStyle = colours.white;
+		this.ctx.fillStyle = colours.orange;
 		this.ctx.textAlign = 'center';
 		this.ctx.shadowOffsetX = 0;
 		this.ctx.shadowOffsetY = 0;
-		this.ctx.shadowBlur = 5;
-		this.ctx.shadowColor = '#222222';  // TODO: hardcoded
-		this.ctx.font = "normal 400 "+this.size+"px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.shadowBlur = 10;
+		this.ctx.shadowColor = '#FFFFFF';  // TODO: hardcoded
+		this.ctx.font = "bold "+this.size+"px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		this.ctx.fillText(this.text, this.position.x, this.position.y);		
 		this.ctx.shadowColor = "transparent";
 		this.ctx.textAlign = 'start';

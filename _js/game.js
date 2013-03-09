@@ -49,14 +49,15 @@ var gameClass = Class.extend({
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
 		this.ready = true;
-		requestAnimationFrame( game.animFrame );
+		requestAnimationFrame( game.animFrame );	// Start animation loop
 	},
 	
 
 	animFrame: function(){
-		requestAnimationFrame( game.animFrame );
-		effects.animFrame();
-		units.animFrame();
+		// Animation loop
+		requestAnimationFrame( game.animFrame ); 	// continue loop
+		effects.animFrame();						// render any currrent effects
+		units.animFrame();							// render any unit changes
 	},
 	
 	setupListners: function () {
@@ -98,8 +99,14 @@ var gameClass = Class.extend({
 	collectResource: function (resource) {
 		// Allocate any occupied resources to that team
 		// TODO: trigger resource collection animation "text effect"
-		if( resource.substring(0,1) == 'f') this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
-		else if( resource.substring(0,1) == 's') this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
+		if( resource.substring(0,1) == 'f') {
+			this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
+			effects.renderText(resource.substring(1)+' food resouces collected',{center:true});
+		}
+		else if( resource.substring(0,1) == 's') {
+			this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
+			effects.renderText(resource.substring(1)+' science resouces collected',{center:true});
+		}
 	},
 });
 
