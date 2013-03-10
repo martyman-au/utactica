@@ -141,6 +141,7 @@ UnitClass = Class.extend({
 	},
 
 	activate: function () {
+//		units.activeUnit = this;	// TODO need to set units.activeUnit to this unit's ID...
 		this.state = 'active';
 		this.redraw();
 		effects.renderEffect('active', this.ux, this.uy);
@@ -170,8 +171,7 @@ UnitClass = Class.extend({
 		
 		if( newtile ) // if the desired tile exists check if this is a move or attack
 		{
-			var enemies = units.getEnemies(newtile);
-
+			var enemies = units.getEnemies(newtile); // Check for enemies on teh target tile
 			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
 			{
 				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
@@ -186,13 +186,24 @@ UnitClass = Class.extend({
 				var newslot = board.allocateSlot(newtile);		// Find which slot on the tile is available
 				if( newslot )
 				{
-					board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
+//					effects.deleteAnimation('active');
+//					this.remainingmoves--;
+					
+					// calculate a tranlation effect
+					var newloc = {};
+					var slots = board.tiles[newtile].slots;
+					var slotoffsetx = Math.max( -50, Math.min(50, slots[newslot].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+					var slotoffsety = Math.max( -50, Math.min(50, slots[newslot].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+					newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
+					newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
+					units.translations.push( new TranslateClass(units.units[units.activeUnit], newloc));
+
+					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 					this.tileid = newtile; 	// Set unit to new tile location
 					this.slotid = newslot;	// set unit to new tile slot
-					this.redraw();			// Wipe and redraw in new location
-					effects.deleteAnimation('active');
-					effects.renderEffect('active', this.ux, this.uy);
-					if( --this.remainingmoves < 1) this.deactivate();
+					
+//					effects.renderEffect('active', this.ux, this.uy);
+//					if( --this.remainingmoves < 1) this.deactivate();
 				}
 				else {
 					effects.renderText('THERE IS NO SPACE AVAILABLE',{center:true});
@@ -241,7 +252,7 @@ UnitClass = Class.extend({
 		if(slot == undefined )	var slot = board.allocateSlot(hometile);	// find a free slot at the home tile
 		if( slot ) // Free slot means that we can teleport home
 		{
-			this.remainingmoves--;
+			this.remainingmoves--;	// decrease the remaining moves of this unit
 			board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 			this.deactivate();
 			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
@@ -355,15 +366,15 @@ TranslateClass = Class.extend({
 	unit: {},
 	start: {x:0,y:0},	// starting position of translation
 	end: {x:0,y:0},
-	length: 60,	// number of frames to run the animation
+	length: 20,	// number of frames to run the animation
 	count: 0,	// Frame counter
 	
 	init: function (unit, end) {
 		this.unit = unit;
-		console.log(unit);
 		this.start.x = unit.ux;
 		this.start.y = unit.uy;
 		this.end = end;
+		this.unit.deactivate();
 	},
 	
 	interpolate: function (fraction) {
@@ -380,6 +391,12 @@ TranslateClass = Class.extend({
 		var newloc = this.interpolate(fraction);
 		this.unit.ux = newloc.x;
 		this.unit.uy = newloc.y;
-		if(this.count == this.length) return 'done';
+		if(this.count == this.length)
+		{
+			this.unit.remainingmoves--;
+			this.unit.redraw();
+			if(this.unit.remainingmoves > 0) this.unit.activate();
+			return 'done';
+		}
 	}
 });
