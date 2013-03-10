@@ -63,13 +63,23 @@ UnitsClass = Class.extend({
 	},
 	
 	move: function (keycode) {
-		// move a unit
+		// move the active unit
 		if( this.activeUnit == null ) {
 			sound.playSound('doh');
 			effects.renderText('NO UNIT SELECTED',{center:true});
 			return;
 		}
 		else this.units[this.activeUnit].move(keycode);
+	},
+	
+	teleport: function () {
+		// teleport the active unit
+		if( this.activeUnit == null ) {
+			sound.playSound('doh');
+			effects.renderText('NO UNIT SELECTED',{center:true});
+			return;
+		}
+		else this.units[this.activeUnit].teleport();
 	},
 	
 	getEnemies: function (tile) {
@@ -160,7 +170,10 @@ UnitClass = Class.extend({
 			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
 			{
 				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
-				else sound.playSound('doh');					// If this unit is worker don't move
+				else {
+					effects.renderText('WORKERS CAN\'T ATTACK',{center:true});
+					sound.playSound('doh');					// If this unit is worker don't move
+				}
 			}
 			else	// There was no enemies lets see if we can move there
 			{
@@ -176,10 +189,16 @@ UnitClass = Class.extend({
 					effects.renderEffect('active', this.ux, this.uy);
 					if( --this.remainingmoves < 1) this.deactivate();
 				}
-				else sound.playSound('doh');
+				else {
+					effects.renderText('THERE IS NO SPACE AVAILABLE',{center:true});
+					sound.playSound('doh');
+				}
 			}
 		}
-		else sound.playSound('doh');
+		else {
+			effects.renderText('YOU CAN\'T MOVE THAT DIRECTION',{center:true});
+			sound.playSound('doh');
+		}
 	},
 
 
@@ -218,6 +237,7 @@ UnitClass = Class.extend({
 		if(slot == undefined )	var slot = board.allocateSlot(hometile);	// find a free slot at the home tile
 		if( slot ) // Free slot means that we can teleport home
 		{
+			this.remainingmoves--;
 			board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 			this.deactivate();
 			effects.renderEffect('teleport', this.ux, this.uy)	// render an explosion or teleport effect
@@ -229,7 +249,10 @@ UnitClass = Class.extend({
 			var end = { x: this.ux, y: this.uy };
 			effects.renderBeam('beam',start,end);
 		}
-		else { sound.playSound('doh'); } // No free slot means we can't teleport home 
+		else { // No free slot means we can't teleport home 
+			effects.renderText('THERE IS NO SPACE AVAILABLE',{center:true});
+			sound.playSound('doh');
+		}
 	},
 });
 	
@@ -239,7 +262,7 @@ SoldierUnitClass = UnitClass.extend({
 	canAttack: true,
 
 	attack: function (tile, enemies) {
-		game.controlLock = true;										// Lock control input TODO: Need to make this more formalized and robust
+		game.controlLock = true;						// Lock control input TODO: Need to make this more formalized and robust
 		this.remainingmoves--;
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
@@ -250,11 +273,12 @@ SoldierUnitClass = UnitClass.extend({
 		sound.playSound('battle');				// play attack sound effect
 		if( result >= -15 && result <= 15 )	
 		{
-			console.log('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL');
-			setTimeout( function () {effects.renderText('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL',{center:true}); }, 1500);
+			setTimeout( function () {
+				effects.renderText('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL',{center:true});
+				game.controlLock = false;
+			}, 1500);
 			this.deactivate();
 			this.redraw();
-			game.controlLock = false;
 		}
 		else if( result < -15 ) {
 			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
