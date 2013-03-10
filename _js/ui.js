@@ -178,17 +178,14 @@ UIClass = Class.extend({
 			return;
 		}	
 		var code = e.keyCode;
+//		console.log(code);
 		if( code in config.movekeys )	// This is a move command
 		{
 			ui.moveIconFlash(code);		// Animate on screen arrow button
 			units.move(code); 			// attempt to move the active unit
 		}
 		else if( code == '72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
-		else if( code == '88' )
-		{
-			var unit = units.activeUnit;
-			if(units.units[unit].lose() == 'delete') delete units.units[unit];	// "x" will explode the active unit (for testing)
-		}
+
 		else if (code == '32' ) {												// Space bar ends turn
 			ui.widgets.endturn.pulse(200);
 			game.endTurn();	
@@ -198,6 +195,7 @@ UIClass = Class.extend({
 			ui.widgets.teleport.pulse(200);
 			units.teleport();
 		}
+		else if (code == '80' ) units.translations.push( new TranslateClass(units.units[units.activeUnit], {x:20, y:20}));
 	},
 	
 	moveIconFlash: function (code) {

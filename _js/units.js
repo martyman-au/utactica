@@ -2,6 +2,7 @@ UnitsClass = Class.extend({
 	// Class that contains all of the units in the game
 	units: new Array(),
 	activeUnit: null,
+	translations: [],
 	
 	init: function () {
 		this.allocateUnits();
@@ -21,6 +22,9 @@ UnitsClass = Class.extend({
 	},
 	
 	animFrame: function () {
+		for( i in this.translations )	{
+			if( this.translations[i].animFrame() == 'done') delete this.translations[i];
+		}
 		this.redraw();
 	},
 	
@@ -33,6 +37,7 @@ UnitsClass = Class.extend({
 	render: function () {
 		// Render all of the units on the board
 		for( i in this.units ) this.units[i].render(); // render every unit
+		if(this.activeUnit) { this.units[this.activeUnit].render(); } // ensure active unit is drawn on top of other units
 	},
 
 	wipe: function () {
@@ -200,8 +205,7 @@ UnitClass = Class.extend({
 			sound.playSound('doh');
 		}
 	},
-
-
+	
 	wipe: function (dir) {
 		// wipe the units canvas to clear this unit off the board
 		cv.layers['units'].context.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
@@ -344,4 +348,38 @@ WorkerUnitClass = UnitClass.extend({
 			units.redraw();
 		}
 	},
+});
+
+
+TranslateClass = Class.extend({
+	unit: {},
+	start: {x:0,y:0},	// starting position of translation
+	end: {x:0,y:0},
+	length: 60,	// number of frames to run the animation
+	count: 0,	// Frame counter
+	
+	init: function (unit, end) {
+		this.unit = unit;
+		console.log(unit);
+		this.start.x = unit.ux;
+		this.start.y = unit.uy;
+		this.end = end;
+	},
+	
+	interpolate: function (fraction) {
+		// Simple linear interpolation a "fraction" of the distance between two points
+		var x = this.start.x + (this.end.x - this.start.x) * fraction;
+		var y = this.start.y + (this.end.y - this.start.y) * fraction;
+		return { x: x, y: y};
+	},
+	
+	animFrame: function () {
+		// Calculate new unit position and update
+		this.count++;
+		var fraction = this.count/this.length		// calculate how far through the animation we are
+		var newloc = this.interpolate(fraction);
+		this.unit.ux = newloc.x;
+		this.unit.uy = newloc.y;
+		if(this.count == this.length) return 'done';
+	}
 });
