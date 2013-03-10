@@ -106,5 +106,3 @@ var config = {
 	music: ['mmm']
 	
 };
-
-console.log(config.movekeys);
