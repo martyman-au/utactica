@@ -166,7 +166,7 @@ TextEffectClass = Class.extend({
 	text: 'Test Text',
 	position: {x:0,y:0},	// starting position of vector
 	ctx: null,
-	length: 120,
+	length: 60,
 	count: 0,
 	size: 70,
 	colour: colours.white,
@@ -185,6 +185,8 @@ TextEffectClass = Class.extend({
 	},
 	
 	drawFrame: function () {
+		// Render the text to the effects layer
+		// TODO: Fade out text based on this.count
 		this.ctx.fillStyle = colours.orange;
 		this.ctx.textAlign = 'center';
 		this.ctx.shadowOffsetX = 0;
