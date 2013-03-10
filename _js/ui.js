@@ -23,28 +23,25 @@ UIClass = Class.extend({
 			}
 		});		
 		
-		// Initialise User Interface widgets
+		// Initialise all the User Interface widgets
 		this.widgets.speaker = new ImageButtonClass( {left:25,bottom:30}, ['speaker.png', 'speaker_mute.png'], true);
 		this.widgets.speaker.action = function (){sound.toggleMute(); };
 
 		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
-		this.widgets.upright.action = function (){ units.move('kc33'); };
+		this.widgets.upright.action = function (){ units.move('33'); };
 		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
-		this.widgets.up.action = function (){ units.move('kc38'); };
+		this.widgets.up.action = function (){ units.move('38'); };
 		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
-		this.widgets.upleft.action = function (){ units.move('kc36'); };
+		this.widgets.upleft.action = function (){ units.move('36'); };
 		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
-		this.widgets.downright.action = function (){ units.move('kc34'); };
+		this.widgets.downright.action = function (){ units.move('34'); };
 		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
-		this.widgets.down.action = function (){ units.move('kc40'); };
+		this.widgets.down.action = function (){ units.move('40'); };
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
-		this.widgets.downleft.action = function (){ units.move('kc35'); };
+		this.widgets.downleft.action = function (){ units.move('35'); };
 		
 		this.widgets.teleport = new VectorButtonClass( {left:15,top:190}, 'Teleport', 110);
-		this.widgets.teleport.action = function (){
-			if(units.activeUnit !== null) units.units[units.activeUnit].teleport();
-			else sound.playSound('doh');
-		};
+		this.widgets.teleport.action = function (){ units.teleport(); };
 
 		this.widgets.buyunits = new VectorButtonClass( {left:15,top:250}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ ui.widgets.buyunitspopup.render(); };
@@ -181,7 +178,6 @@ UIClass = Class.extend({
 			return;
 		}	
 		var code = e.keyCode;
-//		console.log(code);
 		if( code in config.movekeys )	// This is a move command
 		{
 			ui.moveIconFlash(code);		// Animate on screen arrow button
@@ -193,14 +189,15 @@ UIClass = Class.extend({
 			var unit = units.activeUnit;
 			if(units.units[unit].lose() == 'delete') delete units.units[unit];	// "x" will explode the active unit (for testing)
 		}
-		else if (code == '32' ) // Space bar ends turn
-		{
+		else if (code == '32' ) {												// Space bar ends turn
 			ui.widgets.endturn.pulse(200);
 			game.endTurn();	
 		}
 		else if (code == '77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
-		else if (code == '84' ) units.units[units.activeUnit].teleport();		// "t" Teleport a unit home
-
+		else if (code == '84' ) {												// "t" Teleport a unit home
+			ui.widgets.teleport.pulse(200);
+			units.teleport();
+		}
 	},
 	
 	moveIconFlash: function (code) {
@@ -235,7 +232,7 @@ WidgetClass = Class.extend({
 	},
 	
 	toggleState: function () {
-		// Toggle this button between it's two first states
+		// Toggle this button between it's two first states, if a widget is in a third or higher state reset it to it's first
 		if( this.state == 0) this.state = 1;
 		else this.state = 0;
 		ui.redraw(); 			// TODO: need to change this to only wipe and redraw the button
@@ -260,7 +257,6 @@ WidgetClass = Class.extend({
 ButtonClass = WidgetClass.extend({
 	// Base button class for the UTACTICA UI used to create ImageButtonClass and VectorButtonClass
 	toggleOnMouse: false,
-	
 	
 	mouse: function (event,x,y) {
 		// Deal with mouse events, normally this would just mean actioning a click and toggling the button state
@@ -380,25 +376,25 @@ PopupClass = WidgetClass.extend({
 	
 	render: function () {
 		// Renders this popup to the screen
-
-		this.position.x = (window.innerWidth-this.size.w)/2;
-		this.position.y = (window.innerHeight-this.size.h)/2;
-		//re-calculate edges for click hit matching
-		this.edges.top = this.position.y - 10 ;		
-		this.edges.bottom = this.position.y + this.size.h + 10;
-		this.edges.left = this.position.x - 10;
-		this.edges.right = this.position.x + this.size.w + 10;		
+		this.position.x = (window.innerWidth-this.size.w)/2;		// center in the x direction
+		this.position.y = (window.innerHeight-this.size.h)/2;		// center in the y direction
+		this.edges.top = this.position.y - 10 ;						//re-calculate edges for click hit matching
+		this.edges.bottom = this.position.y + this.size.h + 10;		//re-calculate edges for click hit matching
+		this.edges.left = this.position.x - 10;						//re-calculate edges for click hit matching
+		this.edges.right = this.position.x + this.size.w + 10;		//re-calculate edges for click hit matching
 		
-		ui.popup = this;
-	
+		ui.popup = this; // set the ui global popup variable to point to this popup
+		
+		// grey out the background
 		cv.layers['ui'].context.fillStyle = config.styles.popupgreyout;
 		cv.layers['ui'].context.fillRect(0,0,window.innerWidth,window.innerHeight);
 		
+		// setup shadow
 		cv.layers['ui'].context.shadowOffsetX = 1;
 		cv.layers['ui'].context.shadowOffsetY = 1;
 		cv.layers['ui'].context.shadowBlur = 25;
 		cv.layers['ui'].context.shadowColor = '#222222';
-
+		
 		cv.layers['ui'].context.fillStyle = '#E0E0B0';
 		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
 		cv.layers['ui'].context.lineWidth = 15;
@@ -410,10 +406,11 @@ PopupClass = WidgetClass.extend({
 		cv.layers['ui'].context.shadowColor = "transparent";
 		cv.layers['ui'].context.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
 		
-		this.renderTitle();
+		if(this.title) this.renderTitle(); // if a title exists render it to the popup window
 	},
 	
 	renderTitle: function () {
+		// Render title text onto the popup window
 		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		cv.layers['ui'].context.textAlign = 'center';
 		cv.layers['ui'].context.fillStyle = '#222222';
