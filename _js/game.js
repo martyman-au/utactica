@@ -80,19 +80,14 @@ var gameClass = Class.extend({
 	
 	endTurn: function () {
 		// Perform actions required to end a players turn
-		// Deactivate current unit, collect resources
-		units.deactivate();
-		for( i in units.units )
+		units.deactivate();			// Deactivate current unit
+		for( i in units.units )		// Run through all the units in the game
 		{
-			var unit = units.units[i];
-			if(unit.side == this.turn)
-			{
-				if(unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);
-				unit.remainingmoves = unit.maxmoves;
-			}
+			var unit = units.units[i];				
+			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
+			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
 		}
-		if(this.turn) this.turn = 0;
-		else this.turn = 1;
+		this.turn = 1 - this.turn;	// switch to other player's turn
 		this.redraw();
 	},
 	
