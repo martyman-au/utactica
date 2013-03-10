@@ -2,8 +2,11 @@ UIClass = Class.extend({
 	tiles: new Array(),
 	popup: null,
 	widgets: {},
+	ctx: null,
 	
 	init: function () {
+		this.ctx = cv.layers['ui'].context; // TODO: Hardcoded?
+
 		//fixes a problem where double clicking causes text to get selected on the canvas
 		cv.layers['ui'].canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 		
@@ -40,16 +43,16 @@ UIClass = Class.extend({
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('35'); };
 		
-		this.widgets.teleport = new VectorButtonClass( {left:15,top:190}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {right:125,top:250}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.teleport(); };
 
-		this.widgets.buyunits = new VectorButtonClass( {left:15,top:250}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {right:125,top:310}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ ui.widgets.buyunitspopup.render(); };
 
-		this.widgets.upgrades = new VectorButtonClass( {left:15,top:310}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {right:125,top:370}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
-		this.widgets.endturn = new VectorButtonClass( {left:15,top:370}, 'End turn', 110);
+		this.widgets.endturn = new VectorButtonClass( {right:125,top:190}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
 		
 		this.widgets.upgradespopup = new PopupClass( 'Upgrades' );
@@ -84,50 +87,52 @@ UIClass = Class.extend({
 	
 	wipe: function (dir) {
 		// Clear the UI layer
-		cv.layers['ui'].context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+		this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	},
 	
 	renderPlayerTurn: function () {
+		// Display the current side's name to show who's turn it is
 		var text = config.sides[game.turn].name + 's';
-		cv.layers['ui'].context.fillStyle = colours[config.sides[game.turn].colour];
-		cv.layers['ui'].context.shadowOffsetX = 0;
-		cv.layers['ui'].context.shadowOffsetY = 0;
-		cv.layers['ui'].context.shadowBlur = 3;
-		cv.layers['ui'].context.shadowColor = '#FFFFFF';  // TODO: hardcoded
+		this.ctx.fillStyle = colours[config.sides[game.turn].colour];
+		this.ctx.shadowOffsetX = 0;
+		this.ctx.shadowOffsetY = 0;
+		this.ctx.shadowBlur = 3;
+		this.ctx.shadowColor = '#FFFFFF';  // TODO: hardcoded
 		var x = 10;
-		var y = 125;
-		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		cv.layers['ui'].context.fillText(text, x, y);		
-		cv.layers['ui'].context.shadowColor = "transparent";
+		var y = 120;
+		this.ctx.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.fillText(text, x, y);		
+		this.ctx.shadowColor = "transparent";
 	},
 	
 	renderGameTitle: function () {
-		cv.layers['ui'].context.fillStyle = colours.white;  // TODO: hardcoded
-		cv.layers['ui'].context.font = "normal 400 90px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		cv.layers['ui'].context.shadowOffsetX = 0;
-		cv.layers['ui'].context.shadowOffsetY = 0;
-		cv.layers['ui'].context.shadowBlur = 6;
-		cv.layers['ui'].context.shadowColor = '#552222';  // TODO: hardcoded
+		// Display "Utactica"
+		this.ctx.fillStyle = colours.white;  // TODO: hardcoded
+		this.ctx.font = "normal 400 80px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.shadowOffsetX = 0;
+		this.ctx.shadowOffsetY = 0;
+		this.ctx.shadowBlur = 6;
+		this.ctx.shadowColor = '#552222';  // TODO: hardcoded
 		var x = 10;
 		var y = 80;
-		cv.layers['ui'].context.fillText('UTACTICA', x, y);		
-		cv.layers['ui'].context.shadowColor = "transparent";		
+		this.ctx.fillText('UTACTICA', x, y);		
+		this.ctx.shadowColor = "transparent";		
 	},
 	
 	renderCash: function () {
-		// render the current resource 
-		cv.layers['ui'].context.font = "normal 400 20px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		cv.layers['ui'].context.fillStyle = config.styles.cashtext; 
-		cv.layers['ui'].context.shadowOffsetX = 0;
-		cv.layers['ui'].context.shadowOffsetY = 1;
-		cv.layers['ui'].context.shadowBlur = 6;
-		cv.layers['ui'].context.shadowColor = config.styles.cashtextshadow;
+		// render the current team's resource totals
+		this.ctx.font = "normal 400 20px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.fillStyle = config.styles.cashtext; 
+		this.ctx.shadowOffsetX = 0;
+		this.ctx.shadowOffsetY = 1;
+		this.ctx.shadowBlur = 6;
+		this.ctx.shadowColor = config.styles.cashtextshadow;
 		var x = 10;
 		var y = 150;
-		cv.layers['ui'].context.fillText(config.sides[game.turn].name+' food resources: '+game.foodcash[game.turn], x, y);
+		this.ctx.fillText(config.sides[game.turn].name+' food resources: '+game.foodcash[game.turn], x, y);
 		var y = y + 20;
-		cv.layers['ui'].context.fillText(config.sides[game.turn].name+' tech resources: '+game.sciencecash[game.turn], x, y);
-		cv.layers['ui'].context.shadowColor = "transparent";
+		this.ctx.fillText(config.sides[game.turn].name+' tech resources: '+game.sciencecash[game.turn], x, y);
+		this.ctx.shadowColor = "transparent";
 	},
 	
 	renderArrows: function () {
@@ -142,10 +147,8 @@ UIClass = Class.extend({
 
 	mouse: function (event,x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
-//		console.log(x,y);
-		
 		if(this.popup && this.popup.clickhit(x,y)) { // if it is a popup click
-			// TODO: deal with the popup click
+			this.popup.mouse(event,x,y);	// send click to popup
 		}
 		else {
 			if(event=='mousedown' && this.popup) // If there is a popup then close it and exit
@@ -154,9 +157,8 @@ UIClass = Class.extend({
 				this.redraw();
 				return true;
 			}
-			// Check if the click hits any widgets
 			var i = null;
-			for( i in this.widgets )
+			for( i in this.widgets )	// Check if the click hits any widgets
 			{
 				var widget = this.widgets[i]
 				if( widget.display && widget.clickhit(x,y) )
@@ -169,50 +171,18 @@ UIClass = Class.extend({
 		}
 	},
 	
-	keypress: function (e) {
-		// Deal with keypresses
-		if(this.popup)	// If there is a popup then close it and exit
-		{
-			this.popup = false;
-			this.redraw();
-			return;
-		}	
-		var code = e.keyCode;
-//		console.log(code);
-		if( code in config.movekeys )	// This is a move command
-		{
-			ui.moveIconFlash(code);		// Animate on screen arrow button
-			units.move(code); 			// attempt to move the active unit
-		}
-		else if( code == '72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
-
-		else if (code == '32' ) {												// Space bar ends turn
-			ui.widgets.endturn.pulse(200);
-			game.endTurn();	
-		}
-		else if (code == '77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
-		else if (code == '84' ) {												// "t" Teleport a unit home
-			ui.widgets.teleport.pulse(200);
-			units.teleport();
-		}
-		else if (code == '80' ) units.translations.push( new TranslateClass(units.units[units.activeUnit], {x:20, y:20}));
-	},
-	
 	moveIconFlash: function (code) {
 		// Flash the appropriate move icon when a move is attempted
-		x = config.movekeys[code].x;
-		y = config.movekeys[code].y;
-		if(y == 1)
-		{
-			if( x == 1 ) this.widgets.downright.pulse(200);
+		var dir = config.movekeys[code];
+		if(dir.y == 1) {
+			if( dir.x == 1 ) this.widgets.downright.pulse(200);
 			else this.widgets.downleft.pulse(200);
 		}
-		else if( y == -1 )
-		{
-			if( x == 1 ) this.widgets.upright.pulse(200);
+		else if( dir.y == -1 ) {
+			if( dir.x == 1 ) this.widgets.upright.pulse(200);
 			else this.widgets.upleft.pulse(200);
 		}
-		else if( y == -2) this.widgets.up.pulse(200);
+		else if( dir.y == -2) this.widgets.up.pulse(200);
 		else this.widgets.down.pulse(200);
 	},
 	
@@ -225,6 +195,7 @@ WidgetClass = Class.extend({
 	state: 0,
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
 	display: true,
+	ctx: null,
 	
 	init: function () {
 	},
@@ -279,6 +250,7 @@ ImageButtonClass = ButtonClass.extend({
 		this.position = position;
 		this.artwork = artwork;
 		this.toggleOnMouse = toggleOnMouse;
+		this.ctx = cv.layers['ui'].context; // TODO: Hardcoded?
 	},
 	
 	render: function () {
@@ -287,7 +259,7 @@ ImageButtonClass = ButtonClass.extend({
 		else this.position.x = window.innerWidth-this.position.right;
 		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
 		else this.position.y = window.innerHeight-this.position.bottom;		
-		drawSprite(this.artwork[this.state], cv.layers['ui'].context, this.position.x, this.position.y);	// draw the button sprite at the calculated position
+		drawSprite(this.artwork[this.state], this.ctx, this.position.x, this.position.y);	// draw the button sprite at the calculated position
 		
 		//re-calculate edges for click hit matching
 		this.edges.top = this.position.y - (sprites.getStats(this.artwork[this.state]).h / 2);
@@ -299,8 +271,12 @@ ImageButtonClass = ButtonClass.extend({
 
 VectorButtonClass = ButtonClass.extend({
 	// Used to create procedural ui buttons
+	ctx: null,
 	text: '',
 	size: {w: 0, h: 0},
+	shadowOffset: {x:2,y:2},
+	shadowBlur: 12,
+	shadowColor: '#222222',
 	
 	init: function (position, text, width) {
 		// Initialise a new button
@@ -309,6 +285,7 @@ VectorButtonClass = ButtonClass.extend({
 		if( typeof width === "undefined" ) this.size.w = this.text.length * 12;
 		else this.size.w = width;
 		this.size.h = 35;
+		this.ctx = cv.layers['ui'].context; // TODO: Hardcoded?
 	},
 	
 	render:  function () {
@@ -323,32 +300,32 @@ VectorButtonClass = ButtonClass.extend({
 			this.position.y = this.position.y + 2;
 		}
 		
-		cv.layers['ui'].context.shadowColor = "transparent";
+		this.ctx.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
-			cv.layers['ui'].context.shadowOffsetX = 2;
-			cv.layers['ui'].context.shadowOffsetY = 2;
-			cv.layers['ui'].context.shadowBlur = 12;
-			cv.layers['ui'].context.shadowColor = '#222222';
+			this.ctx.shadowOffsetX = 2;
+			this.ctx.shadowOffsetY = 2;
+			this.ctx.shadowBlur = 12;
+			this.ctx.shadowColor = '#222222';
 		}
 		// White outline
-		cv.layers['ui'].context.fillStyle = config.styles.buttonbg;
-		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
-		cv.layers['ui'].context.lineWidth = 12;
-		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		this.ctx.fillStyle = config.styles.buttonbg;
+		this.ctx.strokeStyle = '#FFFFFF';
+		this.ctx.lineWidth = 12;
+		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 
-		cv.layers['ui'].context.shadowColor = "transparent";
+		this.ctx.shadowColor = "transparent";
 		
-		cv.layers['ui'].context.strokeStyle = colours.brightorange;
-		cv.layers['ui'].context.lineWidth = 7;		
-		cv.layers['ui'].context.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
+		this.ctx.strokeStyle = colours.brightorange;
+		this.ctx.lineWidth = 7;		
+		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 		
-		cv.layers['ui'].context.font = "normal 400 25px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		cv.layers['ui'].context.textAlign = 'center';
-		cv.layers['ui'].context.fillStyle = '#222222';
+		this.ctx.font = "normal 400 25px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.textAlign = 'center';
+		this.ctx.fillStyle = '#222222';
 		var x = this.position.x + this.size.w/2;
 		var y = this.position.y + this.size.h/2 + 8;
-		cv.layers['ui'].context.fillText(this.text, x, y);
-		cv.layers['ui'].context.textAlign = 'start';
+		this.ctx.fillText(this.text, x, y);
+		this.ctx.textAlign = 'start';
 
 		//re-calculate edges for click hit matching
 		this.edges.top = this.position.y - 5 ;		
@@ -360,6 +337,7 @@ VectorButtonClass = ButtonClass.extend({
 
 PopupClass = WidgetClass.extend({
 	// Display popup information
+	ctx: null,
 	display: false,
 	size: {w: 0, h: 0},
 	radius: 0,
@@ -370,6 +348,7 @@ PopupClass = WidgetClass.extend({
 		this.size.w = 800;
 		this.radius = 30;
 		this.title = title;
+		this.ctx = cv.layers['ui'].context; // TODO: Hardcoded?
 	},
 	
 	render: function () {
@@ -384,39 +363,42 @@ PopupClass = WidgetClass.extend({
 		ui.popup = this; // set the ui global popup variable to point to this popup
 		
 		// grey out the background
-		cv.layers['ui'].context.fillStyle = config.styles.popupgreyout;
-		cv.layers['ui'].context.fillRect(0,0,window.innerWidth,window.innerHeight);
+		this.ctx.fillStyle = config.styles.popupgreyout;
+		this.ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 		
 		// setup shadow
-		cv.layers['ui'].context.shadowOffsetX = 1;
-		cv.layers['ui'].context.shadowOffsetY = 1;
-		cv.layers['ui'].context.shadowBlur = 25;
-		cv.layers['ui'].context.shadowColor = '#222222';
+		this.ctx.shadowOffsetX = 1;
+		this.ctx.shadowOffsetY = 1;
+		this.ctx.shadowBlur = 25;
+		this.ctx.shadowColor = '#222222';
 		
-		cv.layers['ui'].context.fillStyle = '#E0E0B0';
-		cv.layers['ui'].context.strokeStyle = '#FFFFFF';
-		cv.layers['ui'].context.lineWidth = 15;
-		cv.layers['ui'].context.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
+		this.ctx.fillStyle = '#E0E0B0';
+		this.ctx.strokeStyle = '#FFFFFF';
+		this.ctx.lineWidth = 15;
+		this.ctx.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
 		
-		cv.layers['ui'].context.strokeStyle = colours.brightorange;
-		cv.layers['ui'].context.lineWidth = 7;		
-		cv.layers['ui'].context.fillStyle = config.styles.popupbg;
-		cv.layers['ui'].context.shadowColor = "transparent";
-		cv.layers['ui'].context.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
+		this.ctx.strokeStyle = colours.brightorange;
+		this.ctx.lineWidth = 7;		
+		this.ctx.fillStyle = config.styles.popupbg;
+		this.ctx.shadowColor = "transparent";
+		this.ctx.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
 		
 		if(this.title) this.renderTitle(); // if a title exists render it to the popup window
 	},
 	
 	renderTitle: function () {
 		// Render title text onto the popup window
-		cv.layers['ui'].context.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		cv.layers['ui'].context.textAlign = 'center';
-		cv.layers['ui'].context.fillStyle = '#222222';
+		this.ctx.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.textAlign = 'center';
+		this.ctx.fillStyle = '#222222';
 		var x = this.position.x + this.size.w/2;
 		var y = this.position.y + 40;
-		cv.layers['ui'].context.fillText(this.title, x, y);
-		cv.layers['ui'].context.textAlign = 'start';
-	}
+		this.ctx.fillText(this.title, x, y);
+		this.ctx.textAlign = 'start';
+	},
+	
+	mouse: function (x,y) {
+	},
 
 
 });

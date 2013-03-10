@@ -61,13 +61,42 @@ var gameClass = Class.extend({
 	},
 	
 	setupListners: function () {
-		window.onkeydown = ui.keypress;	// TODO: best place for this?
+		window.onkeydown = game.keypress;	// TODO: best place for this?
 		
 		window.onresize = function(event) {  // on resize we should reset the canvas size and scale and redraw the board, ui and units
 			cv.setScale();		// Scale canvases
 			game.redraw();		// redraw canvases
 			if(units.activeUnit) units.units[units.activeUnit].deactivate();  // Deactivate active unit on resize to avoid misplaced "active" effect
 		}
+	},
+	
+	keypress: function (e) {
+		// Deal with keypresses
+		if(ui.popup)	// If there is a popup then close it and exit
+		{
+			ui.popup = false;
+			ui.redraw();
+			return;
+		}	
+		var code = e.keyCode;
+//		console.log(code);
+		if( code in config.movekeys )	// This is a move command
+		{
+			ui.moveIconFlash(code);		// Animate on screen arrow button
+			units.move(code); 			// attempt to move the active unit
+		}
+		else if( code == '72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
+
+		else if (code == '32' ) {												// Space bar ends turn
+			ui.widgets.endturn.pulse(200);
+			game.endTurn();	
+		}
+		else if (code == '77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
+		else if (code == '84' ) {												// "t" Teleport a unit home
+			ui.widgets.teleport.pulse(200);
+			units.teleport();
+		}
+		else if (code == '80' ) units.translations.push( new TranslateClass(units.units[units.activeUnit], {x:20, y:20}));
 	},
 	
 	redraw: function () {

@@ -182,14 +182,10 @@ UnitClass = Class.extend({
 			}
 			else	// There was no enemies lets see if we can move there
 			{
-//				console.log('no enemies, try move');
 				var newslot = board.allocateSlot(newtile);		// Find which slot on the tile is available
 				if( newslot )
 				{
-//					effects.deleteAnimation('active');
-//					this.remainingmoves--;
-					
-					// calculate a tranlation effect
+					// calculate a translation effect
 					var newloc = {};
 					var slots = board.tiles[newtile].slots;
 					var slotoffsetx = Math.max( -50, Math.min(50, slots[newslot].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
@@ -206,7 +202,7 @@ UnitClass = Class.extend({
 //					if( --this.remainingmoves < 1) this.deactivate();
 				}
 				else {
-					effects.renderText('THERE IS NO SPACE AVAILABLE',{center:true});
+					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
 					sound.playSound('doh');
 				}
 			}
@@ -265,7 +261,7 @@ UnitClass = Class.extend({
 			effects.renderBeam('beam',start,end);
 		}
 		else { // No free slot means we can't teleport home 
-			effects.renderText('THERE IS NO SPACE AVAILABLE',{center:true});
+			effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
 			sound.playSound('doh');
 		}
 	},
