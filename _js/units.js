@@ -268,8 +268,9 @@ SoldierUnitClass = UnitClass.extend({
 	type: 'soldier',
 
 	attack: function (tile, enemies) {
-		game.controlLock = true;						// Lock control input TODO: Need to make this more formalized and robust
-//		this.remainingmoves--;
+		game.controlLock = true;				// Lock control input TODO: Need to make this more formalized and robust
+		sound.playSound('battle');				// play attack sound effect
+		
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
 		if( enemies.soldier == 0 ) defend = -1000; 		// If no soldiers, workers get no defence
@@ -278,9 +279,38 @@ SoldierUnitClass = UnitClass.extend({
 
 		console.log('attack result: '+result);	// DEBUG: output attack result
 
-		sound.playSound('battle');				// play attack sound effect
-		if( result >= -15 && result <= 15 )	
-		{
+		if( result < -16 ) { // The attacking unit is destroyed
+			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
+			setTimeout( function () {units.units[units.activeUnit].lose(); game.controlLock = false; }, 1500 );
+		}
+		else if( result > 16 ) { // A defending unit is destroyed
+			effects.renderText('YOUR ATTACK WAS SUCCESSFUL',{center:true});
+			// TODO: mark only one soldier dead
+			setTimeout( function () {
+				if( enemies.soldier > 1 ) { // If more than one soldier then only destroy one
+					for( i in enemies.units ) {
+						var unit = units.units[enemies.units[i]];
+						if( unit.type == 'soldier' ) {
+							unit.lose();
+							break;
+						}
+					}
+					units.units[units.activeUnit].remainingmoves--;
+					units.units[units.activeUnit].deactivate();
+					game.controlLock = false;
+				}
+				else { // If one soldier or less, then destroy all units
+					for( i in enemies.units ) {
+						units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers
+					}
+					setTimeout( function () { // after a delay move the attacking unit
+					    units.units[units.activeUnit].actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
+						game.controlLock = false;
+					}, 400 );
+				}
+			}, 1500 );
+		}
+		else { // a stalemate
 			this.remainingmoves--;
 			setTimeout( function () {
 				effects.renderText('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL',{center:true});
@@ -288,39 +318,11 @@ SoldierUnitClass = UnitClass.extend({
 			}, 1500);
 			this.deactivate();
 			this.redraw();
-		}
-		else if( result < -15 ) {
-			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
-			setTimeout( function () {units.units[units.activeUnit].lose(); game.controlLock = false; }, 1500 );
-		}
-		else if( result > 15 )
-		{
-			effects.renderText('YOUR FORCES WERE VICTORIOUS',{center:true});
-			// TODO: mark only one soldier dead
-			setTimeout( function () {
-				for( i in enemies.units ) units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers
-				
-				enemies = units.getEnemies(tile); // count the new number of enemies
-				if( enemies.units.length == 0 )		// TODO: if these are only workers we need to lose() them
-				{
-					setTimeout( function () {	// move the unit to it's new location
-					    units.units[units.activeUnit].actualMove(tile,board.allocateSlot(tile));
-//						var unit = units.units[units.activeUnit]
-//						board.tiles[unit.tileid].clearSlot(unit.slotid); // Clear old slot on board	
-//						unit.tileid = tile;
-//						unit.slotid = board.allocateSlot(tile);
-//						unit.deactivate();
-//						unit.redraw();
-						game.controlLock = false;
-					}, 400 );
-				}
-			}, 1500 );
-		}
-		
+		}		
 	},
 
 	lose: function () {
-		// Deal with the unit losing a battle
+		// Deal with a unit losing a battle
 		this.deactivate();
 		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
 		this.wipe(); 		// wipe the unit from the units cavas
