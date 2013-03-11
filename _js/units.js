@@ -81,7 +81,10 @@ UnitsClass = Class.extend({
 		if( this.activeUnit == null ) {
 			sound.playSound('doh');
 			effects.renderText('NO UNIT SELECTED',{center:true});
-			return;
+		}
+		else if( this.units[this.activeUnit].tileid == config.homeTile[game.turn] ) {
+			sound.playSound('doh');
+			effects.renderText('YOU ARE ALREADY AT YOUR HOME BASE',{center:true});
 		}
 		else this.units[this.activeUnit].teleport();
 	},
@@ -165,37 +168,20 @@ UnitClass = Class.extend({
 		var tgt = {}; 	// Target tile x and y indexes
 		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
 		tgt.y = parseInt(board.tiles[this.tileid].grididx.y) + config.movekeys[code].y;
-		var newtile = board.checkmove(tgt); // find the ID of the deired tile
 		
-		if( newtile ) // if the desired tile exists check if this is a move or attack
-		{
-			var enemies = units.getEnemies(newtile); // Check for enemies on teh target tile
-			if(enemies.units.length > 0) // if there was at least one enemy on the target tile
-			{
+		var newtile = board.checkmove(tgt); 			// find the ID of the deired tile
+		if( newtile ) { 								// if the desired tile exists check if this is a move or attack
+			var enemies = units.getEnemies(newtile);	// Check for enemies on teh target tile
+			if(enemies.units.length > 0) { 				// if there was at least one enemy on the target tile
 				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
 				else {
 					effects.renderText('WORKERS CAN\'T ATTACK',{center:true});
-					sound.playSound('doh');					// If this unit is worker don't move
+					sound.playSound('doh');				// If this unit is worker don't move
 				}
 			}
-			else	// There was no enemies lets see if we can move there
-			{
-				var newslot = board.allocateSlot(newtile);		// Find which slot on the tile is available
-				if( newslot )
-				{
-					// calculate a translation effect
-					var newloc = {};
-					var slots = board.tiles[newtile].slots;
-					var slotoffsetx = Math.max( -50, Math.min(50, slots[newslot].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
-					var slotoffsety = Math.max( -50, Math.min(50, slots[newslot].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
-					newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
-					newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
-					units.translations.push( new TranslateClass(units.units[units.activeUnit], newloc));
-
-					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
-					this.tileid = newtile; 	// Set unit to new tile location
-					this.slotid = newslot;	// set unit to new tile slot
-				}
+			else {	// There was no enemies lets see if we can move there
+				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
+				if( newslot ) { this.actualMove(newtile,newslot); }	// animate the actual move
 				else {
 					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
 					sound.playSound('doh');
@@ -206,6 +192,19 @@ UnitClass = Class.extend({
 			effects.renderText('YOU CAN\'T MOVE THAT DIRECTION',{center:true});
 			sound.playSound('doh');
 		}
+	},
+	
+	actualMove: function (newtile,newslot) {
+		var newloc = {};
+		var slots = board.tiles[newtile].slots;
+		var slotoffsetx = Math.max( -50, Math.min(50, slots[newslot].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+		var slotoffsety = Math.max( -50, Math.min(50, slots[newslot].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
+		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
+		units.translations.push( new TranslateClass(units.units[units.activeUnit], newloc));
+		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+		this.tileid = newtile; 	// Set unit to new tile location
+		this.slotid = newslot;	// set unit to new tile slot
 	},
 	
 	wipe: function (dir) {
@@ -270,16 +269,19 @@ SoldierUnitClass = UnitClass.extend({
 
 	attack: function (tile, enemies) {
 		game.controlLock = true;						// Lock control input TODO: Need to make this more formalized and robust
-		this.remainingmoves--;
+//		this.remainingmoves--;
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
 		if( enemies.soldier == 0 ) defend = -1000; 		// If no soldiers, workers get no defence
 		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];	// Apply upgrade multipliers
 		// TODO: multi unit defence bonus, home base defence bonus
+
 		console.log('attack result: '+result);	// DEBUG: output attack result
+
 		sound.playSound('battle');				// play attack sound effect
 		if( result >= -15 && result <= 15 )	
 		{
+			this.remainingmoves--;
 			setTimeout( function () {
 				effects.renderText('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL',{center:true});
 				game.controlLock = false;
@@ -301,12 +303,14 @@ SoldierUnitClass = UnitClass.extend({
 				enemies = units.getEnemies(tile); // count the new number of enemies
 				if( enemies.units.length == 0 )		// TODO: if these are only workers we need to lose() them
 				{
-					setTimeout( function () {	// TODO: Animate unit movement??
-						var unit = units.units[units.activeUnit]
-						unit.tileid = tile;
-						unit.slotid = board.allocateSlot(tile);
-						unit.deactivate();
-						unit.redraw();
+					setTimeout( function () {	// move the unit to it's new location
+					    units.units[units.activeUnit].actualMove(tile,board.allocateSlot(tile));
+//						var unit = units.units[units.activeUnit]
+//						board.tiles[unit.tileid].clearSlot(unit.slotid); // Clear old slot on board	
+//						unit.tileid = tile;
+//						unit.slotid = board.allocateSlot(tile);
+//						unit.deactivate();
+//						unit.redraw();
 						game.controlLock = false;
 					}, 400 );
 				}
