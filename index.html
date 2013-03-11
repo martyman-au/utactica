@@ -5,13 +5,14 @@
 <link rel="stylesheet" type="text/css" href="_styles/style.css">
 
 <script type="text/javascript">
+var game = {}; // avoid error with game not being defined yet
 	// Google font loader code
 	var WebFontConfig = {
 		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
 		fontactive: function (fontFamily, fontDescription) {
 			if (fontFamily === 'Roboto Condensed') {
 				if(game.ready==true) {
-					game.redraw();  // TODO: fix game ready check  // redraw everything once font is available to make sure the canvas is rendered correctly
+					game.redraw();  // redraw everything once font is available to make sure the canvas is rendered correctly
 				}
 			}
 		}

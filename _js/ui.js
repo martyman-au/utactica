@@ -42,6 +42,9 @@ UIClass = Class.extend({
 		this.widgets.down.action = function (){ units.move('40'); };
 		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
 		this.widgets.downleft.action = function (){ units.move('35'); };
+
+		this.widgets.endturn = new VectorButtonClass( {right:125,top:190}, 'End turn', 110);
+		this.widgets.endturn.action = function (){ game.endTurn(); };
 		
 		this.widgets.teleport = new VectorButtonClass( {right:125,top:250}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.teleport(); };
@@ -52,11 +55,23 @@ UIClass = Class.extend({
 		this.widgets.upgrades = new VectorButtonClass( {right:125,top:370}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
-		this.widgets.endturn = new VectorButtonClass( {right:125,top:190}, 'End turn', 110);
-		this.widgets.endturn.action = function (){ game.endTurn(); };
+		// Define upgrades popup and add buttons
+		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 200 );
+		this.widgets.upgradespopup.widgets.upgradesoldiers = new VectorButtonClass( {center:true,top:-30}, 'Upgrade Soldiers', 300);
+		this.widgets.upgradespopup.widgets.upgradesoldiers.action = function (){ };
+		this.widgets.upgradespopup.widgets.upgradeworkers = new VectorButtonClass( {center:true,top:-30}, 'Upgrade Workers', 300);
+		this.widgets.upgradespopup.widgets.upgradeworkers.action = function (){ };
 		
-		this.widgets.upgradespopup = new PopupClass( 'Upgrades' );
-		this.widgets.buyunitspopup = new PopupClass( 'Buy Units' );
+		// Define buy units popup and add buttons
+		this.widgets.buyunitspopup = new PopupClass( 'Buy Units', 500, 200 );
+		this.widgets.buyunitspopup.widgets.buysoldier = new VectorButtonClass( {center:true,top:-30}, 'New soldier costs 100 food resources', 400);
+		this.widgets.buyunitspopup.widgets.buysoldier.action = function (){ game.buyUnit('soldier');};
+		this.widgets.buyunitspopup.widgets.buysoldier.foodcost = 100;
+		this.widgets.buyunitspopup.widgets.buyworker = new VectorButtonClass( {center:true,top:30}, 'New worker costs 200 food resources', 400);
+		this.widgets.buyunitspopup.widgets.buyworker.action = function (){ game.buyUnit('worker');};
+		this.widgets.buyunitspopup.widgets.buyworker.foodcost = 200;
+
+		// Define help popup
 		this.widgets.helppopup = new PopupClass( 'Help' );
 	},
 	
@@ -186,6 +201,24 @@ UIClass = Class.extend({
 		else this.widgets.down.pulse(200);
 	},
 	
+	greyWidgets: function () {
+		for( i in this.widgets ) {
+			var widget = this.widgets[i];
+			if( widget.widgets !== undefined ) { // check for sub widgets
+				for( j in widget.widgets ) {
+					if(widget.widgets[j].foodcost > game.foodcash[game.turn]) widget.widgets[j].greyed = true;
+					else if(widget.widgets[j].sciencecost > game.sciencecash[game.turn]) widget.widgets[j].greyed = true;
+					else widget.widgets[j].greyed = false;
+				}
+			}
+			else
+			{
+				if(widget.foodcost > game.foodcash[game.turn]) widget.greyed = true;
+				else if(widget.sciencecost > game.sciencecash[game.turn]) widget.greyed = true;
+				else widget.greyed = false;
+			}
+		}
+	}
 });
 
 
@@ -196,6 +229,9 @@ WidgetClass = Class.extend({
 	edges: {top: 0, bottom: 0, right: 0, left: 0},
 	display: true,
 	ctx: null,
+	greyed: false,
+	foodcost: 0,
+	sciencecost: 0,
 	
 	init: function () {
 	},
@@ -216,7 +252,7 @@ WidgetClass = Class.extend({
 	
 	clickhit: function (x,y) {
 		// return true if a click location corresponds to this button
-		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom)
+		if( x >= this.edges.left && x <= this.edges.right && y >= this.edges.top && y <= this.edges.bottom && !this.greyed)
 		{
 			return true;
 		}
@@ -277,6 +313,7 @@ VectorButtonClass = ButtonClass.extend({
 	shadowOffset: {x:2,y:2},
 	shadowBlur: 12,
 	shadowColor: '#222222',
+	edgeColor: colours.brightorange,
 	
 	init: function (position, text, width) {
 		// Initialise a new button
@@ -290,22 +327,36 @@ VectorButtonClass = ButtonClass.extend({
 	
 	render:  function () {
 		// render button to screen in it's defined location (position is recalculated to take into account screen resizing)
-		if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
-		else this.position.x = window.innerWidth-this.position.right;
-		if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
-		else this.position.y = window.innerHeight-this.position.bottom;		
+		if(this.position.center) {
+			this.position.x = (window.innerWidth/2) - this.size.w/2;
+			this.position.y = (window.innerHeight/2) + this.position.top;
+		}
+		else {
+			if(this.position.left) this.position.x = this.position.left; 	// calc the x position based on right or left screen edge offsets
+			else this.position.x = window.innerWidth-this.position.right;
+			if(this.position.top) this.position.y = this.position.top;		// calc the y position based on top or bottom screen edge offsets
+			else this.position.y = window.innerHeight-this.position.bottom;		
+		}
+		
+		if(this.greyed) {
+			this.state = 0;
+			this.edgeColor = '#888888';
+		}
+		else {
+			this.edgeColor = colours.brightorange;
+		}
 		
 		if( this.state === 1) { // add an offset if the button is currently clicked
 			this.position.x = this.position.x + 1;
 			this.position.y = this.position.y + 2;
 		}
 		
-		this.ctx.shadowColor = "transparent";
+//		this.ctx.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
-			this.ctx.shadowOffsetX = 2;
-			this.ctx.shadowOffsetY = 2;
-			this.ctx.shadowBlur = 12;
-			this.ctx.shadowColor = '#222222';
+			this.ctx.shadowOffsetX = this.shadowOffset.x;
+			this.ctx.shadowOffsetY = this.shadowOffset.y;
+			this.ctx.shadowBlur = this.shadowBlur;
+			this.ctx.shadowColor = this.shadowColor;
 		}
 		// White outline
 		this.ctx.fillStyle = config.styles.buttonbg;
@@ -315,7 +366,7 @@ VectorButtonClass = ButtonClass.extend({
 
 		this.ctx.shadowColor = "transparent";
 		
-		this.ctx.strokeStyle = colours.brightorange;
+		this.ctx.strokeStyle = this.edgeColor;
 		this.ctx.lineWidth = 7;		
 		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 		
@@ -341,11 +392,12 @@ PopupClass = WidgetClass.extend({
 	display: false,
 	size: {w: 0, h: 0},
 	radius: 0,
+	widgets: {},
 
-	init: function (title) {
+	init: function (title, width, height) {
 		// Is this where we should set all of the popup's contents?
-		this.size.h = 600;
-		this.size.w = 800;
+		this.size.h = height;
+		this.size.w = width;
 		this.radius = 30;
 		this.title = title;
 		this.ctx = cv.layers['ui'].context; // TODO: Hardcoded?
@@ -384,6 +436,8 @@ PopupClass = WidgetClass.extend({
 		this.ctx.roundRect((window.innerWidth-this.size.w)/2 , (window.innerHeight-this.size.h)/2, this.size.w, this.size.h, this.radius, config.styles.bannerbg );
 		
 		if(this.title) this.renderTitle(); // if a title exists render it to the popup window
+		
+		for( i in this.widgets ) this.widgets[i].render();
 	},
 	
 	renderTitle: function () {
@@ -397,8 +451,23 @@ PopupClass = WidgetClass.extend({
 		this.ctx.textAlign = 'start';
 	},
 	
-	mouse: function (x,y) {
+	mouse: function (event,x,y) {
+		for( i in this.widgets )	// Check if the click hits any widgets
+		{
+			var widget = this.widgets[i]
+			if( widget.display && widget.clickhit(x,y) )
+			{
+				widget.mouse(event,x,y);
+				return true;
+			}
+		}
 	},
 
-
+	greyWidgets: function () {
+		for( i in this.widgets ) {
+			if(this.widgets[i].foodcost > game.foodcash[game.turn]) this.widgets[i].greyed = true;
+			else if(this.widgets[i].sciencecost > game.sciencecash[game.turn]) this.widgets[i].greyed = true;
+			else this.widgets[i].greyed = false;
+		}
+	}
 });

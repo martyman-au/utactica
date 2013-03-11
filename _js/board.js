@@ -68,7 +68,6 @@ BoardClass = Class.extend({
 		}
 		return null;
 	}
-
 });
 
 TileClass = Class.extend({
@@ -128,4 +127,11 @@ TileClass = Class.extend({
 	clearSlot: function (slot) {
 		this.slots[slot].unit = false;
 	},
+	
+	checkSlots: function () {
+		for( i in this.slots ) {
+			if( this.slots[i].unit == false ) return true;
+		}
+		return false;
+	}
 });

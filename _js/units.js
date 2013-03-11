@@ -9,16 +9,16 @@ UnitsClass = Class.extend({
 	},
 	
 	allocateUnits: function () {
-		this.units.push( new SoldierUnitClass('soldier', 0, config.homeTile[0]) );
-		this.units.push( new SoldierUnitClass('soldier', 0, config.homeTile[0]) );
-		this.units.push( new WorkerUnitClass('worker', 0, config.homeTile[0]) );
-		this.units.push( new WorkerUnitClass('worker', 0, config.homeTile[0]) );
-		this.units.push( new SoldierUnitClass('soldier', 1, config.homeTile[1]) );
-		this.units.push( new SoldierUnitClass('soldier', 1, config.homeTile[1]) );
-		this.units.push( new WorkerUnitClass('worker', 1, config.homeTile[1]) );
-		this.units.push( new WorkerUnitClass('worker', 1, config.homeTile[1]) );
-		this.units.push( new WorkerUnitClass('worker', 1, 1) );
-		this.units.push( new SoldierUnitClass('soldier', 1, 1) );
+		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
+		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
+		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
+		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
+		this.units.push( new SoldierUnitClass(1, config.homeTile[1]) );
+		this.units.push( new SoldierUnitClass(1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
+		this.units.push( new WorkerUnitClass(1, 1) );
+		this.units.push( new SoldierUnitClass(1, 1) );
 	},
 	
 	animFrame: function () {
@@ -37,7 +37,6 @@ UnitsClass = Class.extend({
 	render: function () {
 		// Render all of the units on the board
 		for( i in this.units ) this.units[i].render(); // render every unit
-		if(this.activeUnit) { this.units[this.activeUnit].render(); } // ensure active unit is drawn on top of other units
 	},
 
 	wipe: function () {
@@ -110,13 +109,13 @@ UnitsClass = Class.extend({
 		{
 			if(units.units[i].state == 'dead' ) delete units.units[i];
 		}
-	}
+	},
+
 });
 
 
 UnitClass = Class.extend({
 	// Class that defines an individual unit
-	type: '',
 	side: '',
 	colour: '',
 	state: 'normal',
@@ -131,8 +130,7 @@ UnitClass = Class.extend({
 	spritewidth: 50,	// TODO: hardcoded
 	spriteheight: 50,	// TODO: hardcoded
 	
-	init: function (type, side, tile) {
-		this.type = type;
+	init: function (side, tile) {
 		this.side = side;
 		if(this.side) this.colour = 'blue'; // Side 1 has blue units
 		else this.colour = 'red';			// Side 0 has red units
@@ -197,9 +195,6 @@ UnitClass = Class.extend({
 					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 					this.tileid = newtile; 	// Set unit to new tile location
 					this.slotid = newslot;	// set unit to new tile slot
-					
-//					effects.renderEffect('active', this.ux, this.uy);
-//					if( --this.remainingmoves < 1) this.deactivate();
 				}
 				else {
 					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
@@ -271,6 +266,7 @@ SoldierUnitClass = UnitClass.extend({
 	// Class for soldier units
 	canDefend: true,
 	canAttack: true,
+	type: 'soldier',
 
 	attack: function (tile, enemies) {
 		game.controlLock = true;						// Lock control input TODO: Need to make this more formalized and robust
@@ -335,6 +331,7 @@ WorkerUnitClass = UnitClass.extend({
 	// Class for worker units
 	canDefend: false,
 	canAttack: false,
+	type: 'worker',
 	
 	lose: function () {
 		// Deal with the unit losing a battle
@@ -387,11 +384,11 @@ TranslateClass = Class.extend({
 		var newloc = this.interpolate(fraction);
 		this.unit.ux = newloc.x;
 		this.unit.uy = newloc.y;
-		if(this.count == this.length)
+		if(this.count == this.length) // end translation
 		{
 			this.unit.remainingmoves--;
 			this.unit.redraw();
-			if(this.unit.remainingmoves > 0) this.unit.activate();
+			if(this.unit.remainingmoves > 0) this.unit.activate(); // deactivate unit if moves are up
 			return 'done';
 		}
 	}

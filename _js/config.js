@@ -8,7 +8,7 @@ var colours = {
 	orange: '#CC5422',
 	brightorange: '#EE6030',
 	white: '#FFFFFF',
-	greyout: 'rgba(0,0,0,0.3)',
+	greyout: 'rgba(0,0,0,0.5)',
 	blue: '#0000E0',
 	red: '#E00000',
 	beige: '#E0E0B0'
@@ -84,7 +84,9 @@ var config = {
 	homeTile: [0,40],
 	
 	sides:[{name:'Mecritian', colour: 'red'}, {name:'Riveckian', colour:'blue'}],
-		
+
+	unitCosts:{worker:200,soldier:100},
+
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
 	
@@ -103,6 +105,6 @@ var config = {
 	
 	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh'],
 
-	music: ['mmm']
+	music: ['01-the_future_soon', '02-skullcrusher_mountain', '03-i_crush_everything', '04-betty_and_me', '05-mandelbrot_set']
 	
 };

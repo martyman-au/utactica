@@ -30,7 +30,8 @@ var gameClass = Class.extend({
 					game.setupGame();
 					window.clearInterval(game.initcheck);
 				}
-			}, 20 );
+				else console.log('not ready yet'); // DEBUG: debug code
+			}, 50 );
 	},
 
 	setupGame: function () {
@@ -117,6 +118,7 @@ var gameClass = Class.extend({
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
 		}
 		this.turn = 1 - this.turn;	// switch to other player's turn
+		ui.greyWidgets(); // grey out any widgets that are too expensive
 		this.redraw();
 	},
 	
@@ -132,6 +134,21 @@ var gameClass = Class.extend({
 			effects.renderText(resource.substring(1)+' science resouces collected',{center:true});
 		}
 	},
+	
+	buyUnit: function (type) {
+		var cost = config.unitCosts[type];
+		if( board.tiles[config.homeTile[this.turn]].checkSlots() ) { // check for available home slot
+			this.foodcash[this.turn] = this.foodcash[this.turn] - cost;
+			if( type == 'soldier') units.units.push( new SoldierUnitClass(this.turn, config.homeTile[this.turn]) );
+			else units.units.push( new WorkerUnitClass(this.turn, config.homeTile[this.turn]) );
+			units.scale(); // cause the calculation the new unit's location
+			ui.greyWidgets(); // grey out any widgets that are too expensive
+		}
+		else {
+			sound.playSound('doh');
+			effects.renderText('YOU DON\'T HAVE ROOM FOR THIS',{center:true});			
+		}
+	}
 });
 
 // variables used to hold main game objects
