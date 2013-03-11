@@ -274,7 +274,10 @@ SoldierUnitClass = UnitClass.extend({
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
 		if( enemies.soldier == 0 ) defend = -1000; 		// If no soldiers, workers get no defence
-		var result = attack - defend + game.attack[game.turn] - game.defence[game.turn];	// Apply upgrade multipliers
+		console.log('attack roll: '+attack);
+		console.log('defend roll: '+defend);
+		console.log('raw result: '+(attack-defend));
+		var result = attack - defend + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
 		// TODO: multi unit defence bonus, home base defence bonus
 
 		console.log('attack result: '+result);	// DEBUG: output attack result

@@ -56,11 +56,16 @@ UIClass = Class.extend({
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
 		// Define upgrades popup and add buttons
-		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 200 );
-		this.widgets.upgradespopup.widgets.upgradesoldiers = new VectorButtonClass( {center:true,top:-30}, 'Upgrade Soldiers', 300);
-		this.widgets.upgradespopup.widgets.upgradesoldiers.action = function (){ };
-		this.widgets.upgradespopup.widgets.upgradeworkers = new VectorButtonClass( {center:true,top:-30}, 'Upgrade Workers', 300);
-		this.widgets.upgradespopup.widgets.upgradeworkers.action = function (){ };
+		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 300 );
+		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-60}, 'Soldiers +20% attack (50 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeattack.action = function (){ game.buyUpgrade('attack'); };
+		this.widgets.upgradespopup.widgets.upgradeattack.sciencecost = 50;
+		this.widgets.upgradespopup.widgets.upgradedefence = new VectorButtonClass( {center:true,top:0}, 'Soldiers +20% defence (50 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradedefence.action = function (){ game.buyUpgrade('defence'); };
+		this.widgets.upgradespopup.widgets.upgradedefence.sciencecost = 50;
+		this.widgets.upgradespopup.widgets.upgradeproduction = new VectorButtonClass( {center:true,top:60}, 'Workers +20% production (100 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeproduction.action = function (){ game.buyUpgrade('production'); };
+		this.widgets.upgradespopup.widgets.upgradeproduction.sciencecost = 100;
 		
 		// Define buy units popup and add buttons
 		this.widgets.buyunitspopup = new PopupClass( 'Buy Units', 500, 200 );
@@ -136,7 +141,7 @@ UIClass = Class.extend({
 	
 	renderCash: function () {
 		// render the current team's resource totals
-		this.ctx.font = "normal 400 20px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.font = "normal 400 18px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		this.ctx.fillStyle = config.styles.cashtext; 
 		this.ctx.shadowOffsetX = 0;
 		this.ctx.shadowOffsetY = 1;
@@ -144,9 +149,15 @@ UIClass = Class.extend({
 		this.ctx.shadowColor = config.styles.cashtextshadow;
 		var x = 10;
 		var y = 150;
-		this.ctx.fillText(config.sides[game.turn].name+' food resources: '+game.foodcash[game.turn], x, y);
+		this.ctx.fillText('Food resources: '+game.foodcash[game.turn], x, y);
 		var y = y + 20;
-		this.ctx.fillText(config.sides[game.turn].name+' tech resources: '+game.sciencecash[game.turn], x, y);
+		this.ctx.fillText('Science resources: '+game.sciencecash[game.turn], x, y);
+		var y = y + 20;
+		this.ctx.fillText('Attack upgrades: '+game.attack[game.turn]+'%', x, y);
+		var y = y + 20;
+		this.ctx.fillText('Defence upgrades: '+game.defence[game.turn]+'%', x, y);
+		var y = y + 20;
+		this.ctx.fillText('Production rate: '+(game.production[game.turn]*100)+'%', x, y);
 		this.ctx.shadowColor = "transparent";
 	},
 	

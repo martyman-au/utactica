@@ -86,6 +86,8 @@ var config = {
 	sides:[{name:'Mecritian', colour: 'red'}, {name:'Riveckian', colour:'blue'}],
 
 	unitCosts:{worker:200,soldier:100},
+	
+	upgradeCosts:{attack:50,defence:50,production:100},
 
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],

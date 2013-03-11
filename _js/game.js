@@ -4,8 +4,8 @@ var gameClass = Class.extend({
 	foodcash: [250,250],
 	sciencecash: [100,100],
 	production: [1,1],
-	attack: [10,10],
-	defence: [10,10],
+	attack: [0,0],
+	defence: [0,0],
 	initcheck: null,
 	controlLock: false,
 
@@ -126,12 +126,14 @@ var gameClass = Class.extend({
 		// Allocate any occupied resources to that team
 		// TODO: trigger resource collection animation "text effect"
 		if( resource.substring(0,1) == 'f') {
-			this.foodcash[this.turn] = this.foodcash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
-			effects.renderText(resource.substring(1)+' food resouces collected',{center:true});
+			var food = this.production[this.turn] * Number(resource.substring(1));
+			this.foodcash[this.turn] = this.foodcash[this.turn] + food;
+			effects.renderText(food+' food resouces collected',{center:true});
 		}
 		else if( resource.substring(0,1) == 's') {
-			this.sciencecash[this.turn] = this.sciencecash[this.turn] + this.production[this.turn] * Number(resource.substring(1));
-			effects.renderText(resource.substring(1)+' science resouces collected',{center:true});
+			var science = this.production[this.turn] * Number(resource.substring(1));
+			this.sciencecash[this.turn] = this.sciencecash[this.turn] + science;
+			effects.renderText(science+' science resouces collected',{center:true});
 		}
 	},
 	
@@ -148,6 +150,15 @@ var gameClass = Class.extend({
 			sound.playSound('doh');
 			effects.renderText('YOU DON\'T HAVE ROOM FOR THIS',{center:true});			
 		}
+	},
+	
+	buyUpgrade: function (type) {
+		var cost = config.upgradeCosts[type];
+		this.sciencecash[this.turn] = this.sciencecash[this.turn] - cost;
+		if(type == 'attack') this.attack[this.turn] = this.attack[this.turn] + 20;
+		else if(type == 'defence') this.defence[this.turn] = this.defence[this.turn] + 20;
+		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
+		ui.greyWidgets(); // grey out any widgets that are too expensive
 	}
 });
 
