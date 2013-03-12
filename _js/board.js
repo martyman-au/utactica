@@ -88,10 +88,7 @@ TileClass = Class.extend({
 				yoffset: 1},
 		slot3: { unit: false,
 				xoffset: 1,
-				yoffset: 1},
-//		slot4: { unit: false,
-//				xoffset: 0,
-//				yoffset: 0}
+				yoffset: 1}
 		},
 				
 	init: function (tilenum, grididx, position, resource) {
@@ -121,7 +118,24 @@ TileClass = Class.extend({
 			cv.layers['board'].context.shadowColor = config.styles.resourcetextshadow;
 			cv.layers['board'].context.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
 			cv.layers['board'].context.shadowColor = "transparent";
-		} 
+		}
+		console.log('tile: '+this.tilenum);
+		for( i in config.homeTile ) {
+			if( this.tilenum == config.homeTile[i]+1 ) {
+				// Render a circle on the effects canvas
+				if(i==0)var color = '#BB1111';
+				else color = '#1111BB';
+				cv.layers['board'].context.shadowColor = color;
+				cv.layers['board'].context.shadowOffsetX = 0;
+				cv.layers['board'].context.shadowOffsetY = 0;
+				cv.layers['board'].context.shadowBlur = 10;
+				cv.layers['board'].context.beginPath();
+				cv.layers['board'].context.arc(this.center.x + cv.Offset.x, this.center.y + cv.Offset.y, 15, 0, 2 * Math.PI, false);
+				cv.layers['board'].context.fillStyle = color;
+				cv.layers['board'].context.fill();
+				cv.layers['board'].context.shadowColor = "transparent";
+			}
+		}
 	},
 
 	clearSlot: function (slot) {
