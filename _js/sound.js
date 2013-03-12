@@ -15,39 +15,39 @@ SoundClass = Class.extend({
 			});
 		}
 		// load in our music files
-		fisherYates ( config.music ); // Shuffle music tracks
-		this.musictag = document.createElement('audio');
-		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');
-		this.musictag.addEventListener('ended', function() { sound.nextTrack(); });
-		this.musictag.play();
-	},
-	
-	animFrame: function () {
-		// Called once per animation frame, used to check song position and start downloading of next track
-		// TODO: We could check the current track position and kick off the next track download if needed
+		fisherYates ( config.music ); 						// Shuffle music tracks
+		this.musictag = document.createElement('audio');	// Create a html5 audio tag
+		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');	// set the source to the first track
+		this.musictag.addEventListener('ended', function() { sound.nextTrack(); });		// add a callback for the end of the tack
+		this.musictag.play();								// Kick off playback
 	},
 	
 	playSound: function (name) {
+		// Simple interface to play a sound effect
 		this.sounds[name].play();
 	},
 	
 	nextTrack: function () {
+		// Change the src of the audio tag to the next music track
 		this.track += 1;
 		if(this.track > (config.music.length-1)) this.track = 0;
-		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');		
-		this.musictag.play();
+		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');	// Set new src
+		this.musictag.play();								// Kick off playback
 	},
 
 	toggleMute: function () {
+		// Mute or unmute the sound
 		if( this.mute )
 		{
 			this.mute = false;
-			Howler.unmute();
+			Howler.unmute();		// unmute sound effects
+			this.musictag.play();	// unpause music
 		}
 		else
 		{
 			this.mute = true;
-			Howler.mute();
+			Howler.mute();			// mute sound effects
+			this.musictag.pause();	// pause music
 		}
 	}
 
