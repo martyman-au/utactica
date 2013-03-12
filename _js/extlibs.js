@@ -1,3 +1,9 @@
+/*
+ *  Code in this file has been sourced from different lcoations on the web. 
+ *  They are covered by their own copyright casues, not by the CC BY-NC-SA covering the rest of the code
+ *
+ */
+
 // Fisher yates randomising code from http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
 var fisherYates = function (myArray) {
 	"use strict";
@@ -43,7 +49,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, ra
 	}
 };
 
-
+// From the udacity CS255 course
 function xhrGet(reqUri, callback, type) {
 	"use strict";
     var request = new XMLHttpRequest();
@@ -52,51 +58,3 @@ function xhrGet(reqUri, callback, type) {
     request.onload = function () { callback(request); };
     request.send();
 }
-
-// http://www.phpied.com/sleep-in-javascript/
-function sleep(milliseconds) {
-	"use strict";
-	var start = new Date().getTime(), i;
-	for (i = 0; i < 1e7; i++) {
-		if ((new Date().getTime() - start) > milliseconds) {
-			break;
-		}
-	}
-}
-
-/*
-//http://stackoverflow.com/questions/1529593/javascript-custom-array-prototype-interfering-with-for-in-loops
-Object.keys = function(obj) {
-  var a = [];
-  for (var property in obj) {
-    if (obj.hasOwnProperty(property)) {
-      a.push(property);
-    }
-  }
-  return a;
-};
-*/
-
-/*
-function loadfonts() {
-	// Google font loader code
-	"use strict";
-	var WebFontConfig = {
-		google: { families: [ 'Roboto+Condensed:400,700:latin' ] },
-		fontactive: function (fontFamily, fontDescription) {
-			if (fontFamily === 'Roboto Condensed') {
-				game.redraw();  // redraw everything once font is available to make sure the canvas is rendered correctly
-								// TODO: this doesn't seem good
-			}
-		}
-	};
-	(function () {
-		var wf = document.createElement('script'), s = document.getElementsByTagName('script')[0];
-		wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
-			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-		wf.type = 'text/javascript';
-		wf.async = 'true';
-		s.parentNode.insertBefore(wf, s);
-	}());
-}
-*/
