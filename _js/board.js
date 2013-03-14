@@ -106,10 +106,11 @@ BoardClass = Class.extend({
 	},
 	
 	moveHighlight: function (tile1,tile2,max) {
-		var oldtile = this.tiles[tile1];
+		// grey out unreachable tiles, highlight current tile
+		// TODO: grey out enemy tiles (for worker only?)
 		var newtile = this.tiles[tile2];
 		for( i in this.tiles) {
-			var distance = config.distances[Math.abs(oldtile.grididx.y - this.tiles[i].grididx.y)][Math.abs(oldtile.grididx.x - this.tiles[i].grididx.x)];
+			var distance = this.tileDistance(tile1,tile2);
 			if( distance > max ) this.tiles[i].state = 2;
 			else this.tiles[i].state = 0;
 		}
@@ -120,6 +121,12 @@ BoardClass = Class.extend({
 		for( i in this.tiles) {
 			this.tiles[i].state = 0;
 		}
+	},
+	
+	tileDistance: function (tile1,tile2) {
+		var oldtile = this.tiles[tile1];
+		var newtile = this.tiles[tile2];
+		return config.distances[Math.abs(oldtile.grididx.y - this.tiles[i].grididx.y)][Math.abs(oldtile.grididx.x - this.tiles[i].grididx.x)];
 	}
 });
 

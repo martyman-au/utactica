@@ -73,7 +73,7 @@ UnitsClass = Class.extend({
 				this.units[this.activeUnit].ux = x + this.dragoffset.x;
 				this.units[this.activeUnit].uy = y + this.dragoffset.y;
 				var newtile = board.clickhit(x,y);
-				board.moveHighlight(this.units[this.activeUnit].tileid,newtile,this.units[this.activeUnit].remainingmoves);
+				board.moveHighlight(this.units[this.activeUnit].tileid,newtile,this.units[this.activeUnit].remainingmoves); // grey out unreachable tiles
 			}
 		}
 		else if( event === 'mouseup') {
@@ -85,7 +85,13 @@ UnitsClass = Class.extend({
 	
 	dragmove: function (x,y) {
 		var newtile = board.clickhit(x,y);
-		if(newtile && newtile.state !== 2 ) { this.units[this.activeUnit].actualMove(newtile,'slot0'); }
+		if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile move
+			// TODO: check if it is an attack, enforce only attackign for one tile away
+			// TODO: check if we can allocate a slot beofre moving
+			// TODO: doh on failed move
+			this.units[this.activeUnit].remainingmoves -= board.tileDistance(this.units[this.activeUnit].tileid,newtile); // TODO: buggy?
+			this.units[this.activeUnit].actualMove(newtile,'slot0'); // TODO: alocate slot
+		}
 		else this.units[this.activeUnit].actualMove(this.units[this.activeUnit].tileid,this.units[this.activeUnit].slotid);
 	},
 	
@@ -101,7 +107,7 @@ UnitsClass = Class.extend({
 			var tile = board.checkmove(tgt);
 			if(tile == newtile) return true;
 		}
-		return false;	
+		return false;	 
 	},
 	
 	move: function (keycode) {
@@ -433,7 +439,7 @@ TranslateClass = Class.extend({
 		this.unit.uy = newloc.y;
 		if(this.count == this.length) // end translation
 		{
-			this.unit.remainingmoves--; // TODO this isn't were we should do this.
+//			this.unit.remainingmoves--; // TODO this isn't were we should do this.
 			this.unit.redraw();
 			if(this.unit.remainingmoves > 0) this.unit.activate(); // deactivate unit if moves are up
 			return 'done';
