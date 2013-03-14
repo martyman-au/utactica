@@ -57,6 +57,7 @@ var gameClass = Class.extend({
 	animFrame: function(){
 		// Animation loop
 		requestAnimationFrame( game.animFrame ); 	// continue loop
+		board.animFrame();
 		effects.animFrame();						// render any currrent effects
 		units.animFrame();							// render any unit changes
 	},

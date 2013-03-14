@@ -3,6 +3,8 @@ UnitsClass = Class.extend({
 	units: new Array(),
 	activeUnit: null,
 	translations: [],
+	drag: false,
+	dragoffset: {x:null, y:null},
 	
 	init: function () {
 		this.allocateUnits();
@@ -49,21 +51,57 @@ UnitsClass = Class.extend({
 		for( i in this.units ) this.units[i].calcPos();
 	},
 	
-	click: function (x,y) {
-		// Deal with a click by checking if it hits any units
+	mouse: function (event, x, y) {
 		var i = null;
 		var unit = null;
-		this.deactivate();
-		this.activeUnit = null;
-		for( i in this.units )
-		{
-			unit = this.units[i];
-			if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0)
-				{
+		if(event === 'mousedown') {
+			this.deactivate();
+			this.activeUnit = null;
+			this.drag = true;
+			for( i in this.units ) {
+				unit = this.units[i];
+				if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0) {
 					unit.activate();
 					this.activeUnit = i;
+					this.dragoffset.x = this.units[this.activeUnit].ux - x;
+					this.dragoffset.y = this.units[this.activeUnit].uy - y;
 				}
+			}
 		}
+		else if( event === 'mousemove') {
+			if(this.activeUnit && this.drag) {
+				this.units[this.activeUnit].ux = x + this.dragoffset.x;
+				this.units[this.activeUnit].uy = y + this.dragoffset.y;
+				var newtile = board.clickhit(x,y);
+				board.moveHighlight(this.units[this.activeUnit].tileid,newtile,this.units[this.activeUnit].remainingmoves);
+			}
+		}
+		else if( event === 'mouseup') {
+			if( this.activeUnit ) this.dragmove(x,y);
+			this.drag = false;
+			board.unHighlight();
+		}
+	},
+	
+	dragmove: function (x,y) {
+		var newtile = board.clickhit(x,y);
+		if(newtile && newtile.state !== 2 ) { this.units[this.activeUnit].actualMove(newtile,'slot0'); }
+		else this.units[this.activeUnit].actualMove(this.units[this.activeUnit].tileid,this.units[this.activeUnit].slotid);
+	},
+	
+	isMovePossible: function (newtile) {
+		var oldtile = board.tiles[this.units[this.activeUnit].tileid].grididx;
+		var possibles = [];
+		var tgt = {};
+		directions = [{x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1},{x:0,y:-2},{x:0,y:2}];
+		for( i in directions ) {
+			tgt.x = parseInt(oldtile.x) + directions[i].x;
+			tgt.y = parseInt(oldtile.y) + directions[i].y;
+			console.log(tgt);
+			var tile = board.checkmove(tgt);
+			if(tile == newtile) return true;
+		}
+		return false;	
 	},
 	
 	move: function (keycode) {
@@ -74,7 +112,7 @@ UnitsClass = Class.extend({
 			return;
 		}
 		else this.units[this.activeUnit].move(keycode);
-	},
+	},	
 	
 	teleport: function () {
 		// teleport the active unit
@@ -126,8 +164,8 @@ UnitClass = Class.extend({
 	slotid: null,
 	ux: null,
 	uy: null,
-	maxmoves: 1,
-	remainingmoves: 1,
+	maxmoves: 2,
+	remainingmoves: 2,
 	slotoffsetx: 0,
 	slotoffsety: 0,
 	spritewidth: 50,	// TODO: hardcoded
@@ -145,7 +183,7 @@ UnitClass = Class.extend({
 //		units.activeUnit = this;	// TODO need to set units.activeUnit to this unit's ID...
 		this.state = 'active';
 		this.redraw();
-		effects.renderEffect('active', this.ux, this.uy);
+//		effects.renderEffect('active', this.ux, this.uy);
 	},
 	
 	deactivate: function () {
@@ -207,7 +245,7 @@ UnitClass = Class.extend({
 		this.slotid = newslot;	// set unit to new tile slot
 	},
 	
-	wipe: function (dir) {
+	wipe: function () {
 		// wipe the units canvas to clear this unit off the board
 		cv.layers['units'].context.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
 	},
@@ -368,7 +406,7 @@ TranslateClass = Class.extend({
 	unit: {},
 	start: {x:0,y:0},	// starting position of translation
 	end: {x:0,y:0},
-	length: 20,	// number of frames to run the animation
+	length: 10,	// number of frames to run the animation
 	count: 0,	// Frame counter
 	
 	init: function (unit, end) {
@@ -395,7 +433,7 @@ TranslateClass = Class.extend({
 		this.unit.uy = newloc.y;
 		if(this.count == this.length) // end translation
 		{
-			this.unit.remainingmoves--;
+			this.unit.remainingmoves--; // TODO this isn't were we should do this.
 			this.unit.redraw();
 			if(this.unit.remainingmoves > 0) this.unit.activate(); // deactivate unit if moves are up
 			return 'done';

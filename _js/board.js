@@ -1,11 +1,13 @@
 BoardClass = Class.extend({
 	
 	tiles: new Array(), // Array to store board tile objects
+	ctx: null,
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
 		// an array of arrays for each row of the board
 		// fills this.tiles with tile objects
+		this.ctx = cv.layers['board'].context; // TODO: Hardcoded?
 		var tilenum = 0;
 		var grididx = {};
 		var position = {};
@@ -17,7 +19,7 @@ BoardClass = Class.extend({
 				grididx.y = i;				//
 				position.x = (row[j]*148);	// calculate the x position of the tile (top left)  TODO: fix hard coding
 				position.y = (i*86);		// calculate the y position of the tile (top left)  TODO: fix hard coding
-				this.tiles[tilenum++] = new TileClass( tilenum, grididx, position, ''); // create and save new tile object
+				this.tiles[tilenum++] = new TileClass( this.ctx, tilenum, grididx, position, ''); // create and save new tile object
 			}	
 		}
 		this.distributeResources();			// seed resources across the completed board
@@ -40,6 +42,40 @@ BoardClass = Class.extend({
 		for( i in this.tiles ) {
 			this.tiles[i].render();
 		}
+	},
+
+	redraw: function () {
+		// Wipe the whole UI layer and render all UI elements
+		this.wipe();
+		this.render();
+	},
+	
+	wipe: function (dir) {
+		// Clear the UI layer
+		this.ctx.clearRect(0, 0, window.innerWidth / cv.scale, window.innerHeight / cv.scale);
+	},
+	
+	animFrame: function () {
+		this.redraw();
+	},
+	
+	clickhit: function (x,y) {
+		// check which tile an x,y position cosresonds to
+		var xoff = null;
+		var yoff = null;
+		var besttile = null;
+		var bestdist = 100000;
+		for( i in this.tiles )
+		{
+			xoff = Math.abs((this.tiles[i].center.x + cv.Offset.x) - x);
+			yoff = Math.abs((this.tiles[i].center.y + cv.Offset.y) - y);
+			if((xoff + yoff) < bestdist) {
+				besttile = i;
+				bestdist = xoff + yoff;
+			}
+		}
+		if( bestdist < 130 ) return besttile;
+		return null;
 	},
 	
 	checkmove: function (tgt) {
@@ -67,15 +103,34 @@ BoardClass = Class.extend({
 			}
 		}
 		return null;
+	},
+	
+	moveHighlight: function (tile1,tile2,max) {
+		var oldtile = this.tiles[tile1];
+		var newtile = this.tiles[tile2];
+		for( i in this.tiles) {
+			var distance = config.distances[Math.abs(oldtile.grididx.y - this.tiles[i].grididx.y)][Math.abs(oldtile.grididx.x - this.tiles[i].grididx.x)];
+			if( distance > max ) this.tiles[i].state = 2;
+			else this.tiles[i].state = 0;
+		}
+		if( newtile.state == 0 ) newtile.state = 1;
+	},
+	
+	unHighlight: function () {
+		for( i in this.tiles) {
+			this.tiles[i].state = 0;
+		}
 	}
 });
 
 TileClass = Class.extend({
 	tilenum: null,					// ID of the tile number top down left to right
+	ctx: null,
 	grididx: {x: null, y: null},	// grid index of the tile
 	position: {x: null, y: null},	// position of the top left corner of the tile (in scaled pixels)
 	center: {x: null, y: null},		// position of the center of the tile (in scaled pixels)
 	resource: null,					// resource location on the tile
+	state: 0,						// 0 = std, 1 = actived, 3 = grey
 	slots: {						// slots that can hold units on a tile TODO: seems messy
 		slot0: { unit: false,
 				xoffset: -1,
@@ -91,8 +146,9 @@ TileClass = Class.extend({
 				yoffset: 1}
 		},
 				
-	init: function (tilenum, grididx, position, resource) {
+	init: function (ctx, tilenum, grididx, position, resource) {
 		// Initialise a tile object with a tilenumber, grid index, x and y pixel position and resource (if exists)
+		this.ctx = ctx;
 		this.tilenum = tilenum;
 		this.grididx = copy(grididx);		// TODO: is this the best way to do this?
 		this.position = copy(position);		// TODO: is this the best way to do this?
@@ -103,39 +159,53 @@ TileClass = Class.extend({
 	
 	render: function () {
 		// render a tile and it's resource (if exists)
-		drawSprite('hextile.png', cv.layers['board'].context, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
-		if(this.resource)
+		if( this.state == 0 ) {
+			drawSprite('hextile.png', this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
+		}
+		else if( this.state == 1 ) {
+			drawSprite('hextile-active.png', this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
+		}
+		else if( this.state == 2 ) {
+			drawSprite('hextile-grey.png', this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y)
+		}
+		
+		if(this.resource)  
 		{
 			var resourceimg = '';
 			if(this.resource.substring(0,1) == 'f') resourceimg = 'food-resource.png';
 			else resourceimg = 'science-resource.png';
-			drawSprite(resourceimg, cv.layers['board'].context, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
-			cv.layers['board'].context.font = "normal 700 50px 'Roboto Condensed'";
-			cv.layers['board'].context.fillStyle = config.styles.resourcetext; 
-			cv.layers['board'].context.shadowOffsetX = 1;
-			cv.layers['board'].context.shadowOffsetY = 1;
-			cv.layers['board'].context.shadowBlur = 6;
-			cv.layers['board'].context.shadowColor = config.styles.resourcetextshadow;
-			cv.layers['board'].context.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
-			cv.layers['board'].context.shadowColor = "transparent";
+			drawSprite(resourceimg, this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y);
+			this.ctx.font = "normal 700 50px 'Roboto Condensed'";
+			this.ctx.fillStyle = config.styles.resourcetext; 
+			this.ctx.shadowOffsetX = 1;
+			this.ctx.shadowOffsetY = 1;
+			this.ctx.shadowBlur = 6;
+			this.ctx.shadowColor = config.styles.resourcetextshadow;
+			this.ctx.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
+			this.ctx.shadowColor = "transparent";
 		}
-		console.log('tile: '+this.tilenum);
 		for( i in config.homeTile ) {
 			if( this.tilenum == config.homeTile[i]+1 ) {
 				// Render a circle on the effects canvas
 				if(i==0)var color = '#BB1111';
 				else color = '#1111BB';
-				cv.layers['board'].context.shadowColor = color;
-				cv.layers['board'].context.shadowOffsetX = 0;
-				cv.layers['board'].context.shadowOffsetY = 0;
-				cv.layers['board'].context.shadowBlur = 10;
-				cv.layers['board'].context.beginPath();
-				cv.layers['board'].context.arc(this.center.x + cv.Offset.x, this.center.y + cv.Offset.y, 15, 0, 2 * Math.PI, false);
-				cv.layers['board'].context.fillStyle = color;
-				cv.layers['board'].context.fill();
-				cv.layers['board'].context.shadowColor = "transparent";
+				this.ctx.shadowColor = color;
+				this.ctx.shadowOffsetX = 0;
+				this.ctx.shadowOffsetY = 0;
+				this.ctx.shadowBlur = 10;
+				this.ctx.beginPath();
+				this.ctx.arc(this.center.x + cv.Offset.x, this.center.y + cv.Offset.y, 15, 0, 2 * Math.PI, false);
+				this.ctx.fillStyle = color;
+				this.ctx.fill();
+				this.ctx.shadowColor = "transparent";
 			}
 		}
+		
+		// TODO: Remove debug code
+//		this.ctx.font = "normal 700 20px 'Roboto Condensed'";
+//		this.ctx.fillStyle = '#FF0000'; 
+//		this.ctx.fillText('x: '+this.grididx.x+' y: '+this.grididx.y, this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
+		
 	},
 
 	clearSlot: function (slot) {
