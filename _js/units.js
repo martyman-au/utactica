@@ -1,16 +1,17 @@
 UnitsClass = Class.extend({
 	// Class that contains all of the units in the game
-	units: new Array(),
-	activeUnit: null,
-	translations: [],
-	drag: false,
-	dragoffset: {x:null, y:null},
+	units: new Array(),				// Array of game units
+	activeUnit: null,				// The currently active unit
+	translations: [],				// Any currently running unit translation (movement animation)
+	down: false, 					// Keep track if the mouse button is currently down
+	dragoffset: {x:null, y:null},	// The offset from the center of the current unit to the click location
 	
 	init: function () {
 		this.allocateUnits();
 	},
 	
 	allocateUnits: function () {
+		// give out the starting units
 		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
 		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
 		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
@@ -24,13 +25,15 @@ UnitsClass = Class.extend({
 	},
 	
 	animFrame: function () {
-		for( i in this.translations )	{
+		// called every animation frame
+		for( i in this.translations ) {
 			if( this.translations[i].animFrame() == 'done') delete this.translations[i];
 		}
 		this.redraw();
 	},
 	
 	redraw: function () {
+		// Redraw all the units at their current location
 		this.destroy(); // delete dead units
 		this.wipe();	// clear the board
 		this.render();	// redraw existing units
@@ -47,56 +50,46 @@ UnitsClass = Class.extend({
 	},
 	
 	scale: function () {
-		// Calculate position of units after rescale
+		// Calculate position of units after a window rescale
 		for( i in this.units ) this.units[i].calcPos();
 	},
 	
 	mouse: function (event, x, y) {
+		// Deal with a mouse event
 		var i = null;
 		var unit = null;
-		if(event === 'mousedown') {
+		if(event === 'mousedown') { // If the event is a down click
 			this.deactivate();
 			this.activeUnit = null;
-			this.drag = true;
+			this.down = true;
 			for( i in this.units ) {
 				unit = this.units[i];
 				if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0) {
 					unit.activate();
-					this.activeUnit = i;
-					this.dragoffset.x = this.units[this.activeUnit].ux - x;
-					this.dragoffset.y = this.units[this.activeUnit].uy - y;
+					this.activeUnit = this.units[i];
+					this.dragoffset.x = this.activeUnit.ux - x;
+					this.dragoffset.y = this.activeUnit.uy - y;
 				}
 			}
 		}
-		else if( event === 'mousemove') {
-			if(this.activeUnit && this.drag) {
-				this.units[this.activeUnit].ux = x + this.dragoffset.x;
-				this.units[this.activeUnit].uy = y + this.dragoffset.y;
+		else if( event === 'mousemove') { // If the event is a mouse move
+			if(this.activeUnit && this.down) {
+				this.activeUnit.ux = x + this.dragoffset.x;
+				this.activeUnit.uy = y + this.dragoffset.y;
 				var newtile = board.clickhit(x,y);
-				board.moveHighlight(this.units[this.activeUnit].tileid,newtile,this.units[this.activeUnit].remainingmoves); // grey out unreachable tiles
+				board.moveHighlight(this.activeUnit.tileid,newtile,this.activeUnit.remainingmoves); // grey out unreachable tiles
 			}
 		}
-		else if( event === 'mouseup') {
-			if( this.activeUnit ) this.dragmove(x,y);
-			this.drag = false;
+		else if( event === 'mouseup') {  // If the event is an up click
+			if( this.activeUnit ) this.activeUnit.dragmove(x,y);
+			this.down = false;
 			board.unHighlight();
 		}
 	},
 	
-	dragmove: function (x,y) {
-		var newtile = board.clickhit(x,y);
-		if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile move
-			// TODO: check if it is an attack, enforce only attackign for one tile away
-			// TODO: check if we can allocate a slot beofre moving
-			// TODO: doh on failed move
-			this.units[this.activeUnit].remainingmoves -= board.tileDistance(this.units[this.activeUnit].tileid,newtile); // TODO: buggy?
-			this.units[this.activeUnit].actualMove(newtile,'slot0'); // TODO: alocate slot
-		}
-		else this.units[this.activeUnit].actualMove(this.units[this.activeUnit].tileid,this.units[this.activeUnit].slotid);
-	},
-	
+
 	isMovePossible: function (newtile) {
-		var oldtile = board.tiles[this.units[this.activeUnit].tileid].grididx;
+		var oldtile = board.tiles[this.activeUnit.tileid].grididx;
 		var possibles = [];
 		var tgt = {};
 		directions = [{x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1},{x:0,y:-2},{x:0,y:2}];
@@ -117,7 +110,7 @@ UnitsClass = Class.extend({
 			effects.renderText('NO UNIT SELECTED',{center:true});
 			return;
 		}
-		else this.units[this.activeUnit].move(keycode);
+		else this.activeUnit.move(keycode);
 	},	
 	
 	teleport: function () {
@@ -126,7 +119,7 @@ UnitsClass = Class.extend({
 			sound.playSound('doh');
 			effects.renderText('NO UNIT SELECTED',{center:true});
 		}
-		else if( this.units[this.activeUnit].tileid == config.homeTile[game.turn] ) {
+		else if( this.activeUnit.tileid == config.homeTile[game.turn] ) {
 			sound.playSound('doh');
 			effects.renderText('YOU ARE ALREADY AT YOUR HOME BASE',{center:true});
 		}
@@ -148,7 +141,7 @@ UnitsClass = Class.extend({
 	},
 	
 	deactivate: function () {
-		if(this.activeUnit) this.units[this.activeUnit].deactivate(); // deactive active unit
+		if(this.activeUnit) this.activeUnit.deactivate(); // deactive active unit
 	},
 
 	destroy: function () {
@@ -170,8 +163,8 @@ UnitClass = Class.extend({
 	slotid: null,
 	ux: null,
 	uy: null,
-	maxmoves: 2,
-	remainingmoves: 2,
+	maxmoves: 1,
+	remainingmoves: 1,
 	slotoffsetx: 0,
 	slotoffsety: 0,
 	spritewidth: 50,	// TODO: hardcoded
@@ -238,6 +231,33 @@ UnitClass = Class.extend({
 		}
 	},
 	
+	dragmove: function (x,y) {
+		var newtile = board.clickhit(x,y);
+		if(newtile == this.tileid) { // If we haven't moved out of our original tile
+			// TODO: does this have to be a special case?
+			this.actualMove(this.tileid,this.slotid);
+		}
+		else if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile move
+			// TODO: check if it is an attack, enforce only attacking for one tile away
+			// TODO: check if we can allocate a slot beofre moving
+			this.remainingmoves -= board.tileDistance(this.tileid,newtile);
+			var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
+			if( newslot ) { // animate the actual move
+				board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+				this.actualMove(newtile,newslot);
+			}
+			else {
+				this.actualMove(this.tileid,this.slotid);
+				effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
+				sound.playSound('doh');
+			}
+		}
+		else {
+			this.actualMove(this.tileid,this.slotid);
+			effects.renderText('YOU CAN\'T MOVE THERE',{center:true});
+			sound.playSound('doh');		}
+	},
+		
 	actualMove: function (newtile,newslot) {
 		var newloc = {};
 		var slots = board.tiles[newtile].slots;
@@ -245,8 +265,8 @@ UnitClass = Class.extend({
 		var slotoffsety = Math.max( -50, Math.min(50, slots[newslot].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
-		units.translations.push( new TranslateClass(units.units[units.activeUnit], newloc));
-		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+		units.translations.push( new TranslateClass(this, newloc));
+//		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 		this.tileid = newtile; 	// Set unit to new tile location
 		this.slotid = newslot;	// set unit to new tile slot
 	},
