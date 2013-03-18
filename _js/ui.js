@@ -207,7 +207,7 @@ UIClass = Class.extend({
 	
 	moveIconFlash: function (code) {
 		// Flash the appropriate move icon when a move is attempted
-		var dir = config.movekeys[code];
+/*		var dir = config.movekeys[code];
 		if(dir.y == 1) {
 			if( dir.x == 1 ) this.widgets.downright.pulse(200);
 			else this.widgets.downleft.pulse(200);
@@ -217,7 +217,7 @@ UIClass = Class.extend({
 			else this.widgets.upleft.pulse(200);
 		}
 		else if( dir.y == -2) this.widgets.up.pulse(200);
-		else this.widgets.down.pulse(200);
+		else this.widgets.down.pulse(200); */
 	},
 	
 	greyWidgets: function () {
