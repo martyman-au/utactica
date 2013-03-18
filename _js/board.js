@@ -8,18 +8,19 @@ BoardClass = Class.extend({
 		// an array of arrays for each row of the board
 		// fills this.tiles with tile objects
 		this.ctx = cv.layers['board'].context; // TODO: Hardcoded?
-		var tilenum = 0;
 		var grididx = {};
 		var position = {};
+		var index = 0;
 		for( i in pattern ) { 				// for each row on the board
 			var row = pattern[i];			// grab that row
 			for( j in row )					// for each tile in the row
 			{
 				grididx.x = row[j];			// calculate a grid index for the tile
-				grididx.y = i;				//
+				grididx.y = Number(i);				//
 				position.x = (row[j]*148);	// calculate the x position of the tile (top left)  TODO: fix hard coding
 				position.y = (i*86);		// calculate the y position of the tile (top left)  TODO: fix hard coding
-				this.tiles[tilenum++] = new TileClass( this.ctx, tilenum, grididx, position, ''); // create and save new tile object
+				this.tiles[index] = new TileClass( this.ctx, index, grididx, position, ''); // create and save new tile object
+				index++;
 			}	
 		}
 		this.distributeResources();			// seed resources across the completed board
@@ -110,11 +111,11 @@ BoardClass = Class.extend({
 		// TODO: grey out enemy tiles (for worker only?)
 		var newtile = this.tiles[tile2];
 		for( i in this.tiles) {
-			var distance = this.tileDistance(tile1,tile2);
+			var distance = this.tileDistance(tile1,this.tiles[i].tilenum);
 			if( distance > max ) this.tiles[i].state = 2;
 			else this.tiles[i].state = 0;
 		}
-		if( newtile.state == 0 ) newtile.state = 1;
+		if( newtile.state == 0 ) newtile.state = 1; // If we haven't greyed ou the target tile then highlight it
 	},
 	
 	unHighlight: function () {
@@ -124,9 +125,7 @@ BoardClass = Class.extend({
 	},
 	
 	tileDistance: function (tile1,tile2) {
-		var oldtile = this.tiles[tile1];
-		var newtile = this.tiles[tile2];
-		return config.distances[Math.abs(oldtile.grididx.y - this.tiles[i].grididx.y)][Math.abs(oldtile.grididx.x - this.tiles[i].grididx.x)];
+		return config.distances[Math.abs(this.tiles[tile1].grididx.y - this.tiles[tile2].grididx.y)][Math.abs(this.tiles[tile1].grididx.x - this.tiles[tile2].grididx.x)];
 	}
 });
 
@@ -157,7 +156,8 @@ TileClass = Class.extend({
 		// Initialise a tile object with a tilenumber, grid index, x and y pixel position and resource (if exists)
 		this.ctx = ctx;
 		this.tilenum = tilenum;
-		this.grididx = copy(grididx);		// TODO: is this the best way to do this?
+		this.grididx.x = grididx.x;
+		this.grididx.y = grididx.y;
 		this.position = copy(position);		// TODO: is this the best way to do this?
 		this.resource = resource;
 		this.center.x = position.x+100;		// TODO: hard coded
@@ -192,7 +192,7 @@ TileClass = Class.extend({
 			this.ctx.shadowColor = "transparent";
 		}
 		for( i in config.homeTile ) {
-			if( this.tilenum == config.homeTile[i]+1 ) {
+			if( this.tilenum == config.homeTile[i] ) {
 				// Render a circle on the effects canvas
 				if(i==0)var color = '#BB1111';
 				else color = '#1111BB';
@@ -207,12 +207,12 @@ TileClass = Class.extend({
 				this.ctx.shadowColor = "transparent";
 			}
 		}
-		
 		// TODO: Remove debug code
 //		this.ctx.font = "normal 700 20px 'Roboto Condensed'";
 //		this.ctx.fillStyle = '#FF0000'; 
 //		this.ctx.fillText('x: '+this.grididx.x+' y: '+this.grididx.y, this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
-		
+//		this.ctx.fillText(this.tilenum, this.center.x - 28 + cv.Offset.x, this.center.y + 38 + cv.Offset.y);
+//		var distance = board.tileDistance(this.tilenum,12);
 	},
 
 	clearSlot: function (slot) {
