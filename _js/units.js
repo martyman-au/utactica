@@ -94,7 +94,6 @@ UnitsClass = Class.extend({
 		else if( event === 'mouseup') {  // If the event is an up click
 			if( this.activeUnit) {
 				if( this.drag ) this.activeUnit.dragmove(x,y);
-//				else this.activeUnit.activate();
 			}
 			this.down = false;
 			board.unHighlight();
@@ -155,15 +154,13 @@ UnitsClass = Class.extend({
 	},
 	
 	deactivate: function () {
-		// simply call deactivate() if there is an active unit
-		// avoid having to check if there is an active unit
+		// simply call deactivate() if there is an active unit, avoid having to check if there is an active unit
 		if(this.activeUnit) this.activeUnit.deactivate(); // deactive active unit
 	},
 
 	destroy: function () {
 		// delete any "dead" units
-		for( i in this.units )
-		{
+		for( i in this.units ) {
 			if(units.units[i].state == 'dead' ) delete units.units[i];
 		}
 	},
@@ -239,7 +236,10 @@ UnitClass = Class.extend({
 			}
 			else {	// There was no enemies lets see if we can move there
 				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
-				if( newslot ) { this.actualMove(newtile,newslot); }	// animate the actual move
+				if( newslot ) { 
+					board.tiles[this.tileid].clearSlot(this.slotid); 	// release old slot
+					this.actualMove(newtile,newslot);					// animate the actual move
+				}	
 				else {
 					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
 					sound.playSound('doh');
@@ -260,21 +260,20 @@ UnitClass = Class.extend({
 		}
 		else if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile move
 			// TODO: check if it is an attack, enforce only attacking for one tile away
-			// TODO: check if we can allocate a slot beofre moving
-			this.remainingmoves -= board.tileDistance(this.tileid,newtile);
 			var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
 			if( newslot ) { // animate the actual move
+				this.remainingmoves -= board.tileDistance(this.tileid,newtile);		// Decrement remaining moves count
 				board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
-				this.actualMove(newtile,newslot);
+				this.actualMove(newtile,newslot);			// Move the unit to the new tile and slot
 			}
 			else {
-				this.actualMove(this.tileid,this.slotid);
+				this.actualMove(this.tileid,this.slotid);	// Move back to where we came from
 				effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
 				sound.playSound('doh');
 			}
 		}
 		else {
-			this.actualMove(this.tileid,this.slotid);
+			this.actualMove(this.tileid,this.slotid);		// Move back to where we came from
 			effects.renderText('YOU CAN\'T MOVE THERE',{center:true});
 			sound.playSound('doh');		}
 	},
@@ -287,7 +286,7 @@ UnitClass = Class.extend({
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
 		units.translations.push( new TranslateClass(this, newloc));
-		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+//		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 		this.tileid = newtile; 	// Set unit to new tile location
 		this.slotid = newslot;	// set unit to new tile slot
 	},
@@ -359,9 +358,9 @@ SoldierUnitClass = UnitClass.extend({
 		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
 		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
 		if( enemies.soldier == 0 ) defend = -1000; 		// If no soldiers, workers get no defence
-		console.log('attack roll: '+attack);
-		console.log('defend roll: '+defend);
-		console.log('raw result: '+(attack-defend));
+		console.log('attack roll: '+attack);	// DEBUG: output attack result
+		console.log('defend roll: '+defend);	// DEBUG: output attack result
+		console.log('raw result: '+(attack-defend));	// DEBUG: output attack result
 		var result = attack - defend + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
 		// TODO: multi unit defence bonus, home base defence bonus
 
@@ -393,6 +392,7 @@ SoldierUnitClass = UnitClass.extend({
 					}
 					setTimeout( function () { // after a delay move the attacking unit
 					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
+						board.tiles[units.activeUnit.tileid].clearSlot(units.activeUnit.slotid); // Clear old slot on board	
 						game.controlLock = false;
 					}, 400 );
 				}
