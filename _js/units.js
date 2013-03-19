@@ -59,14 +59,18 @@ UnitsClass = Class.extend({
 		var i = null;
 		var unit = null;
 		if(event === 'mousedown') { // If the event is a down click
-			this.deactivate();
-			this.activeUnit = null;
+			if( this.activeUnit ) {
+				this.activeUnit.deactivate();
+				this.activeUnit = null;
+			}
 			this.down = true;
+			this.drag = false;
 			for( i in this.units ) {
 				unit = this.units[i];
 				if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0) {
 					unit.activate();
 					this.activeUnit = this.units[i];
+					this.activeUnit.origpos = {x:this.activeUnit.ux, y:this.activeUnit.uy};
 					this.dragoffset.x = this.activeUnit.ux - x;
 					this.dragoffset.y = this.activeUnit.uy - y;
 				}
@@ -74,14 +78,24 @@ UnitsClass = Class.extend({
 		}
 		else if( event === 'mousemove') { // If the event is a mouse move
 			if(this.activeUnit && this.down) {
-				this.activeUnit.ux = x + this.dragoffset.x;
-				this.activeUnit.uy = y + this.dragoffset.y;
-				var newtile = board.clickhit(x,y);
-				board.moveHighlight(this.activeUnit.tileid,newtile,this.activeUnit.remainingmoves); // grey out unreachable tiles
+				var offset = {x:0, y:0};
+				offset.x = (x  + this.dragoffset.x - this.activeUnit.origpos.x) * (x  + this.dragoffset.x - this.activeUnit.origpos.x);
+				offset.y = (y  + this.dragoffset.y - this.activeUnit.origpos.y) * (y  + this.dragoffset.y - this.activeUnit.origpos.y);
+				var distance = Math.sqrt(offset.x + offset.y);
+				if( distance > 3 ) {
+					this.drag = true;
+					this.activeUnit.ux = x + this.dragoffset.x;
+					this.activeUnit.uy = y + this.dragoffset.y;
+					var newtile = board.clickhit(x,y);
+					board.moveHighlight(this.activeUnit.tileid,newtile,this.activeUnit.remainingmoves); // grey out unreachable tiles
+				}
 			}
 		}
 		else if( event === 'mouseup') {  // If the event is an up click
-			if( this.activeUnit ) this.activeUnit.dragmove(x,y);
+			if( this.activeUnit) {
+				if( this.drag ) this.activeUnit.dragmove(x,y);
+//				else this.activeUnit.activate();
+			}
 			this.down = false;
 			board.unHighlight();
 		}
@@ -123,7 +137,7 @@ UnitsClass = Class.extend({
 			sound.playSound('doh');
 			effects.renderText('YOU ARE ALREADY AT YOUR HOME BASE',{center:true});
 		}
-		else this.units[this.activeUnit].teleport();
+		else this.activeUnit.teleport();
 	},
 	
 	getEnemies: function (tile) {
@@ -141,10 +155,13 @@ UnitsClass = Class.extend({
 	},
 	
 	deactivate: function () {
+		// simply call deactivate() if there is an active unit
+		// avoid having to check if there is an active unit
 		if(this.activeUnit) this.activeUnit.deactivate(); // deactive active unit
 	},
 
 	destroy: function () {
+		// delete any "dead" units
 		for( i in this.units )
 		{
 			if(units.units[i].state == 'dead' ) delete units.units[i];
@@ -163,6 +180,7 @@ UnitClass = Class.extend({
 	slotid: null,
 	ux: null,
 	uy: null,
+	origpos: {x:null, y:null},
 	maxmoves: 1,
 	remainingmoves: 1,
 	slotoffsetx: 0,
@@ -182,7 +200,7 @@ UnitClass = Class.extend({
 //		units.activeUnit = this;	// TODO need to set units.activeUnit to this unit's ID...
 		this.state = 'active';
 		this.redraw();
-//		effects.renderEffect('active', this.ux, this.uy);
+		effects.renderEffect('active', this.ux, this.uy);
 	},
 	
 	deactivate: function () {
@@ -266,7 +284,7 @@ UnitClass = Class.extend({
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
 		units.translations.push( new TranslateClass(this, newloc));
-//		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 		this.tileid = newtile; 	// Set unit to new tile location
 		this.slotid = newslot;	// set unit to new tile slot
 	},
@@ -348,7 +366,7 @@ SoldierUnitClass = UnitClass.extend({
 
 		if( result < -16 ) { // The attacking unit is destroyed
 			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
-			setTimeout( function () {units.units[units.activeUnit].lose(); game.controlLock = false; }, 1500 );
+			setTimeout( function () {units.activeUnit.lose(); game.controlLock = false; }, 1500 );
 		}
 		else if( result > 16 ) { // A defending unit is destroyed
 			effects.renderText('YOUR ATTACK WAS SUCCESSFUL',{center:true});
@@ -362,8 +380,8 @@ SoldierUnitClass = UnitClass.extend({
 							break;
 						}
 					}
-					units.units[units.activeUnit].remainingmoves--;
-					units.units[units.activeUnit].deactivate();
+					units.activeUnit.remainingmoves--;
+					units.activeUnit.deactivate();
 					game.controlLock = false;
 				}
 				else { // If one soldier or less, then destroy all units
@@ -371,7 +389,7 @@ SoldierUnitClass = UnitClass.extend({
 						units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers
 					}
 					setTimeout( function () { // after a delay move the attacking unit
-					    units.units[units.activeUnit].actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
+					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
 						game.controlLock = false;
 					}, 400 );
 				}

@@ -111,8 +111,8 @@ var gameClass = Class.extend({
 	
 	endTurn: function () {
 		// Perform actions required to end a players turn
-		units.deactivate();			// Deactivate current unit
-		for( i in units.units )		// Run through all the units in the game
+		units.deactivate();	// Deactivate current unit
+		for( i in units.units )			// Run through all the units in the game
 		{
 			var unit = units.units[i];				
 			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
