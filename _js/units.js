@@ -281,8 +281,8 @@ UnitClass = Class.extend({
 	actualMove: function (newtile,newslot) {
 		var newloc = {};
 		var slots = board.tiles[newtile].slots;
-		var slotoffsetx = Math.max( -60, Math.min(60, slots[newslot].xoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
-		var slotoffsety = Math.max( -60, Math.min(60, slots[newslot].yoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
+		var slotoffsetx = slots[newslot].xoffset*(this.spritewidth*0.55);		// calculate the position for this slot
+		var slotoffsety = slots[newslot].yoffset*(this.spritewidth*0.55)-10; 	// calculate the position for this slot
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
 		units.translations.push( new TranslateClass(this, newloc));
@@ -307,8 +307,8 @@ UnitClass = Class.extend({
 	calcPos: function () {
 		// calculate the x,y position of the unit from the tile and slot
 		var slots = board.tiles[this.tileid].slots;
-		this.slotoffsetx = Math.max( -60, Math.min(60, slots[this.slotid].xoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
-		this.slotoffsety = Math.max( -60, Math.min(60, slots[this.slotid].yoffset*(this.spriteheight*0.6))); // TODO: Hardcoded slot offset distance
+		this.slotoffsetx = slots[this.slotid].xoffset*(this.spritewidth*0.55);		// calculate the position for this slot
+		this.slotoffsety = slots[this.slotid].yoffset*(this.spriteheight*0.55)-10;	// calculate the position for this slot
 		this.ux = board.tiles[this.tileid].center.x + cv.Offset.x + this.slotoffsetx;
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
