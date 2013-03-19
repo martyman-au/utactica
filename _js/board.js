@@ -17,7 +17,7 @@ BoardClass = Class.extend({
 			{
 				grididx.x = row[j];			// calculate a grid index for the tile
 				grididx.y = Number(i);				//
-				position.x = (row[j]*148);	// calculate the x position of the tile (top left)  TODO: fix hard coding
+				position.x = (row[j]*151);	// calculate the x position of the tile (top left)  TODO: fix hard coding
 				position.y = (i*86);		// calculate the y position of the tile (top left)  TODO: fix hard coding
 				this.tiles[index] = new TileClass( this.ctx, index, grididx, position, ''); // create and save new tile object
 				index++;

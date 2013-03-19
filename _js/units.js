@@ -185,8 +185,8 @@ UnitClass = Class.extend({
 	remainingmoves: 1,
 	slotoffsetx: 0,
 	slotoffsety: 0,
-	spritewidth: 50,	// TODO: hardcoded
-	spriteheight: 50,	// TODO: hardcoded
+	spritewidth: null,
+	spriteheight: null,
 	
 	init: function (side, tile) {
 		this.side = side;
@@ -194,6 +194,9 @@ UnitClass = Class.extend({
 		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
 		this.slotid = board.allocateSlot(this.tileid);		// Find which slot on the tile is available
+		var stats = sprites.getStats(this.colour+'-'+this.type+'.png');
+		this.spriteheight = stats.h;
+		this.spritewidth = stats.w;
 	},
 
 	activate: function () {
@@ -279,8 +282,8 @@ UnitClass = Class.extend({
 	actualMove: function (newtile,newslot) {
 		var newloc = {};
 		var slots = board.tiles[newtile].slots;
-		var slotoffsetx = Math.max( -50, Math.min(50, slots[newslot].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
-		var slotoffsety = Math.max( -50, Math.min(50, slots[newslot].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+		var slotoffsetx = Math.max( -60, Math.min(60, slots[newslot].xoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
+		var slotoffsety = Math.max( -60, Math.min(60, slots[newslot].yoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
 		units.translations.push( new TranslateClass(this, newloc));
@@ -305,8 +308,8 @@ UnitClass = Class.extend({
 	calcPos: function () {
 		// calculate the x,y position of the unit from the tile and slot
 		var slots = board.tiles[this.tileid].slots;
-		this.slotoffsetx = Math.max( -50, Math.min(50, slots[this.slotid].xoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
-		this.slotoffsety = Math.max( -50, Math.min(50, slots[this.slotid].yoffset*(this.spritewidth*0.75))); // TODO: Hardcoded slot offset distance
+		this.slotoffsetx = Math.max( -60, Math.min(60, slots[this.slotid].xoffset*(this.spritewidth*0.6))); // TODO: Hardcoded slot offset distance
+		this.slotoffsety = Math.max( -60, Math.min(60, slots[this.slotid].yoffset*(this.spriteheight*0.6))); // TODO: Hardcoded slot offset distance
 		this.ux = board.tiles[this.tileid].center.x + cv.Offset.x + this.slotoffsetx;
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
