@@ -119,7 +119,7 @@ var gameClass = Class.extend({
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
 		}
 		this.turn = 1 - this.turn;	// switch to other player's turn
-		ui.greyWidgets(); // grey out any widgets that are too expensive
+		ui.greyWidgets(); 			// grey out any widgets that are too expensive
 		this.redraw();
 	},
 	
@@ -127,13 +127,13 @@ var gameClass = Class.extend({
 		// Allocate any occupied resources to that team
 		// TODO: trigger resource collection animation "text effect"
 		if( resource.substring(0,1) == 'f') {
-			var food = this.production[this.turn] * Number(resource.substring(1));
-			this.foodcash[this.turn] = this.foodcash[this.turn] + food;
+			var food = parseInt(this.production[this.turn] * Number(resource.substring(1)));
+			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] + food);
 			effects.renderText(food+' food resouces collected',{center:true});
 		}
 		else if( resource.substring(0,1) == 's') {
-			var science = this.production[this.turn] * Number(resource.substring(1));
-			this.sciencecash[this.turn] = this.sciencecash[this.turn] + science;
+			var science = parseInt(this.production[this.turn] * Number(resource.substring(1)));
+			this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] + science);
 			effects.renderText(science+' science resouces collected',{center:true});
 		}
 	},
@@ -141,7 +141,7 @@ var gameClass = Class.extend({
 	buyUnit: function (type) {
 		var cost = config.unitCosts[type];
 		if( board.tiles[config.homeTile[this.turn]].checkSlots() ) { // check for available home slot
-			this.foodcash[this.turn] = this.foodcash[this.turn] - cost;
+			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] - cost);
 			if( type == 'soldier') units.units.push( new SoldierUnitClass(this.turn, config.homeTile[this.turn]) );
 			else units.units.push( new WorkerUnitClass(this.turn, config.homeTile[this.turn]) );
 			units.scale(); // cause the calculation the new unit's location
@@ -155,9 +155,9 @@ var gameClass = Class.extend({
 	
 	buyUpgrade: function (type) {
 		var cost = config.upgradeCosts[type];
-		this.sciencecash[this.turn] = this.sciencecash[this.turn] - cost;
-		if(type == 'attack') this.attack[this.turn] = this.attack[this.turn] + 20;
-		else if(type == 'defence') this.defence[this.turn] = this.defence[this.turn] + 20;
+		this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] - cost);
+		if(type == 'attack') this.attack[this.turn] = parseInt(this.attack[this.turn] + 20);
+		else if(type == 'defence') this.defence[this.turn] = parseInt(this.defence[this.turn] + 20);
 		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
 		ui.greyWidgets(); // grey out any widgets that are too expensive
 	}

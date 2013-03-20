@@ -165,7 +165,7 @@ UIClass = Class.extend({
 		var y = y + 20;
 		this.ctx.fillText('Defence upgrades: '+game.defence[game.turn]+'%', x, y);
 		var y = y + 20;
-		this.ctx.fillText('Production rate: '+(game.production[game.turn]*100)+'%', x, y);
+		this.ctx.fillText('Production rate: '+parseInt(game.production[game.turn]*100)+'%', x, y);
 		this.ctx.shadowColor = "transparent";
 	},
 	
