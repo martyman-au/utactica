@@ -15,44 +15,52 @@ UIClass = Class.extend({
 			if(!game.controlLock) {
 				var mouse = cv.getMouse(e);
 				var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-				if(!uihit) units.click(mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+				if(!uihit) units.mouse('mousedown',mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
 			}
 		});
 		
 		cv.layers['ui'].canvas.addEventListener('mouseup', function(e) {
 			if(!game.controlLock) {
-				var mouse = cv.getMouse(e);
+				var mouse = cv.getMouse(e); // get scaled mouse position from canvas class
 				var uihit = ui.mouse('mouseup',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
+				if(!uihit) units.mouse('mouseup',mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
 			}
-		});		
+		});
+
+		cv.layers['ui'].canvas.addEventListener('mousemove', function(e) {
+			if(!game.controlLock) {
+				var mouse = cv.getMouse(e); // get scaled mouse position from canvas class
+				units.mouse('mousemove',mouse.sx,mouse.sy);  	// send click to UI click handling code
+			}
+		});
 		
 		// Initialise all the User Interface widgets
 		this.widgets.speaker = new ImageButtonClass( {left:25,bottom:30}, ['speaker.png', 'speaker_mute.png'], true);
 		this.widgets.speaker.action = function (){sound.toggleMute(); };
 
-		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
-		this.widgets.upright.action = function (){ units.move('33'); };
-		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
-		this.widgets.up.action = function (){ units.move('38'); };
-		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
-		this.widgets.upleft.action = function (){ units.move('36'); };
-		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
-		this.widgets.downright.action = function (){ units.move('34'); };
-		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
-		this.widgets.down.action = function (){ units.move('40'); };
-		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
-		this.widgets.downleft.action = function (){ units.move('35'); };
+//		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
+//		this.widgets.upright.action = function (){ units.move('33'); };
+//		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
+//		this.widgets.up.action = function (){ units.move('38'); };
+//		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
+//		this.widgets.upleft.action = function (){ units.move('36'); };
+//		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
+//		this.widgets.downright.action = function (){ units.move('34'); };
+//		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
+//		this.widgets.down.action = function (){ units.move('40'); };
+//		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
+//		this.widgets.downleft.action = function (){ units.move('35'); };
 
-		this.widgets.endturn = new VectorButtonClass( {right:125,top:190}, 'End turn', 110);
+		this.widgets.endturn = new VectorButtonClass( {right:125,top:90}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
 		
-		this.widgets.teleport = new VectorButtonClass( {right:125,top:250}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {right:125,top:150}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.teleport(); };
 
-		this.widgets.buyunits = new VectorButtonClass( {right:125,top:310}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {right:125,top:210}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ ui.widgets.buyunitspopup.render(); };
 
-		this.widgets.upgrades = new VectorButtonClass( {right:125,top:370}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {right:125,top:270}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
 		// Define upgrades popup and add buttons
@@ -157,7 +165,7 @@ UIClass = Class.extend({
 		var y = y + 20;
 		this.ctx.fillText('Defence upgrades: '+game.defence[game.turn]+'%', x, y);
 		var y = y + 20;
-		this.ctx.fillText('Production rate: '+(game.production[game.turn]*100)+'%', x, y);
+		this.ctx.fillText('Production rate: '+parseInt(game.production[game.turn]*100)+'%', x, y);
 		this.ctx.shadowColor = "transparent";
 	},
 	
@@ -199,7 +207,7 @@ UIClass = Class.extend({
 	
 	moveIconFlash: function (code) {
 		// Flash the appropriate move icon when a move is attempted
-		var dir = config.movekeys[code];
+/*		var dir = config.movekeys[code];
 		if(dir.y == 1) {
 			if( dir.x == 1 ) this.widgets.downright.pulse(200);
 			else this.widgets.downleft.pulse(200);
@@ -209,7 +217,7 @@ UIClass = Class.extend({
 			else this.widgets.upleft.pulse(200);
 		}
 		else if( dir.y == -2) this.widgets.up.pulse(200);
-		else this.widgets.down.pulse(200);
+		else this.widgets.down.pulse(200); */
 	},
 	
 	greyWidgets: function () {

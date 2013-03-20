@@ -63,8 +63,6 @@ var config = {
 	// TODO: should this be made into an array with simple 0 or 1 at each grid index?
 	boardPattern: [
 		[4],
-		[],
-		[4],
 		[3,5],
 		[2,4,6],
 		[1,3,5,7],
@@ -77,11 +75,9 @@ var config = {
 		[2,4,6],
 		[3,5],
 		[4],
-		[],
-		[4]
 		],
 
-	homeTile: [0,40],
+	homeTile: [0,38],
 	
 	sides:[{name:'Mecritian', colour: 'red'}, {name:'Riveckian', colour:'blue'}],
 
@@ -107,6 +103,20 @@ var config = {
 	
 	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh'],
 
-	music: ['01-the_future_soon', '02-skullcrusher_mountain', '03-i_crush_everything', '04-betty_and_me', '05-mandelbrot_set']
+	music: ['01-the_future_soon', '02-skullcrusher_mountain', '03-i_crush_everything', '04-betty_and_me', '05-mandelbrot_set'],
 	
+	//pre-computed distances between hextile gridids
+	distances: [ [0,null,2,null,4,null,6,null,8,null,10,null],
+				 [null,1,null,3,null,5,null,7,null,9,null,11],
+				 [1,null,2,null,4,null,6,null,8,null,10,null],
+				 [null,2,null,3,null,5,null,7,null,9,null,11],
+				 [2,null,3,null,4,null,6,null,8,null,10,null],
+				 [null,3,null,4,null,5,null,7,null,9,null,11],
+				 [3,null,4,null,5,null,6,null,8,null,10,null],
+				 [null,4,null,5,null,6,null,7,null,9,null,11],
+				 [4,null,5,null,6,null,7,null,8,null,10,null],
+				 [null,5,null,6,null,7,null,8,null,9,null,11],
+				 [5,null,6,null,7,null,8,null,9,null,10,null],
+				 [null,6,null,7,null,8,null,9,null,10,null,11],
+				 [6,null,7,null,8,null,9,null,10,null,11,null]]
 };
