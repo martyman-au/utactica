@@ -2,7 +2,7 @@ BoardClass = Class.extend({
 	
 	tiles: new Array(),	// Array to store board tile objects
 	ctx: null,			// Reference to the board 2D canvas context
-	animCount: 0,		// Counter to avoid having to redraw the board every animation frame
+	tilestates: null,	// Stores an indication of the last tile state so that we don't have to redraw the board unless it changes
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
@@ -59,10 +59,19 @@ BoardClass = Class.extend({
 	
 	animFrame: function () {
 		// Update called by requestAnimationFrame
-		if( this.animCount++ >= 10 ) { // Only redraw board every 10th animationFrame to save CPU
+		// TODO: Can we update soemthing when changing states so that we don't have to lookup the tile states every frame?
+		if( this.tilestates !== this.tilesGetStates() ) { // Only redraw board if a tile has changed state
+			this.tilestates = this.tilesGetStates();
 			this.redraw();
-			this.animCount = 0;
 		}
+	},
+	
+	tilesGetStates: function () {
+		var states = '';
+		for( i in this.tiles ) {
+			states += this.tiles[i].state;
+		}
+		return states;
 	},
 	
 	clickhit: function (x,y) {
