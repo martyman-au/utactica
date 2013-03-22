@@ -261,7 +261,7 @@ UnitClass = Class.extend({
 		}
 		else if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile them make a move
 			// TODO: check if it is an attack
-			var enemies = units.getEnemies(newtile);	// Check for enemies on teh target tile
+			var enemies = units.getEnemies(newtile);	// Check for enemies on the target tile
 			if(enemies.units.length > 0) { 				// if there was at least one enemy on the target tile
 				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
 			}
@@ -384,7 +384,7 @@ SoldierUnitClass = UnitClass.extend({
 				if( enemies.soldier > 1 ) { // If more than one soldier then only destroy one
 					for( i in enemies.units ) {
 						var unit = units.units[enemies.units[i]];
-						if( unit.type == 'soldier' ) {
+						if( unit.type == 'soldier' ) { // Kill the first soldier we find
 							unit.lose();
 							break;
 						}
@@ -394,9 +394,7 @@ SoldierUnitClass = UnitClass.extend({
 					game.controlLock = false;
 				}
 				else { // If one soldier or less, then destroy all units
-					for( i in enemies.units ) {
-						units.units[enemies.units[i]].lose(); // TODO: make only one unit die and deal with remaining workers
-					}
+					for( i in enemies.units ) { units.units[enemies.units[i]].lose(); }
 					setTimeout( function () { // after a delay move the attacking unit
 					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
 						board.tiles[units.activeUnit.tileid].clearSlot(units.activeUnit.slotid); // Clear old slot on board	
