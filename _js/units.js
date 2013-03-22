@@ -68,7 +68,7 @@ UnitsClass = Class.extend({
 			for( i in this.units ) {
 				unit = this.units[i];
 				if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0) {
-					unit.activate();
+//					unit.activate();
 					this.activeUnit = this.units[i];
 					this.activeUnit.origpos = {x:this.activeUnit.ux, y:this.activeUnit.uy};
 					this.dragoffset.x = this.activeUnit.ux - x;
@@ -93,14 +93,16 @@ UnitsClass = Class.extend({
 		}
 		else if( event === 'mouseup') {  // If the event is an up click
 			if( this.activeUnit) {
-				if( this.drag ) this.activeUnit.dragmove(x,y);
+				if( this.drag ) { // If we have dragged somewhere we are either moving or attacking
+					this.activeUnit.dragmove(x,y);
+				}
+				else if(this.activeUnit.remainingmoves > 0) this.activeUnit.activate();
 			}
 			this.down = false;
 			board.unHighlight();
 		}
 	},
 	
-
 	isMovePossible: function (newtile) {
 		var oldtile = board.tiles[this.activeUnit.tileid].grididx;
 		var possibles = [];
@@ -255,21 +257,26 @@ UnitClass = Class.extend({
 	dragmove: function (x,y) {
 		var newtile = board.clickhit(x,y);
 		if(newtile == this.tileid) { // If we haven't moved out of our original tile
-			// TODO: does this have to be a special case?
-			this.actualMove(this.tileid,this.slotid);
+			this.actualMove(this.tileid,this.slotid); // Move back where we came from
 		}
-		else if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile move
-			// TODO: check if it is an attack, enforce only attacking for one tile away
-			var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
-			if( newslot ) { // animate the actual move
-				this.remainingmoves -= board.tileDistance(this.tileid,newtile);		// Decrement remaining moves count
-				board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
-				this.actualMove(newtile,newslot);			// Move the unit to the new tile and slot
+		else if(newtile && board.tiles[newtile].state !== 2 ) { // If this isn't a greyed tile them make a move
+			// TODO: check if it is an attack
+			var enemies = units.getEnemies(newtile);	// Check for enemies on teh target tile
+			if(enemies.units.length > 0) { 				// if there was at least one enemy on the target tile
+				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
 			}
 			else {
-				this.actualMove(this.tileid,this.slotid);	// Move back to where we came from
-				effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
-				sound.playSound('doh');
+				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
+				if( newslot ) { // animate the actual move
+					this.remainingmoves -= board.tileDistance(this.tileid,newtile);		// Decrement remaining moves count
+					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
+					this.actualMove(newtile,newslot);			// Move the unit to the new tile and slot
+				}
+				else {
+					this.actualMove(this.tileid,this.slotid);	// Move back to where we came from
+					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
+					sound.playSound('doh');
+				}
 			}
 		}
 		else {
@@ -323,7 +330,7 @@ UnitClass = Class.extend({
 	
 	teleport: function (slot) {
 		var hometile = config.homeTile[this.side];
-		if(slot == undefined )	var slot = board.allocateSlot(hometile);	// find a free slot at the home tile
+		if(slot == undefined )	var slot = board.allocateSlot(hometile);	// find a free slot at the home tile if one not provided
 		if( slot ) // Free slot means that we can teleport home
 		{
 			this.remainingmoves--;	// decrease the remaining moves of this unit
