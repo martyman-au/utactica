@@ -4,12 +4,11 @@ CanvasClass = Class.extend({
 	scale: null,		// Scale required to fit board into canvas
 	screenRatio: null,	// Apect ratio of the dipslay window
 	screenMode: null,	// sreen mode setting used to switch UI layout for portrait layout
-	layers: {},
+	layers: {},			// each of our game rendering layers is stored here
 
 	init: function () {
-		// Create canvases for the various game layers
+		// Create canvases for the various game layers base don the config file
 		var body = document.getElementById("body"), layer; 
-		
 		for( i in config.layers )
 		{
 			name = config.layers[i].name;
@@ -25,7 +24,7 @@ CanvasClass = Class.extend({
 	
 	getMouse: function(e) {
 		// return an object with sx and sy being the X and Y position of the click on the scaled canvases and x and y being the unscaled canvas click location
-		// TODO: Is this the best place for this
+		// TODO: Is this the best place for this?
 		return {sx: e.pageX / this.scale, sy: e.pageY / this.scale, x: e.pageX, y: e.pageY };
 	},
  
@@ -41,20 +40,16 @@ CanvasClass = Class.extend({
 	},
 	
 	setScale: function () {
+		// Set the scale for the canvases so as to fit the game on any screen size
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
-		
 		var boardheight = config.boardPattern.length * 91.5;
 		
-//		this.scale = Math.min(window.innerWidth / 1385, ((window.innerHeight - ui.bannerheight) / boardheight)); // Scale needed to fit board in canvas
 		this.scale = Math.min(window.innerWidth / 1385, window.innerHeight / boardheight); // Scale needed to fit board in canvas
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
 		this.Offset.x = ((window.innerWidth - (1385 * this.scale))/2)/this.scale; 						// Offset needed to center board in canvas X
-//		this.Offset.y = (((window.innerHeight - ui.bannerheight) - (boardheight * this.scale))/2)/this.scale; 						// Offset needed to center board in canvas X
 		this.Offset.y = ((window.innerHeight - (boardheight * this.scale))/2)/this.scale; 						// Offset needed to center board in canvas X
 
-//		this.Offset.y = Math.max( 0, ( (window.innerHeight - ui.bannerheight) /this.scale - boardheight ));	// Offset needed to center board in canvas Y
-		
 		this.setSize( window.innerWidth, window.innerHeight ); // canvas = full window size
 		
 		// Apply scale to canvases
