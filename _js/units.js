@@ -263,7 +263,10 @@ UnitClass = Class.extend({
 			// TODO: check if it is an attack
 			var enemies = units.getEnemies(newtile);	// Check for enemies on the target tile
 			if(enemies.units.length > 0) { 				// if there was at least one enemy on the target tile
-				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
+				if( this.canAttack ) {
+					this.redraw();
+					this.attack(newtile, enemies);	// If this unit is a soldier then attack
+				}
 			}
 			else {
 				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
@@ -379,7 +382,6 @@ SoldierUnitClass = UnitClass.extend({
 		}
 		else if( result > 16 ) { // A defending unit is destroyed
 			effects.renderText('YOUR ATTACK WAS SUCCESSFUL',{center:true});
-			// TODO: mark only one soldier dead
 			setTimeout( function () {
 				if( enemies.soldier > 1 ) { // If more than one soldier then only destroy one
 					for( i in enemies.units ) {
@@ -398,6 +400,8 @@ SoldierUnitClass = UnitClass.extend({
 					setTimeout( function () { // after a delay move the attacking unit
 					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
 						board.tiles[units.activeUnit.tileid].clearSlot(units.activeUnit.slotid); // Clear old slot on board	
+						units.activeUnit.remainingmoves--;
+						units.activeUnit.deactivate();
 						game.controlLock = false;
 					}, 400 );
 				}
