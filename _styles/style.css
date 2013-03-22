@@ -3,6 +3,14 @@ body {
 	overflow:hidden;
 	background: #CC5422;
 	font-family: 'Roboto Condensed','Trebuchet MS',sans-serif;
+	color: #FFFFFF;
 }
 
-canvas { font-family: 'Roboto Condensed','Trebuchet MS',sans-serif }
+canvas { 
+	font-family: 'Roboto Condensed','Trebuchet MS',sans-serif;
+}
+
+#intro {
+	font-size:150%;
+	padding: 20px;
+}

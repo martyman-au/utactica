@@ -23,18 +23,21 @@ var gameClass = Class.extend({
 					};
 		spritejson.send();
 		
-		this.initcheck = setInterval( function () {
-				if ( sprites.fullyLoaded && sprites.fullyParsed ) {
-					game.setupGame();
-					window.clearInterval(game.initcheck);
-				}
-				else console.log('not ready yet'); // DEBUG: debug code
-			}, 50 );
+//		this.initcheck = setInterval( function () {
+//				if ( sprites.fullyLoaded && sprites.fullyParsed ) {
+//					game.setupGame();
+//					window.clearInterval(game.initcheck);
+//				}
+//				else console.log('not ready yet'); // DEBUG: debug code
+//			}, 50 );
 	},
 
 	setupGame: function () {
 		// Create objects to look after game output, data and logic
-
+		
+		intro = document.getElementById('intro');
+		intro.parentNode.removeChild(intro);
+		
 		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
 
 		cv = new CanvasClass();  							// canvas layers and contexts
