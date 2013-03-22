@@ -1,20 +1,18 @@
 var gameClass = Class.extend({
-	ready: false,
-	turn: null,
-	foodcash: [250,250],
-	sciencecash: [100,100],
-	production: [1,1],
-	attack: [0,0],
-	defence: [0,0],
-	initcheck: null,
-	controlLock: false,
+	ready: false,			// Used in the game initialisation phase TODO: Is this needed?
+	turn: null,				// Tracks which player's turn it is
+	foodcash: [250,250],	// Food resources for each side
+	sciencecash: [100,100],	// Science resources for each side
+	production: [1,1],		// Production rate for each side
+	attack: [0,0],			// Attack bonus for each side
+	defence: [0,0],			// Defence bonus for each side
+	initcheck: null,		// TODO: ?????
+	controlLock: false,		// Lock controls while an animation is running TODO: fix this up?
 
 	init: function () {
 		// Start loading sprites, fonts, etc
-//		loadfonts();		
 		sprites = new SpriteSheetClass();
 		sprites.load('_media/sprites.png');
-		
 
 		// now load json defining the sprite sheet
 		var spritejson = new XMLHttpRequest();
@@ -125,7 +123,6 @@ var gameClass = Class.extend({
 	
 	collectResource: function (resource) {
 		// Allocate any occupied resources to that team
-		// TODO: trigger resource collection animation "text effect"
 		if( resource.substring(0,1) == 'f') {
 			var food = parseInt(this.production[this.turn] * Number(resource.substring(1)));
 			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] + food);
@@ -139,6 +136,7 @@ var gameClass = Class.extend({
 	},
 	
 	buyUnit: function (type) {
+		// Buy a new unit and debit food resources
 		var cost = config.unitCosts[type];
 		if( board.tiles[config.homeTile[this.turn]].checkSlots() ) { // check for available home slot
 			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] - cost);
@@ -154,6 +152,7 @@ var gameClass = Class.extend({
 	},
 	
 	buyUpgrade: function (type) {
+		// Buy an upgrade and debit science resources
 		var cost = config.upgradeCosts[type];
 		this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] - cost);
 		if(type == 'attack') this.attack[this.turn] = parseInt(this.attack[this.turn] + 20);
@@ -164,11 +163,11 @@ var gameClass = Class.extend({
 });
 
 // variables used to hold main game objects
-var sprites = {};
-var cv = {};
-var board = {};
-var units = {};
-var effects = {};
-var ui = {};
-var sound = {};
-var game = new gameClass();
+var sprites = {};	// Sprites class
+var cv = {};		// Canvas class
+var board = {};		// Board class
+var units = {};		// Units class
+var effects = {};	// Effects class
+var ui = {};		// User interface class
+var sound = {};		// Sound class
+var game = new gameClass();	// Overall game class
