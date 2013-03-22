@@ -2,6 +2,7 @@ BoardClass = Class.extend({
 	
 	tiles: new Array(), // Array to store board tile objects
 	ctx: null,
+	animCount: 0,
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
@@ -57,7 +58,11 @@ BoardClass = Class.extend({
 	},
 	
 	animFrame: function () {
-		this.redraw();
+		// Update called by requestAnimationFrame
+		if( this.animCount++ >= 10 ) { // Only redraw board every 10th animationFrame to save CPU
+			this.redraw();
+			this.animCount = 0;
+		}
 	},
 	
 	clickhit: function (x,y) {
@@ -80,8 +85,7 @@ BoardClass = Class.extend({
 	},
 	
 	checkmove: function (tgt) {
-		// given a target x and y board index, run through the tiles and check if one exists at that location
-		// TODO: game logic needed here, to track attacks etc?
+		// given a target {x,y} board index, run through the tiles and check if one exists at that location
 		for( i in this.tiles )
 		{
 			if( (this.tiles[i].grididx.x == tgt.x) && (this.tiles[i].grididx.y == tgt.y))
