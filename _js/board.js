@@ -1,8 +1,8 @@
 BoardClass = Class.extend({
 	
-	tiles: new Array(), // Array to store board tile objects
-	ctx: null,
-	animCount: 0,
+	tiles: new Array(),	// Array to store board tile objects
+	ctx: null,			// Reference to the board 2D canvas context
+	animCount: 0,		// Counter to avoid having to redraw the board every animation frame
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
@@ -111,7 +111,8 @@ BoardClass = Class.extend({
 	},
 	
 	moveHighlight: function (tile1,tile2,max) {
-		// grey out unreachable tiles, highlight current tile
+		// Given a starting tile, currently hoveredover tile and maximum move distance grey out unreachable tiles, highlight current tile
+		// This is then used by game logic to allow/disallow moves
 		// TODO: grey out enemy tiles (for worker only?)
 		var newtile = this.tiles[tile2];
 		for( i in this.tiles) {
@@ -123,12 +124,14 @@ BoardClass = Class.extend({
 	},
 	
 	unHighlight: function () {
+		// After moveHighlighting above return all tiles to their standard state
 		for( i in this.tiles) {
 			this.tiles[i].state = 0;
 		}
 	},
 	
 	tileDistance: function (tile1,tile2) {
+		// Given two tile idxs calculate the distance between them
 		return config.distances[Math.abs(this.tiles[tile1].grididx.y - this.tiles[tile2].grididx.y)][Math.abs(this.tiles[tile1].grididx.x - this.tiles[tile2].grididx.x)];
 	}
 });
