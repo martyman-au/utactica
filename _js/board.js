@@ -3,11 +3,13 @@ BoardClass = Class.extend({
 	tiles: new Array(),	// Array to store board tile objects
 	ctx: null,			// Reference to the board 2D canvas context
 	tilestates: null,	// Stores an indication of the last tile state so that we don't have to redraw the board unless it changes
+	stats: {},		// Stores the stats of the standard board tile
 
 	init: function (pattern) {
 		// Supply the board pattern for the hextiles
 		// an array of arrays for each row of the board
 		// fills this.tiles with tile objects
+		this.stats = sprites.getStats('hextile.png'); // TODO: tile name hard coded
 		this.ctx = cv.layers['board'].context; // TODO: Hardcoded?
 		var grididx = {};
 		var position = {};
@@ -17,10 +19,10 @@ BoardClass = Class.extend({
 			for( j in row )					// for each tile in the row
 			{
 				grididx.x = row[j];			// calculate a grid index for the tile
-				grididx.y = Number(i);				//
-				position.x = (row[j]*151);	// calculate the x position of the tile (top left)  TODO: fix hard coding
-				position.y = (i*86);		// calculate the y position of the tile (top left)  TODO: fix hard coding
-				this.tiles[index] = new TileClass( this.ctx, index, grididx, position, ''); // create and save new tile object
+				grididx.y = Number(i);		//
+				position.x = (row[j]*this.stats.w*0.75);	// calculate the x position of the tile (top left)
+				position.y = (i*this.stats.h*0.495);		// calculate the y position of the tile (top left)
+				this.tiles[index] = new TileClass( this.ctx, index, grididx, position, this.stats); // create and save new tile object
 				index++;
 			}	
 		}
@@ -79,7 +81,7 @@ BoardClass = Class.extend({
 		var xoff = null;
 		var yoff = null;
 		var besttile = null;
-		var bestdist = 100000;
+		var bestdist = 100000; // TODO: This is not nice
 		for( i in this.tiles )
 		{
 			xoff = Math.abs((this.tiles[i].center.x + cv.Offset.x) - x);
@@ -89,7 +91,7 @@ BoardClass = Class.extend({
 				bestdist = xoff + yoff;
 			}
 		}
-		if( bestdist < 130 ) return besttile;
+		if( bestdist < 130 ) return besttile;  // TODO: can we do better than this?
 		return null;
 	},
 	
@@ -155,8 +157,9 @@ TileClass = Class.extend({
 	grididx: {x: null, y: null},	// grid index of the tile
 	position: {x: null, y: null},	// position of the top left corner of the tile (in scaled pixels)
 	center: {x: null, y: null},		// position of the center of the tile (in scaled pixels)
-	resource: null,					// resource location on the tile
+	resource: '',					// resource location on the tile
 	state: 0,						// 0 = std, 1 = actived, 3 = grey
+	stats: {},
 	slots: {						// slots that can hold units on a tile TODO: seems messy
 		slot0: { unit: false,
 				xoffset: -1,
@@ -172,16 +175,16 @@ TileClass = Class.extend({
 				yoffset: 1}
 		},
 				
-	init: function (ctx, tilenum, grididx, position, resource) {
-		// Initialise a tile object with a tilenumber, grid index, x and y pixel position and resource (if exists)
+	init: function (ctx, tilenum, grididx, position, stats) {
+		// Initialise a tile object with a tilenumber, grid index, x and y pixel position
 		this.ctx = ctx;
 		this.tilenum = tilenum;
 		this.grididx.x = grididx.x;
 		this.grididx.y = grididx.y;
 		this.position = copy(position);		// TODO: is this the best way to do this?
-		this.resource = resource;
-		this.center.x = position.x+100;		// TODO: hard coded
-		this.center.y = position.y+88;		// TODO: hard coded
+		this.stats = stats;
+		this.center.x = position.x+(this.stats.w/2);
+		this.center.y = position.y+(this.stats.h/2);
 	},
 	
 	render: function () {

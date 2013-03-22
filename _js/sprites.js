@@ -121,7 +121,6 @@ SpriteSheetClass = Class.extend({
 	// Walk through all the sprite definitions for this
     // atlas, and find which one matches the name.
 	getStats: function (name) {
- //       console.log(this);
         // For each sprite in the 'sprites' Array...
 		for(var i = 0; i < this.sprites.length; i++) {
             // Check if the sprite's 'id' parameter

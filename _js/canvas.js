@@ -42,13 +42,13 @@ CanvasClass = Class.extend({
 	setScale: function () {
 		// Set the scale for the canvases so as to fit the game on any screen size
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
-		var boardheight = config.boardPattern.length * 91.5;
+		var boardheight = config.boardPattern.length * 93;
 		
-		this.scale = Math.min(window.innerWidth / 1385, window.innerHeight / boardheight); // Scale needed to fit board in canvas
+		this.scale = Math.min(window.innerWidth / 1410, window.innerHeight / boardheight); // Scale needed to fit board in canvas
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
-		this.Offset.x = ((window.innerWidth - (1385 * this.scale))/2)/this.scale; 						// Offset needed to center board in canvas X
-		this.Offset.y = ((window.innerHeight - (boardheight * this.scale))/2)/this.scale; 						// Offset needed to center board in canvas X
+		this.Offset.x = ((window.innerWidth - (1410 * this.scale))/2)/this.scale; 				// Offset needed to center board in canvas X
+		this.Offset.y = ((window.innerHeight - (boardheight * this.scale))/2)/this.scale; 		// Offset needed to center board in canvas X
 
 		this.setSize( window.innerWidth, window.innerHeight ); // canvas = full window size
 		

@@ -398,8 +398,8 @@ SoldierUnitClass = UnitClass.extend({
 				else { // If one soldier or less, then destroy all units
 					for( i in enemies.units ) { units.units[enemies.units[i]].lose(); }
 					setTimeout( function () { // after a delay move the attacking unit
-					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
 						board.tiles[units.activeUnit.tileid].clearSlot(units.activeUnit.slotid); // Clear old slot on board	
+					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
 						units.activeUnit.remainingmoves--;
 						units.activeUnit.deactivate();
 						game.controlLock = false;
