@@ -158,6 +158,7 @@ TileClass = Class.extend({
 	position: {x: null, y: null},	// position of the top left corner of the tile (in scaled pixels)
 	center: {x: null, y: null},		// position of the center of the tile (in scaled pixels)
 	resource: '',					// resource location on the tile
+	features: [],
 	state: 0,						// 0 = std, 1 = actived, 3 = grey
 	stats: {},
 	slots: {						// slots that can hold units on a tile TODO: seems messy
@@ -185,6 +186,8 @@ TileClass = Class.extend({
 		this.stats = stats;
 		this.center.x = position.x+(this.stats.w/2);
 		this.center.y = position.y+(this.stats.h/2);
+		
+		if(Math.random() > 0.4) this.features.push( new TileFeatureClass(this)); // TODO: testing features code
 	},
 	
 	render: function () {
@@ -236,6 +239,10 @@ TileClass = Class.extend({
 //		this.ctx.fillText('x: '+this.grididx.x+' y: '+this.grididx.y, this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
 //		this.ctx.fillText(this.tilenum, this.center.x - 28 + cv.Offset.x, this.center.y + 38 + cv.Offset.y);
 //		var distance = board.tileDistance(this.tilenum,12);
+
+		for (var i = 0; i < this.features.length; i++) {
+			this.features[i].render();
+		}
 	},
 
 	clearSlot: function (slot) {
@@ -247,5 +254,27 @@ TileClass = Class.extend({
 			if( this.slots[i].unit == false ) return true;
 		}
 		return false;
+	}
+});
+
+TileFeatureClass = Class.extend({
+	// Class used to define tile decoration features
+	spritestats: {},
+	rotation: 60,
+	tile: null,
+	
+	init: function (tile) {
+		this.tile = tile;
+		this.spritestats = sprites.getStats('science-resource.png'); // TODO: tile name hard coded
+		console.log(this.spritestats);
+	},
+	
+	render: function () {
+		// Render this feature to it's parent tile location
+		this.tile.ctx.translate(this.tile.center.x + cv.Offset.x, this.tile.center.y + cv.Offset.y);
+		this.tile.ctx.rotate(this.rotation*(3.14159/180));
+		drawSprite(this.spritestats.id, this.tile.ctx, 0, 0);
+		this.tile.ctx.rotate(-this.rotation*(3.14159/180));
+		this.tile.ctx.translate(-(this.tile.center.x + cv.Offset.x), -(this.tile.center.y + cv.Offset.y));
 	}
 });
