@@ -42,6 +42,7 @@ var gameClass = Class.extend({
 
 		cv = new CanvasClass();  							// canvas layers and contexts
 		board = new BoardClass(config.boardPattern);		// board and tiles
+		board.distributeResources();
 		units = new UnitsClass();							// units
 		effects = new EffectsClass(sprites); 				// effects (animations, etc)			
 		ui = new UIClass();									// user interface

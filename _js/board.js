@@ -26,7 +26,7 @@ BoardClass = Class.extend({
 				index++;
 			}	
 		}
-		this.distributeResources();			// seed resources across the completed board
+//		this.distributeResources();			// seed resources across the completed board
 	},
 	
 	distributeResources: function () {
@@ -37,6 +37,17 @@ BoardClass = Class.extend({
 			if (config.resources.hasOwnProperty(i))
 			{
 				this.tiles[config.resourcedTiles[i]].resource = config.resources[i];	// save resource to tile object
+			}
+		}
+		
+		for (var i = 0; i < this.tiles.length; i++) {		
+			if(!this.tiles[i].resource && Math.random() > 0.5) this.tiles[i].features.push( new RiverClass(this.tiles[i])); // TODO: testing features code
+		}
+		
+		
+		for (var i = 0; i < this.tiles.length; i++) {
+			for (var j = 0; j < this.tiles[i].features.length; j++) {
+				this.tiles[i].features[j].setup();
 			}
 		}
 	},
@@ -186,8 +197,6 @@ TileClass = Class.extend({
 		this.stats = stats;
 		this.center.x = position.x+(this.stats.w/2);
 		this.center.y = position.y+(this.stats.h/2);
-		
-		if(Math.random() > 0.4) this.features.push( new TileFeatureClass(this)); // TODO: testing features code
 	},
 	
 	render: function () {
@@ -259,22 +268,43 @@ TileClass = Class.extend({
 
 TileFeatureClass = Class.extend({
 	// Class used to define tile decoration features
-	spritestats: {},
+	sprite: null,
 	rotation: 60,
 	tile: null,
 	
 	init: function (tile) {
 		this.tile = tile;
-		this.spritestats = sprites.getStats('science-resource.png'); // TODO: tile name hard coded
-		console.log(this.spritestats);
+//		this.spritestats = sprites.getStats('science-resource.png'); // TODO: tile name hard coded
 	},
 	
 	render: function () {
 		// Render this feature to it's parent tile location
 		this.tile.ctx.translate(this.tile.center.x + cv.Offset.x, this.tile.center.y + cv.Offset.y);
 		this.tile.ctx.rotate(this.rotation*(3.14159/180));
-		drawSprite(this.spritestats.id, this.tile.ctx, 0, 0);
+		drawSprite(this.sprite, this.tile.ctx, 0, 0);
 		this.tile.ctx.rotate(-this.rotation*(3.14159/180));
 		this.tile.ctx.translate(-(this.tile.center.x + cv.Offset.x), -(this.tile.center.y + cv.Offset.y));
 	}
+});
+
+RiverClass = TileFeatureClass.extend({
+	score: 0,
+	
+	setup: function () {
+		for (var i = 0; i < config.adjacentTiles.length; i++) {
+			var x = this.tile.grididx.x + config.adjacentTiles[i].x;
+			var y = this.tile.grididx.y + config.adjacentTiles[i].y;
+			var adj = board.checkmove({x:x,y:y});
+			if(adj) {
+				console.log(i);
+				if(board.tiles[adj].features.length > 0) this.score += Math.pow(2,i);
+			}
+			else {
+				if(Math.random() > 0.8) this.score += Math.pow(2,i);
+			}
+		}
+		this.sprite = config.rivers[this.score].sprite;
+		this.rotation = config.rivers[this.score].rot;
+	}
+
 });
