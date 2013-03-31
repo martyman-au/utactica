@@ -11,7 +11,13 @@ var colours = {
 	greyout: 'rgba(0,0,0,0.5)',
 	blue: '#0000E0',
 	red: '#E00000',
-	beige: '#E0E0B0'
+	beige: '#E0E0B0',
+	healthgreen: '#117711',
+	healthyellow: '#888822',
+	healthred: '#771111',
+	healthgreengrey: '#447744',
+	healthyellowgrey: '#888866',
+	healthredgrey: '#774444'
 }
 
 //config stores game configuration options
@@ -27,7 +33,13 @@ var config = {
 		bannerhigh2: colours.white,
 		popupgreyout: colours.greyout,
 		popupbg: colours.white,
-		buttonbg: colours.beige
+		buttonbg: colours.beige,
+		healthbargood: colours.healthgreen,
+		healthbarmid: colours.healthyellow,
+		healthbarbad: colours.healthred,
+		healthbargoodgrey: colours.healthgreengrey,
+		healthbarmidgrey: colours.healthyellowgrey,
+		healthbarbadgrey: colours.healthredgrey	
 	},
 	
 	//Canvas layers defined here
@@ -85,6 +97,8 @@ var config = {
 	
 	upgradeCosts:{attack:50,defence:50,production:100},
 
+	Unithp:{soldier:50,worker:1},
+	
 	//resourcedTiles defines which tiles on the board are allowed to have resources
 	resourcedTiles: [6,9,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,32],
 	

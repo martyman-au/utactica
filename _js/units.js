@@ -42,6 +42,8 @@ UnitsClass = Class.extend({
 	render: function () {
 		// Render all of the units on the board
 		for( i in this.units ) this.units[i].render(); // render every unit
+		
+		if(this.activeunit) this.activeunit.render(); // TODO: fix dragged unit going behind other units
 	},
 
 	wipe: function () {
@@ -143,15 +145,24 @@ UnitsClass = Class.extend({
 	
 	getEnemies: function (tile) {
 		// get array of enemies located on a tile
-		var enemies = { units: [], soldier: 0, worker: 0};
+		var enemies = { units: [], soldier: 0, worker: 0, bestunit: {}};
+		var besthp = 0;
+		var bestunit = {};
+		var unit;
 		for( i in units.units ) // count how many soldiers exist on a tile
 		{
 			if( units.units[i].tileid == tile && units.units[i].side != game.turn )
 			{
-				enemies.units.push( i ); 
-				enemies[units.units[i].type]++; // if the tile has soldiers
+				unit = units.units[i];
+				if( unit.hp > besthp ) {
+					besthp = unit.hp;
+					bestunit = unit;
+				}
+				enemies.units.push( unit ); 
+				enemies[unit.type]++; // if the tile has soldiers
 			}
 		}
+		enemies.bestunit = bestunit;
 		return enemies;
 	},
 	
@@ -186,6 +197,8 @@ UnitClass = Class.extend({
 	slotoffsety: 0,
 	spritewidth: null,
 	spriteheight: null,
+	hp: 0,							// Hit points for damage tacking
+	type: '',
 	
 	init: function (side, tile) {
 		this.side = side;
@@ -196,6 +209,7 @@ UnitClass = Class.extend({
 		var stats = sprites.getStats(this.colour+'-'+this.type+'.png');
 		this.spriteheight = stats.h;
 		this.spritewidth = stats.w;
+		this.hp = config.Unithp[this.type];
 	},
 
 	activate: function () {
@@ -308,10 +322,39 @@ UnitClass = Class.extend({
 	
 	render: function () {
 		// render this unit to the units canvas
-		var spriteimg = this.colour+'-'+this.type
+		var ctx = cv.layers['units'].context;
+		var spriteimg = this.colour+'-'+this.type;
+		var healthcolor = null; 
+		
 		if(this.remainingmoves == 0 || this.side != game.turn) spriteimg = spriteimg+'-grey';
 		spriteimg = spriteimg+'.png';
-		drawSprite(spriteimg, cv.layers['units'].context, this.ux, this.uy)
+
+		drawSprite(spriteimg, ctx, this.ux, this.uy)
+		
+		if(this.remainingmoves == 0 || this.side != game.turn) {
+			if(this.hp >= 35) { healthcolor = config.styles.healthbargoodgrey; }
+			else {
+				if(this.hp >= 15) { healthcolor = config.styles.healthbarmidgrey; }
+				else { healthcolor = config.styles.healthbarbadgrey; }
+			}		}
+		else {
+			if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
+			else {
+				if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
+				else { healthcolor = config.styles.healthbarbad; }
+			}
+		}
+		
+//		console.log(healthcolor);
+		
+		ctx.font = "normal 700 20px 'Roboto Condensed'";
+		ctx.fillStyle = healthcolor; 
+		ctx.fillText(this.hp, this.ux, this.uy);
+		
+		var xoffset = -25;
+		var yoffset = 35;
+		
+		ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 8);
 	},
 	
 	calcPos: function () {
@@ -372,10 +415,21 @@ SoldierUnitClass = UnitClass.extend({
 		console.log('defend roll: '+defend);	// DEBUG: output attack result
 		console.log('raw result: '+(attack-defend));	// DEBUG: output attack result
 		var result = attack - defend + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
+		var defenderdamage = attack + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
+		var attackerdamage = defend + game.attack[(1-game.turn)] - game.defence[game.turn];	// Apply upgrade multipliers
+
 		// TODO: multi unit defence bonus, home base defence bonus
 
 		console.log('attack result: '+result);	// DEBUG: output attack result
 
+		console.log('defenderdamage: '+defenderdamage);	// DEBUG: output attack result
+		console.log('attackerdamage: '+attackerdamage);	// DEBUG: output attack result
+		
+		this.hp = this.hp - attackerdamage; // Damage the attacking unit;
+		
+		enemies.bestunit.hp = enemies.bestunit.hp - defenderdamage;
+		
+/*		
 		if( result < -16 ) { // The attacking unit is destroyed
 			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
 			setTimeout( function () {units.activeUnit.lose(); game.controlLock = false; }, 1500 );
@@ -416,6 +470,8 @@ SoldierUnitClass = UnitClass.extend({
 			this.deactivate();
 			this.redraw();
 		}		
+*/
+		game.controlLock = false;
 	},
 
 	lose: function () {
