@@ -331,34 +331,36 @@ UnitClass = Class.extend({
 
 		drawSprite(spriteimg, ctx, this.ux, this.uy)
 		
-		//Set the colour of teh health bar
-		if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
-		else {
-			if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
-			else { healthcolor = config.styles.healthbarbad; }
+		if(this.type == 'soldier') { // Only soldiers get a health bar
+			//Set the colour of teh health bar
+			if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
+			else {
+				if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
+				else { healthcolor = config.styles.healthbarbad; }
+			}
+			
+			ctx.fillStyle = healthcolor; 
+			
+			//ctx.font = "normal 700 20px 'Roboto Condensed'";
+			//ctx.fillText(this.hp, this.ux-10, this.uy); //TODO: remove debug code
+			
+			ctx.shadowColor = '#ffffff';
+			shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.shadowBlur = 6;
+			
+			var xoffset = -25;
+			var yoffset = 38;
+			ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 4);
+			ctx.shadowColor = "transparent";
 		}
-		
-		ctx.fillStyle = healthcolor; 
-		
-		//ctx.font = "normal 700 20px 'Roboto Condensed'";
-		//ctx.fillText(this.hp, this.ux-10, this.uy); //TODO: remove debug code
-		
-		ctx.shadowColor = '#ffffff';
-		shadowOffsetX = 0;
-		ctx.shadowOffsetY = 0;
-		ctx.shadowBlur = 6;
-		
-		var xoffset = -25;
-		var yoffset = 38;
-		ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 4);
-		ctx.shadowColor = "transparent";
 	},
 	
 	calcPos: function () {
 		// calculate the x,y position of the unit from the tile and slot
 		var slots = board.tiles[this.tileid].slots;
 		this.slotoffsetx = slots[this.slotid].xoffset*(this.spritewidth*0.55);		// calculate the position for this slot
-		this.slotoffsety = slots[this.slotid].yoffset*(this.spriteheight*0.55)-10;	// calculate the position for this slot
+		this.slotoffsety = slots[this.slotid].yoffset*(this.spriteheight*0.6);	// calculate the position for this slot
 		this.ux = board.tiles[this.tileid].center.x + cv.Offset.x + this.slotoffsetx;
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
@@ -451,13 +453,10 @@ SoldierUnitClass = UnitClass.extend({
 
 	lose: function () {
 		// Deal with a unit losing a battle
-		this.deactivate();
-		board.tiles[this.tileid].clearSlot(this.slotid); // Clear slot on board	
-		this.wipe(); 		// wipe the unit from the units cavas
-
+		this.deactivate();									// Deactivate the unit in case it is the active unit
 		effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion
-		this.state = 'dead';
-		units.redraw();
+		board.tiles[this.tileid].clearSlot(this.slotid); 	// Clear slot on board	
+		this.state = 'dead';								// Set state to dead so that it is deleted
 	},
 });
 
@@ -552,14 +551,17 @@ BattleClass = Class.extend({
 		this.attackerstarthp = this.attacker.hp;
 		this.defenderstarthp = this.defender.hp;
 		
-		var attackscore = Math.floor((Math.random()*100)+1) + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
-		if( this.defender.type == 'soldier' ) {
-			var defendscore = Math.floor((Math.random()*100)+1) + game.attack[(1-game.turn)] - game.defence[game.turn];	// Apply upgrade multipliers
+		// BATTLE CALCULATIONS
+		// Attack damage is a rnd(0-100) + attacker's attack upgrades - defender's defence upgrades
+		// Retaliation damage is a rnd(0-100) + defender's attack upgrades - attacker's attack upgrades
+		var attackscore = Math.floor((Math.random()*100)+1) + game.attack[game.turn] - game.defence[(1-game.turn)];
+		if( this.defender.type == 'soldier' ) {	// Only soldiers can retaliate
+			var defendscore = Math.floor((Math.random()*100)+1) + game.attack[(1-game.turn)] - game.defence[game.turn];
 		}
 		else defendscore = 0; // workers are unable to retaliate
 		
-		this.defenderdamage = Math.min( attackscore, this.defender.hp );
-		this.attackerdamage = Math.min( defendscore, this.attacker.hp );
+		this.defenderdamage = Math.max( 0, Math.min( attackscore, this.defender.hp ));  // Bound damage between the unit.hp and 0
+		this.attackerdamage = Math.max( 0, Math.min( defendscore, this.attacker.hp ));	// Bound damage between the unit.hp and 0
 
 		sound.playSound('battle');
 	},
@@ -569,20 +571,22 @@ BattleClass = Class.extend({
 		
 		if(this.progress < 0.75) { 						// Battle phase first 75% of battle time
 			var battleprogress = this.progress / 0.75;
-			if( Math.random() < 0.1 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress;
-			if( Math.random() < 0.1 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress;
+			if( Math.random() < 0.1 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
+			if( Math.random() < 0.1 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
 		}
 		else {
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
 				this.attacker.hp = this.attackerstarthp - this.attackerdamage;
 				this.defender.hp = this.defenderstarthp - this.defenderdamage;
-				if( this.attacker.hp < 1 ) this.attacker.lose();
-				if( this.defender.hp < 1 ) this.defender.lose();
-				this.results = true;
+				if( this.attacker.hp < 1 ) this.attacker.lose();	// destroy losing units
+				if( this.defender.hp < 1 ) this.defender.lose();	// destroy losing units
+		
+				this.results = true; 					// Results stage is done
 			}
 			else {
 				if( this.progress >= 1) {				// End the battle
 					game.controlLock = false;
+					this.attacker.remainingmoves--;
 					this.done = true;
 				}
 			}
