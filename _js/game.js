@@ -8,6 +8,7 @@ var gameClass = Class.extend({
 	defence: [0,0],			// Defence bonus for each side
 	initcheck: null,		// TODO: ?????
 	controlLock: false,		// Lock controls while an animation is running TODO: fix this up?
+	battle:  null,
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -61,6 +62,14 @@ var gameClass = Class.extend({
 		board.animFrame();
 		effects.animFrame();						// render any currrent effects
 		units.animFrame();							// render any unit changes
+		if(game.battle) {
+			if(game.battle.done) {
+				game.battle = null;
+			}
+			else {
+				game.battle.animFrame();	// process any running battle
+			}
+		}
 	},
 	
 	setupListners: function () {

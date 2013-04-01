@@ -205,9 +205,9 @@ TextEffectClass = Class.extend({
 BeamEffectClass = VectorEffectClass.extend({
 	// Teleport beam class extends vector class
 	drawFrame: function () { // define drawFrame() for 'beam' animation
-		var percent = ((Date.now()-this.animstart) / this.length)		// calculate how far through the animation we are
+		var progress = ((Date.now()-this.animstart) / this.length)		// calculate how far through the animation we are
 		this.drawline(this.start,this.end,6,'rgba(255,255,56,0.3)');	// render a line from teh starting to the ending point
-		this.drawcircle(this.interpolate(this.start,this.end,this.percent), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
-		if(percent >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
+		this.drawcircle(this.interpolate(this.start,this.end,Math.min(1,(progress*2))), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
+		if(progress >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
 	},
 });

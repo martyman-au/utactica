@@ -12,12 +12,9 @@ var colours = {
 	blue: '#0000E0',
 	red: '#E00000',
 	beige: '#E0E0B0',
-	healthgreen: '#117711',
-	healthyellow: '#888822',
-	healthred: '#771111',
-	healthgreengrey: '#447744',
-	healthyellowgrey: '#888866',
-	healthredgrey: '#774444'
+	healthgreen: '#11aa11',
+	healthyellow: '#eeee22',
+	healthred: '#aa1111'
 }
 
 //config stores game configuration options
@@ -36,10 +33,7 @@ var config = {
 		buttonbg: colours.beige,
 		healthbargood: colours.healthgreen,
 		healthbarmid: colours.healthyellow,
-		healthbarbad: colours.healthred,
-		healthbargoodgrey: colours.healthgreengrey,
-		healthbarmidgrey: colours.healthyellowgrey,
-		healthbarbadgrey: colours.healthredgrey	
+		healthbarbad: colours.healthred
 	},
 	
 	//Canvas layers defined here

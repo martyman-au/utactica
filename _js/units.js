@@ -331,30 +331,27 @@ UnitClass = Class.extend({
 
 		drawSprite(spriteimg, ctx, this.ux, this.uy)
 		
-		if(this.remainingmoves == 0 || this.side != game.turn) {
-			if(this.hp >= 35) { healthcolor = config.styles.healthbargoodgrey; }
-			else {
-				if(this.hp >= 15) { healthcolor = config.styles.healthbarmidgrey; }
-				else { healthcolor = config.styles.healthbarbadgrey; }
-			}		}
+		//Set the colour of teh health bar
+		if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
 		else {
-			if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
-			else {
-				if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
-				else { healthcolor = config.styles.healthbarbad; }
-			}
+			if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
+			else { healthcolor = config.styles.healthbarbad; }
 		}
 		
-//		console.log(healthcolor);
-		
-		ctx.font = "normal 700 20px 'Roboto Condensed'";
 		ctx.fillStyle = healthcolor; 
-		ctx.fillText(this.hp, this.ux, this.uy);
+		
+		//ctx.font = "normal 700 20px 'Roboto Condensed'";
+		//ctx.fillText(this.hp, this.ux-10, this.uy); //TODO: remove debug code
+		
+		ctx.shadowColor = '#ffffff';
+		shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		ctx.shadowBlur = 6;
 		
 		var xoffset = -25;
-		var yoffset = 35;
-		
-		ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 8);
+		var yoffset = 38;
+		ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 4);
+		ctx.shadowColor = "transparent";
 	},
 	
 	calcPos: function () {
@@ -405,30 +402,8 @@ SoldierUnitClass = UnitClass.extend({
 	type: 'soldier',
 
 	attack: function (tile, enemies) {
-		game.controlLock = true;				// Lock control input TODO: Need to make this more formalized and robust
-		sound.playSound('battle');				// play attack sound effect
-		
-		var attack = Math.floor((Math.random()*100)+1);	// roll for attackers
-		var defend = Math.floor((Math.random()*100)+1);	// roll for defenders
-		if( enemies.soldier == 0 ) defend = -1000; 		// If no soldiers, workers get no defence
-		console.log('attack roll: '+attack);	// DEBUG: output attack result
-		console.log('defend roll: '+defend);	// DEBUG: output attack result
-		console.log('raw result: '+(attack-defend));	// DEBUG: output attack result
-		var result = attack - defend + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
-		var defenderdamage = attack + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
-		var attackerdamage = defend + game.attack[(1-game.turn)] - game.defence[game.turn];	// Apply upgrade multipliers
 
-		// TODO: multi unit defence bonus, home base defence bonus
-
-		console.log('attack result: '+result);	// DEBUG: output attack result
-
-		console.log('defenderdamage: '+defenderdamage);	// DEBUG: output attack result
-		console.log('attackerdamage: '+attackerdamage);	// DEBUG: output attack result
-		
-		this.hp = this.hp - attackerdamage; // Damage the attacking unit;
-		
-		enemies.bestunit.hp = enemies.bestunit.hp - defenderdamage;
-		
+	game.battle = new BattleClass(this, tile);
 /*		
 		if( result < -16 ) { // The attacking unit is destroyed
 			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
@@ -470,8 +445,8 @@ SoldierUnitClass = UnitClass.extend({
 			this.deactivate();
 			this.redraw();
 		}		
-*/
 		game.controlLock = false;
+*/
 	},
 
 	lose: function () {
@@ -508,7 +483,6 @@ WorkerUnitClass = UnitClass.extend({
 		{
 			effects.renderEffect('explosion', this.ux, this.uy)	// render an explosion or teleport effect
 			this.state = 'dead';
-			units.redraw();
 		}
 	},
 });
@@ -545,10 +519,74 @@ TranslateClass = Class.extend({
 		this.unit.uy = newloc.y;
 		if(this.count == this.length) // end translation
 		{
-//			this.unit.remainingmoves--; // TODO this isn't were we should do this.
 			this.unit.redraw();
 			if(this.unit.remainingmoves > 0) this.unit.activate(); // deactivate unit if moves are up
 			return 'done';
 		}
 	}
+});
+
+BattleClass = Class.extend({
+	attacker: {},
+	defender: {},
+	target: {},
+	start: null,
+	done: false,
+	totaltime: 2500,
+	progress: 0,
+	enemies: [],
+	attackerstarthp: null,
+	defenderstarthp: null,
+	defenderdamage: null,
+	attackerdamager: null,
+	results: null,
+	
+	init: function (unit, target) {
+		game.controlLock = true;	// Lock control input TODO: Need to make this more formalized and robust
+		this.start = Date.now();
+		this.attacker = unit;
+		this.target = target;
+		this.enemies = units.getEnemies(target);
+		this.defender = this.enemies.bestunit;
+		
+		this.attackerstarthp = this.attacker.hp;
+		this.defenderstarthp = this.defender.hp;
+		
+		var attackscore = Math.floor((Math.random()*100)+1) + game.attack[game.turn] - game.defence[(1-game.turn)];	// Apply upgrade multipliers
+		if( this.defender.type == 'soldier' ) {
+			var defendscore = Math.floor((Math.random()*100)+1) + game.attack[(1-game.turn)] - game.defence[game.turn];	// Apply upgrade multipliers
+		}
+		else defendscore = 0; // workers are unable to retaliate
+		
+		this.defenderdamage = Math.min( attackscore, this.defender.hp );
+		this.attackerdamage = Math.min( defendscore, this.attacker.hp );
+
+		sound.playSound('battle');
+	},
+	
+	animFrame: function () {
+		this.progress = ( Date.now() - this.start ) / this.totaltime;
+		
+		if(this.progress < 0.75) { 						// Battle phase first 75% of battle time
+			var battleprogress = this.progress / 0.75;
+			if( Math.random() < 0.1 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress;
+			if( Math.random() < 0.1 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress;
+		}
+		else {
+			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
+				this.attacker.hp = this.attackerstarthp - this.attackerdamage;
+				this.defender.hp = this.defenderstarthp - this.defenderdamage;
+				if( this.attacker.hp < 1 ) this.attacker.lose();
+				if( this.defender.hp < 1 ) this.defender.lose();
+				this.results = true;
+			}
+			else {
+				if( this.progress >= 1) {				// End the battle
+					game.controlLock = false;
+					this.done = true;
+				}
+			}
+		}
+	}
+
 });
