@@ -35,7 +35,7 @@ AUDIO FILES
 The audio files are either licensed freely or under CC BY 3.0
 
 Music
-http://opengameart.org/content/man-made-messiah
+Jonathan Coulton "Where Tradition Meets Tomorrow" CC-BY-NC
 
 Explosion
 http://www.flashkit.com/soundfx/Mayhem/Explosives/Explosio-Ivan-8042/index.php
@@ -45,3 +45,6 @@ http://www.flashkit.com/soundfx/Electronic/Arcade/SpriteEx-Mark_E_B-8069/index.p
 
 doh beep
 http://www.flashkit.com/soundfx/Interfaces/Beeps/Small_Bo-Public_D-323/index.php
+
+Battle Noises
+http://www.grsites.com/archive/sounds/category/7/?offset=36
