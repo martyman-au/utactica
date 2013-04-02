@@ -201,7 +201,7 @@ UnitClass = Class.extend({
 	type: '',
 	
 	init: function (side, tile) {
-		this.side = side;
+		this.side = Number(side);
 		if(this.side) this.colour = 'blue'; // Side 1 has blue units
 		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
@@ -218,7 +218,7 @@ UnitClass = Class.extend({
 		this.redraw();
 		effects.renderEffect('active', this.ux, this.uy);
 	},
-	
+	 
 	deactivate: function () {
 		if(this.state == 'active')
 		{
@@ -533,18 +533,18 @@ BattleClass = Class.extend({
 	done: false,
 	totaltime: 2500,
 	progress: 0,
-	enemies: [],
+	enemies: {},
 	attackerstarthp: null,
 	defenderstarthp: null,
-	defenderdamage: null,
-	attackerdamager: null,
+	defenderdamage: 0,
+	attackerdamage: 0,
 	results: null,
 	
 	init: function (unit, target) {
 		game.controlLock = true;	// Lock control input TODO: Need to make this more formalized and robust
 		this.start = Date.now();
 		this.attacker = unit;
-		this.target = target;
+		this.target = Number(target);
 		this.enemies = units.getEnemies(target);
 		this.defender = this.enemies.bestunit;
 		
@@ -560,34 +560,58 @@ BattleClass = Class.extend({
 		}
 		else defendscore = 0; // workers are unable to retaliate
 		
-		this.defenderdamage = Math.max( 0, Math.min( attackscore, this.defender.hp ));  // Bound damage between the unit.hp and 0
-		this.attackerdamage = Math.max( 0, Math.min( defendscore, this.attacker.hp ));	// Bound damage between the unit.hp and 0
+//		console.log('attack score = '+attackscore); // DEBUG CODE
+//		console.log('defend score = '+defendscore); // DEBUG CODE
+		
+		// Apply a multiple defender bonus of 10% per extra soldier
+		var multidefenderbonus = 0;
+		if(this.enemies.soldier > 1) { multidefenderbonus = (this.enemies.soldier - 1) * 10; } 
+		defendscore += multidefenderbonus; // increase the defend score by the multiple unit bonus
+		attackscore -= multidefenderbonus; // decrease the attack score by the multiple unit bonus
+		
+		// Apply a home base defence bonus of 20%
+		var homebasebonus = 0;
+		if(this.target == config.homeTile[this.defender.side]) { homebasebonus = 10; } 	
+		defendscore += homebasebonus; // increase the defend score by the home base bonus
+		attackscore -= homebasebonus; // decrease the attack score by the home base bonus	
+		
+		var maxdefenderdamage = Math.max( 0, attackscore);  // Don't allow negative damage!
+		var maxattackerdamage = Math.max( 0, defendscore);	// Don't allow negative damage!
 
-		sound.playSound('battle');
+//		console.log('max attacker damage = '+maxattackerdamage); // DEBUG CODE
+//		console.log('max defender damage = '+maxdefenderdamage); // DEBUG CODE
+		
+		// deal out damage in discrete chunks and stop when at least one unit dies, fewer chunks leads to more coincidental mutual destruction
+		for( var i = 1; i <= 10; i++ ) {
+			this.defenderdamage += maxdefenderdamage/10;
+			this.attackerdamage += maxattackerdamage/10;
+			if( this.defenderdamage >= this.defenderstarthp || this.attackerdamage >= this.attackerstarthp)	break;
+		}
+		sound.playSound('battle');	// Play the battle sound effect
 	},
 	
 	animFrame: function () {
 		this.progress = ( Date.now() - this.start ) / this.totaltime;
-		
-		if(this.progress < 0.75) { 						// Battle phase first 75% of battle time
-			var battleprogress = this.progress / 0.75;
+		if(this.progress < 0.75) { 						// shooting phase first 75% of battle time (make noises, decrease unit's hp)
+			var battleprogress = this.progress / 0.75;	// calculate progress through the shooting phase
 			if( Math.random() < 0.1 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
 			if( Math.random() < 0.1 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
 		}
 		else {
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
-				this.attacker.hp = this.attackerstarthp - this.attackerdamage;
-				this.defender.hp = this.defenderstarthp - this.defenderdamage;
-				if( this.attacker.hp < 1 ) this.attacker.lose();	// destroy losing units
-				if( this.defender.hp < 1 ) this.defender.lose();	// destroy losing units
-		
-				this.results = true; 					// Results stage is done
+				this.attacker.hp = this.attackerstarthp - this.attackerdamage;	// Reduce units to their final hp level
+				this.defender.hp = this.defenderstarthp - this.defenderdamage;	// Reduce units to their final hp level
+				if( this.attacker.hp < 1 ) this.attacker.lose();	// destroy losing attacker
+				if( this.defender.hp < 1 ) { 						// The defender was destroyed, more logic follows
+					this.defender.lose();							// destroy losing defender
+				}
+				this.results = true; 					// Mark results stage done
 			}
 			else {
-				if( this.progress >= 1) {				// End the battle
-					game.controlLock = false;
-					this.attacker.remainingmoves--;
-					this.done = true;
+				if( this.progress >= 1) {				// End of the battle
+					game.controlLock = false;			// release the control lock
+					if(this.attacker) { this.attacker.remainingmoves--; }		// decrement remaining moves of the attacker if it wasn't destroyed
+					this.done = true;					// mark the battle done (will be deleted)
 				}
 			}
 		}

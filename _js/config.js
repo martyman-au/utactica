@@ -14,7 +14,7 @@ var colours = {
 	beige: '#E0E0B0',
 	healthgreen: '#11aa11',
 	healthyellow: '#eeee22',
-	healthred: '#aa1111'
+	healthred: '#dd1111'
 }
 
 //config stores game configuration options
