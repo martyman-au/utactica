@@ -569,7 +569,7 @@ BattleClass = Class.extend({
 		defendscore += multidefenderbonus; // increase the defend score by the multiple unit bonus
 		attackscore -= multidefenderbonus; // decrease the attack score by the multiple unit bonus
 		
-		// Apply a home base defence bonus of 20%
+		// Apply a home base defence bonus of 10%
 		var homebasebonus = 0;
 		if(this.target == config.homeTile[this.defender.side]) { homebasebonus = 10; } 	
 		defendscore += homebasebonus; // increase the defend score by the home base bonus
