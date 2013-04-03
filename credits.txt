@@ -15,6 +15,10 @@ http://www.codeandweb.com/texturepacker
 Explosions generated using Positech's explosion generator
 http://www.positech.co.uk/content/explosion/explosiongenerator.html
 
+IMAGES
+
+Background image
+http://smattila.deviantart.com/art/Lava-Planet-166250586
 
 
 CODE
@@ -35,7 +39,7 @@ AUDIO FILES
 The audio files are either licensed freely or under CC BY 3.0
 
 Music
-Jonathan Coulton "Where Tradition Meets Tomorrow" CC-BY-NC
+http://opengameart.org/content/man-made-messiah
 
 Explosion
 http://www.flashkit.com/soundfx/Mayhem/Explosives/Explosio-Ivan-8042/index.php
@@ -45,6 +49,3 @@ http://www.flashkit.com/soundfx/Electronic/Arcade/SpriteEx-Mark_E_B-8069/index.p
 
 doh beep
 http://www.flashkit.com/soundfx/Interfaces/Beeps/Small_Bo-Public_D-323/index.php
-
-Battle Noises
-http://www.grsites.com/archive/sounds/category/7/?offset=36

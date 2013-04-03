@@ -4,6 +4,12 @@ body {
 	background: #CC5422;
 	font-family: 'Roboto Condensed','Trebuchet MS',sans-serif;
 	color: #FFFFFF;
+	height: 100%;
+	background: url('../_media/background.jpg') no-repeat center center fixed; 
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 }
 
 canvas { 
@@ -13,4 +19,5 @@ canvas {
 #intro {
 	font-size:150%;
 	padding: 20px;
+
 }

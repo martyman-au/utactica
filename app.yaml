@@ -5,13 +5,6 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: .*
-#  static_files: index.html
-#  upload: index.html
-  script: guestbook.app
-  
-- url: /static
-  static_dir: static
 
 - url: /_js
   static_dir: _js
@@ -21,6 +14,12 @@ handlers:
 
 - url: /_styles
   static_dir: _styles
+  
+- url: /licenses.html
+  static_files: licenses.html
+  upload: licenses.html  
 
-- url: /hello/.*
-  script: server.app
+- url: /.*
+  static_files: index.html
+  upload: index.html
+
