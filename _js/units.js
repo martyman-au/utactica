@@ -197,7 +197,7 @@ UnitClass = Class.extend({
 	slotoffsety: 0,
 	spritewidth: null,
 	spriteheight: null,
-	hp: 0,							// Hit points for damage tacking
+	hp: 0,							// Hit points for damage tracking
 	type: '',
 	
 	init: function (side, tile) {
@@ -227,6 +227,10 @@ UnitClass = Class.extend({
 			units.activeUnit = null;
 			effects.deleteAnimation('active');
 		}
+	},
+	
+	regen: function () {
+		this.hp = config.Unithp[this.type];
 	},
 	
 	redraw: function () {
@@ -351,7 +355,7 @@ UnitClass = Class.extend({
 			
 			var xoffset = -25;
 			var yoffset = 38;
-			ctx.fillRect(this.ux + xoffset, this.uy + yoffset, this.hp, 4);
+			ctx.fillRect(this.ux + xoffset, this.uy + yoffset, Math.max(0,this.hp), 4);
 			ctx.shadowColor = "transparent";
 		}
 	},
@@ -404,51 +408,7 @@ SoldierUnitClass = UnitClass.extend({
 	type: 'soldier',
 
 	attack: function (tile, enemies) {
-
-	game.battle = new BattleClass(this, tile);
-/*		
-		if( result < -16 ) { // The attacking unit is destroyed
-			effects.renderText('YOUR UNIT WAS DESTOYED IN THE BATTLE',{center:true});
-			setTimeout( function () {units.activeUnit.lose(); game.controlLock = false; }, 1500 );
-		}
-		else if( result > 16 ) { // A defending unit is destroyed
-			effects.renderText('YOUR ATTACK WAS SUCCESSFUL',{center:true});
-			setTimeout( function () {
-				if( enemies.soldier > 1 ) { // If more than one soldier then only destroy one
-					for( i in enemies.units ) {
-						var unit = units.units[enemies.units[i]];
-						if( unit.type == 'soldier' ) { // Kill the first soldier we find
-							unit.lose();
-							break;
-						}
-					}
-					units.activeUnit.remainingmoves--;
-					units.activeUnit.deactivate();
-					game.controlLock = false;
-				}
-				else { // If one soldier or less, then destroy all units
-					for( i in enemies.units ) { units.units[enemies.units[i]].lose(); }
-					setTimeout( function () { // after a delay move the attacking unit
-						board.tiles[units.activeUnit.tileid].clearSlot(units.activeUnit.slotid); // Clear old slot on board	
-					    units.activeUnit.actualMove(tile,board.allocateSlot(tile)); // move the unit to it's new location
-						units.activeUnit.remainingmoves--;
-						units.activeUnit.deactivate();
-						game.controlLock = false;
-					}, 400 );
-				}
-			}, 1500 );
-		}
-		else { // a stalemate
-			this.remainingmoves--;
-			setTimeout( function () {
-				effects.renderText('UNFORTUNATELY YOUR ATTACK WAS UNSUCCESSFUL',{center:true});
-				game.controlLock = false;
-			}, 1500);
-			this.deactivate();
-			this.redraw();
-		}		
-		game.controlLock = false;
-*/
+		game.battle = new BattleClass(this, tile);
 	},
 
 	lose: function () {
@@ -581,7 +541,7 @@ BattleClass = Class.extend({
 //		console.log('max attacker damage = '+maxattackerdamage); // DEBUG CODE
 //		console.log('max defender damage = '+maxdefenderdamage); // DEBUG CODE
 		
-		// deal out damage in discrete chunks and stop when at least one unit dies, fewer chunks leads to more coincidental mutual destruction
+		// deal out damage in discrete chunks and stop when the first unit dies, fewer chunks leads to more coincidental mutual destruction
 		for( var i = 1; i <= 10; i++ ) {
 			this.defenderdamage += maxdefenderdamage/10;
 			this.attackerdamage += maxattackerdamage/10;
@@ -601,16 +561,35 @@ BattleClass = Class.extend({
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
 				this.attacker.hp = this.attackerstarthp - this.attackerdamage;	// Reduce units to their final hp level
 				this.defender.hp = this.defenderstarthp - this.defenderdamage;	// Reduce units to their final hp level
-				if( this.attacker.hp < 1 ) this.attacker.lose();	// destroy losing attacker
-				if( this.defender.hp < 1 ) { 						// The defender was destroyed, more logic follows
-					this.defender.lose();							// destroy losing defender
+				if( this.attacker.hp < 1 ) {
+					this.attacker.lose();	// destroy losing attacker
+					this.attacker = null;	// remove local reference
 				}
+				if( this.defender.hp < 1 ) { 
+					this.defender.lose();	// destroy losing defender
+					this.defender = null;	// remove local reference
+				}
+				units.destroy();
+				this.enemies = units.getEnemies(this.target);
+				
+				if(this.enemies.soldier < 1 && this.attacker) {
+					for(i in this.enemies.units) {
+						this.enemies.units[i].lose();
+					}
+					board.tiles[this.attacker.tileid].clearSlot(this.attacker.slotid); // Clear old slot on board	
+					this.attacker.actualMove(this.target,board.allocateSlot(this.target)); // move the unit to it's new location
+				}
+				
+				
 				this.results = true; 					// Mark results stage done
 			}
 			else {
 				if( this.progress >= 1) {				// End of the battle
 					game.controlLock = false;			// release the control lock
-					if(this.attacker) { this.attacker.remainingmoves--; }		// decrement remaining moves of the attacker if it wasn't destroyed
+					if(this.attacker) { 
+						this.attacker.remainingmoves--; 		// decrement remaining moves of the attacker if it wasn't destroyed
+						this.attacker.deactivate();
+					}
 					this.done = true;					// mark the battle done (will be deleted)
 				}
 			}

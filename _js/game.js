@@ -23,20 +23,12 @@ var gameClass = Class.extend({
 						sprites.parseAtlasDefinition(this.responseText);
 					};
 		spritejson.send();
-		
-//		this.initcheck = setInterval( function () {
-//				if ( sprites.fullyLoaded && sprites.fullyParsed ) {
-//					game.setupGame();
-//					window.clearInterval(game.initcheck);
-//				}
-//				else console.log('not ready yet'); // DEBUG: debug code
-//			}, 50 );
 	},
 
 	setupGame: function () {
 		// Create objects to look after game output, data and logic
 		
-		intro = document.getElementById('intro');
+		var intro = document.getElementById('intro');
 		intro.parentNode.removeChild(intro);
 		
 		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
@@ -127,6 +119,7 @@ var gameClass = Class.extend({
 			var unit = units.units[i];				
 			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
+			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources
 		}
 		this.turn = 1 - this.turn;	// switch to other player's turn
 		ui.greyWidgets(); 			// grey out any widgets that are too expensive
