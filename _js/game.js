@@ -21,6 +21,7 @@ var gameClass = Class.extend({
 		spritejson.open("GET", jsonURL, true);
 		spritejson.onload = function() {
 						sprites.parseAtlasDefinition(this.responseText);
+						if(game.ready) { game.redraw();	}
 					};
 		spritejson.send();
 	},
@@ -117,9 +118,11 @@ var gameClass = Class.extend({
 	endTurn: function () {
 		// Perform actions required to end a players turn
 		units.deactivate();	// Deactivate current unit
+		
 		for( i in units.units )			// Run through all the units in the game
 		{
-			var unit = units.units[i];				
+			var unit = units.units[i];
+			if( unit.tileid == config.homeTile[1-unit.side]) console.log('win');
 			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
 			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources

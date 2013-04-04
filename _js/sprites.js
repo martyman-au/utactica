@@ -43,7 +43,10 @@ SpriteSheetClass = Class.extend({
 
         // Create a new image whose source is at 'imgName'.
 		var img = new Image();
-        img.onload = function () { sprites.fullyLoaded = true; };
+        img.onload = function () {
+			sprites.fullyLoaded = true;
+			if( game.ready ) { game.redraw(); }
+		};
 		img.src = imgName;
 
         // Store the Image object in the img parameter.
