@@ -95,7 +95,10 @@ var gameClass = Class.extend({
 			ui.widgets.endturn.pulse(200);
 			game.endTurn();	
 		}
-		else if (code == '77' ) ui.widgets.speaker.action();					// "m" Toogle mute status
+		else if (code == '77' ) {												// "m" Toogle mute status
+			ui.widgets.speaker.toggleState();
+			ui.widgets.speaker.action();
+		}
 		else if (code == '84' ) {												// "t" Teleport a unit home
 			ui.widgets.teleport.pulse(200);
 			units.teleport();

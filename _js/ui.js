@@ -17,7 +17,6 @@ UIClass = Class.extend({
 				var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
 				if(!uihit) {
 					units.mouse('mousedown',mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
-					console.log('send units click');
 				}
 			}
 		});
