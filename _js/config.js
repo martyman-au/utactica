@@ -111,7 +111,7 @@ var config = {
 	
 	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh'],
 
-	music: ['01-the_future_soon', '02-skullcrusher_mountain', '03-i_crush_everything', '04-betty_and_me', '05-mandelbrot_set'],
+	music: ['ObservingTheStar', 'OutThere', 'shrine'],
 	
 	//pre-computed distances between hextile gridids
 	distances: [ [0,null,2,null,4,null,6,null,8,null,10,null],
