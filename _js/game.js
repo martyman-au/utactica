@@ -79,6 +79,10 @@ var gameClass = Class.extend({
 		// Deal with keypresses
 		if(ui.popup)	// If there is a popup then close it and exit
 		{
+			if( ui.popup.div ) {
+				var div = document.getElementById('popupdiv')
+				div.parentNode.removeChild(div);
+			}
 			ui.popup = false;
 			ui.redraw();
 			return;
@@ -122,7 +126,9 @@ var gameClass = Class.extend({
 		for( i in units.units )			// Run through all the units in the game
 		{
 			var unit = units.units[i];
-			if( unit.tileid == config.homeTile[1-unit.side]) console.log('win');
+			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied soemone has won the game
+				console.log('win');
+			}
 			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
 			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources

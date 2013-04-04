@@ -74,7 +74,10 @@ UIClass = Class.extend({
 		this.widgets.buyunitspopup.widgets.buyworker.foodcost = 200;
 
 		// Define help popup
-		this.widgets.helppopup = new PopupClass( 'Help' );
+		this.widgets.helppopup = new PopupClass( 'Help', 700, 600 );	
+		this.widgets.helppopup.div = document.createElement("div");
+		this.widgets.helppopup.div.innerHTML = "Hello";
+//		this.widgets.helppopup.div.setAttribute('class', 'myclass');		
 	},
 	
 	render: function () {
@@ -166,6 +169,10 @@ UIClass = Class.extend({
 		else {
 			if(event=='mousedown' && this.popup) // If there is a popup then close it and exit
 			{
+				if( this.popup.div ) {
+					var div = document.getElementById('popupdiv')
+					div.parentNode.removeChild(div);
+				}
 				this.popup = 'closing';
 				return true;
 			}
@@ -381,6 +388,7 @@ PopupClass = WidgetClass.extend({
 	size: {w: 0, h: 0},
 	radius: 0,
 	widgets: {},
+	div: null,
 
 	init: function (title, width, height) {
 		// Is this where we should set all of the popup's contents?
@@ -426,6 +434,21 @@ PopupClass = WidgetClass.extend({
 		if(this.title) this.renderTitle(); // if a title exists render it to the popup window
 		
 		for( i in this.widgets ) this.widgets[i].render();
+		
+		if(this.div) {
+			this.div.style.width = this.size.w + "px";
+			this.div.style.height = this.size.h + "px";
+			this.div.style.position = "absolute";
+			this.div.style.left = (window.innerWidth - this.size.w)/2 + 'px';
+			this.div.style.top = (window.innerHeight - this.size.h)/2 + 'px';
+			this.div.style.paddingTop = '40px';
+			this.div.style.paddingRight = '10px';
+			this.div.style.paddingBottom = '10px';
+			this.div.style.paddingLeft = '10px';
+			this.div.style.color = 'black';
+			this.div.id = 'popupdiv';
+			document.body.appendChild(this.div);
+		}
 	},
 	
 	renderTitle: function () {
