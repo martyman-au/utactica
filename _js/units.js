@@ -554,8 +554,8 @@ BattleClass = Class.extend({
 		this.progress = ( Date.now() - this.start ) / this.totaltime;
 		if(this.progress < 0.75) { 						// shooting phase first 75% of battle time (make noises, decrease unit's hp)
 			var battleprogress = this.progress / 0.75;	// calculate progress through the shooting phase
-			if( Math.random() < 0.1 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
-			if( Math.random() < 0.1 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
+			if( Math.random() < 0.08 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
+			if( Math.random() < 0.08 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
 		}
 		else {
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
