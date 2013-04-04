@@ -38,19 +38,6 @@ UIClass = Class.extend({
 		this.widgets.speaker = new ImageButtonClass( {left:25,bottom:30}, ['speaker.png', 'speaker_mute.png'], true);
 		this.widgets.speaker.action = function (){sound.toggleMute(); };
 
-//		this.widgets.upright = new ImageButtonClass( {right:40,top:40}, ['arrows/up-right.png','arrows/up-right-highlighted.png']);
-//		this.widgets.upright.action = function (){ units.move('33'); };
-//		this.widgets.up = new ImageButtonClass( {right:100,top:40}, ['arrows/up.png','arrows/up-highlighted.png']);
-//		this.widgets.up.action = function (){ units.move('38'); };
-//		this.widgets.upleft = new ImageButtonClass( {right:160,top:40}, ['arrows/up-left.png','arrows/up-left-highlighted.png']);
-//		this.widgets.upleft.action = function (){ units.move('36'); };
-//		this.widgets.downright = new ImageButtonClass( {right:40,top:120}, ['arrows/down-right.png','arrows/down-right-highlighted.png']);
-//		this.widgets.downright.action = function (){ units.move('34'); };
-//		this.widgets.down = new ImageButtonClass( {right:100,top:120}, ['arrows/down.png','arrows/down-highlighted.png']);
-//		this.widgets.down.action = function (){ units.move('40'); };
-//		this.widgets.downleft = new ImageButtonClass( {right:160,top:120}, ['arrows/down-left.png','arrows/down-left-highlighted.png']);
-//		this.widgets.downleft.action = function (){ units.move('35'); };
-
 		this.widgets.endturn = new VectorButtonClass( {right:125,top:90}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
 		
@@ -168,16 +155,6 @@ UIClass = Class.extend({
 		this.ctx.fillText('Production rate: '+parseInt(game.production[game.turn]*100)+'%', x, y);
 		this.ctx.shadowColor = "transparent";
 	},
-	
-	renderArrows: function () {
-		// Render movement control icons to the screen
-		this.widgets.upright.render();
-		this.widgets.up.render();
-		this.widgets.upleft.render();
-		this.widgets.downright.render();
-		this.widgets.down.render();
-		this.widgets.downleft.render();
-	},
 
 	mouse: function (event,x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
@@ -203,21 +180,6 @@ UIClass = Class.extend({
 			}
 			return false;
 		}
-	},
-	
-	moveIconFlash: function (code) {
-		// Flash the appropriate move icon when a move is attempted
-/*		var dir = config.movekeys[code];
-		if(dir.y == 1) {
-			if( dir.x == 1 ) this.widgets.downright.pulse(200);
-			else this.widgets.downleft.pulse(200);
-		}
-		else if( dir.y == -1 ) {
-			if( dir.x == 1 ) this.widgets.upright.pulse(200);
-			else this.widgets.upleft.pulse(200);
-		}
-		else if( dir.y == -2) this.widgets.up.pulse(200);
-		else this.widgets.down.pulse(200); */
 	},
 	
 	greyWidgets: function () {
