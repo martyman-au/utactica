@@ -15,7 +15,10 @@ UIClass = Class.extend({
 			if(!game.controlLock) {
 				var mouse = cv.getMouse(e);
 				var uihit = ui.mouse('mousedown',mouse.x,mouse.y,mouse.sx,mouse.sy);  	// send click to UI click handling code
-				if(!uihit) units.mouse('mousedown',mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+				if(!uihit) {
+					units.mouse('mousedown',mouse.sx,mouse.sy);	// send scaled click to Units if UI failed to hit
+					console.log('send units click');
+				}
 			}
 		});
 		
@@ -158,16 +161,21 @@ UIClass = Class.extend({
 
 	mouse: function (event,x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
-		if(this.popup && this.popup.clickhit(x,y)) { // if it is a popup click
+		if(this.popup && this.popup !== 'closing' && this.popup.clickhit(x,y)) { // if it is a popup click
 			this.popup.mouse(event,x,y);	// send click to popup
 		}
 		else {
 			if(event=='mousedown' && this.popup) // If there is a popup then close it and exit
 			{
+				this.popup = 'closing';
+				return true;
+			}
+			if(event=='mouseup' && this.popup == 'closing') // If there is a popup then close it and exit
+			{
 				this.popup = false;
 				this.redraw();
 				return true;
-			}
+			}			
 			var i = null;
 			for( i in this.widgets )	// Check if the click hits any widgets
 			{
