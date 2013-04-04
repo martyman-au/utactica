@@ -42,13 +42,13 @@ CanvasClass = Class.extend({
 	setScale: function () {
 		// Set the scale for the canvases so as to fit the game on any screen size
 		// Calculate the scale and offset needed to correctly align canvas elements to screen size
-		var boardheight = config.boardPattern.length * 93;
+		var boardheight = config.boardPattern.length * 94;
 		
 		this.scale = Math.min(window.innerWidth / 1410, window.innerHeight / boardheight); // Scale needed to fit board in canvas
 		this.screenRatio = window.innerWidth / window.innerHeight;
 		
 		this.Offset.x = ((window.innerWidth - (1410 * this.scale))/2)/this.scale; 				// Offset needed to center board in canvas X
-		this.Offset.y = ((window.innerHeight - (boardheight * this.scale))/2)/this.scale; 		// Offset needed to center board in canvas X
+		this.Offset.y = ((window.innerHeight - (boardheight * this.scale))/2) + 4/this.scale; 	// Offset needed to center board in canvas X
 
 		this.setSize( window.innerWidth, window.innerHeight ); // canvas = full window size
 		
@@ -57,14 +57,7 @@ CanvasClass = Class.extend({
 		this.layers['units'].context.scale(this.scale,this.scale);
 		this.layers['effects'].context.scale(this.scale,this.scale);
 
-// TODO: do we want to adapt for portrait and landscape windows?		
-//		if( this.screenRatio < 0.7 ) this.screenMode = 'portrait';
-//		else this.screenMode = 'landscape'
-		
 		units.scale();	// calculate new unit positions
-		
-//		if( this.screenMode == 'landscape')	document.getElementById("GameTitle").style.fontSize = (window.innerWidth*0.08)+"px";
-//		else document.getElementById("GameTitle").style.fontSize = (window.innerWidth*0.2)+"px";
 	}
 	
 });
