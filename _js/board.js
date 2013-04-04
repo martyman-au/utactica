@@ -214,28 +214,13 @@ TileClass = Class.extend({
 			this.ctx.fillText(this.resource.substring(1), this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
 			this.ctx.shadowColor = "transparent";
 		}
-		for( i in config.homeTile ) {
+		for( i in config.homeTile ) { // Render home base
 			if( this.tilenum == config.homeTile[i] ) {
-				// Render a circle on the effects canvas
-				if(i==0)var color = '#BB1111';
-				else color = '#1111BB';
-				this.ctx.shadowColor = color;
-				this.ctx.shadowOffsetX = 0;
-				this.ctx.shadowOffsetY = 0;
-				this.ctx.shadowBlur = 10;
-				this.ctx.beginPath();
-				this.ctx.arc(this.center.x + cv.Offset.x, this.center.y + cv.Offset.y, 15, 0, 2 * Math.PI, false);
-				this.ctx.fillStyle = color;
-				this.ctx.fill();
-				this.ctx.shadowColor = "transparent";
+				if( i == 0 ) { drawSprite('base2.png', this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y) }
+				else { drawSprite('base1.png', this.ctx, this.center.x + cv.Offset.x, this.center.y + cv.Offset.y) };
 			}
 		}
-		// TODO: Remove debug code
-//		this.ctx.font = "normal 700 20px 'Roboto Condensed'";
-//		this.ctx.fillStyle = '#FF0000'; 
-//		this.ctx.fillText('x: '+this.grididx.x+' y: '+this.grididx.y, this.center.x - 28 + cv.Offset.x, this.center.y + 20 + cv.Offset.y);
-//		this.ctx.fillText(this.tilenum, this.center.x - 28 + cv.Offset.x, this.center.y + 38 + cv.Offset.y);
-//		var distance = board.tileDistance(this.tilenum,12);
+
 	},
 
 	clearSlot: function (slot) {
