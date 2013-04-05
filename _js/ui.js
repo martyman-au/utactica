@@ -73,11 +73,10 @@ UIClass = Class.extend({
 		this.widgets.buyunitspopup.widgets.buyworker.action = function (){ game.buyUnit('worker');};
 		this.widgets.buyunitspopup.widgets.buyworker.foodcost = 200;
 
-		// Define help popup
-		this.widgets.helppopup = new PopupClass( 'Help', 700, 600 );	
-		this.widgets.helppopup.div = document.createElement("div");
-		this.widgets.helppopup.div.innerHTML = "Hello";
-//		this.widgets.helppopup.div.setAttribute('class', 'myclass');		
+		// Define introduction popup
+		this.widgets.intropopup = new PopupClass( 'Introduction', 700, 600 );	
+		this.widgets.intropopup.div = document.createElement("div");
+		this.widgets.intropopup.div.innerHTML = intro[1];
 	},
 	
 	render: function () {
@@ -441,10 +440,6 @@ PopupClass = WidgetClass.extend({
 			this.div.style.position = "absolute";
 			this.div.style.left = (window.innerWidth - this.size.w)/2 + 'px';
 			this.div.style.top = (window.innerHeight - this.size.h)/2 + 'px';
-			this.div.style.paddingTop = '40px';
-			this.div.style.paddingRight = '10px';
-			this.div.style.paddingBottom = '10px';
-			this.div.style.paddingLeft = '10px';
 			this.div.style.color = 'black';
 			this.div.id = 'popupdiv';
 			document.body.appendChild(this.div);

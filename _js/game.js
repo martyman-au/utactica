@@ -94,7 +94,7 @@ var gameClass = Class.extend({
 			ui.moveIconFlash(code);		// Animate on screen arrow button
 			units.move(code); 			// attempt to move the active unit
 		}
-		else if( code == '72' ) ui.widgets.helppopup.render();   				// "h" will bring up a help popup
+		else if( code == '72' ) ui.widgets.intropopup.render();   				// "h" will bring up a help popup
 
 		else if (code == '32' ) {												// Space bar ends turn
 			ui.widgets.endturn.pulse(200);

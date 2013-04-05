@@ -1,0 +1,34 @@
+var intro = [];
+intro[0]  = '<div style="padding:60px 10px 10px 10px;">';
+intro[0] += '  <img style="float:left;" src="_media/intro_board.png">';
+intro[0] += '  <div style="float:right;width:360px;">';
+intro[0] += '    <p>Utactica is a hot seat game for two players. The aim of the game is to occupy your enemy\'s home base, thus taking control of Utactica and its resources.</p>';
+intro[0] += '    <p>The Mecritians start from their home base at the top of the map, while the Riveckian\'s home base is at the bottom of the map.</p>';
+intro[0] += '  </div>';
+intro[0] += '  <div style="float:left;clear:both;width:360px;">';
+intro[0] += '    <p>Resources of types can be collected in the game. Food resources can be spent on buidling new units, and Science resources can be spent on upgrading the capabilities of your units. Resources are randomly distributed across the map.</p>';
+intro[0] += '    <p>The number on the resource tiles shows the number of resources that will be colleted if a worker is placed in the tile each turn.</p>';
+intro[0] += '  </div>';
+intro[0] += '  <img style="float:right;" src="_media/intro_resources.png">';
+intro[0] += '  <div style="clear:both;"></div><div style="float:right;width:360px;"><a href="">Next</a></div>';
+intro[0] += '</div>';
+
+
+intro[1]  = '<div style="padding:60px 10px 10px 10px;">';
+intro[1] += '  <div style="">';
+intro[1] += '    <img style="float:left;" src="_media/intro_soldiers.png">';
+intro[1] += '    <div style="float:right;width:420px;">';
+intro[1] += '      <p>Soldier units can attack and defend other units. Soldiers can withstand a certain amount of damage before being destroyed. Damaged soldiers can return to home base to be repaired back to full health.</p>';
+intro[1] += '      <p>Soldiers can have their attack and defence skills upgraded through the expediture of science resources.</p>';
+intro[1] += '    </div>';
+intro[1] += '  <div style="clear:both;"></div></div>';
+intro[1] += '  <div style="padding-top:20px;">';
+intro[1] += '    <img style="float:left;" src="_media/intro_workers.png">';
+intro[1] += '    <div style="float:right;width:420px;">';
+intro[1] += '      <p>Worker units collect resources from resource tiles. Worker units cannot attack or defend. If attacked a worker unit will operate its emergency teleoprter to beam back to its home base. If there is no free space at the home base the worker will be destroyed.</p>';
+intro[1] += '      <p>Upgrading workers will increase the amount of resources they can harvest from a tile each turn.</p>';
+intro[1] += '    </div>';
+intro[1] += '  <div style="clear:both;"></div></div>';
+intro[1] += '  <p style="clear:both;">Both soldiers and workers can manually teleport back to home base on their turn.</p>';
+intro[1] += '  <div style="clear:both;"></div><div style="float:right;width:360px;"><a href="">Next</a></div>';
+intro[1] += '</div>';
