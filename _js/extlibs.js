@@ -57,4 +57,15 @@ function xhrGet(reqUri, callback, type) {
     if (type) { request.requestType = type; }
     request.onload = function () { callback(request); };
     request.send();
-}
+};
+
+// Find the right method, call on correct element
+function launchFullScreen(element) {
+  if(element.requestFullScreen) {
+    element.requestFullScreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullScreen) {
+    element.webkitRequestFullScreen();
+  }
+};
