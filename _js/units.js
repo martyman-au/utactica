@@ -501,7 +501,7 @@ BattleClass = Class.extend({
 	results: null,
 	
 	init: function (unit, target) {
-		game.controlLock = true;	// Lock control input TODO: Need to make this more formalized and robust
+		game.setControlLock(true);	// Lock control input TODO: Need to make this more formalized and robust
 		this.start = Date.now();
 		this.attacker = unit;
 		this.target = Number(target);
@@ -585,7 +585,7 @@ BattleClass = Class.extend({
 			}
 			else {
 				if( this.progress >= 1) {				// End of the battle
-					game.controlLock = false;			// release the control lock
+					game.setControlLock(false);			// release the control lock
 					if(this.attacker) { 
 						this.attacker.remainingmoves--; 		// decrement remaining moves of the attacker if it wasn't destroyed
 						this.attacker.deactivate();

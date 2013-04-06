@@ -176,6 +176,17 @@ var gameClass = Class.extend({
 		else if(type == 'defence') this.defence[this.turn] = parseInt(this.defence[this.turn] + 20);
 		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
 		ui.greyWidgets(); // grey out any widgets that are too expensive
+	},
+	
+	setControlLock: function (value) {
+		if( value ) {
+			document.body.style.cursor = 'wait';
+			this.controlLock = value;
+		}
+		else {
+			document.body.style.cursor = 'default';
+			this.controlLock = value;
+		}
 	}
 });
 
