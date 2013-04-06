@@ -29,8 +29,8 @@ var gameClass = Class.extend({
 	setupGame: function () {
 		// Create objects to look after game output, data and logic
 		
-		var intro = document.getElementById('intro');
-		intro.parentNode.removeChild(intro);
+		var front = document.getElementById('front');
+		front.parentNode.removeChild(front);
 		
 		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
 
