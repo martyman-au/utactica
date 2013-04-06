@@ -20,8 +20,6 @@ UnitsClass = Class.extend({
 		this.units.push( new SoldierUnitClass(1, config.homeTile[1]) );
 		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
 		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
-		this.units.push( new WorkerUnitClass(1, 1) );
-		this.units.push( new SoldierUnitClass(1, 1) );
 	},
 	
 	animFrame: function () {
@@ -41,9 +39,11 @@ UnitsClass = Class.extend({
 	
 	render: function () {
 		// Render all of the units on the board
-		for( i in this.units ) this.units[i].render(); // render every unit
+		for( i in this.units ) this.units[i].render();	// render every unit
 		
-		if(this.activeunit) this.activeunit.render(); // TODO: fix dragged unit going behind other units
+		if(this.activeUnit) {
+			this.activeUnit.render(); 					// render active unit again so that it does not end up behind other units
+		}
 	},
 
 	wipe: function () {
@@ -70,7 +70,6 @@ UnitsClass = Class.extend({
 			for( i in this.units ) {
 				unit = this.units[i];
 				if( unit.clickHit(x,y) && unit.side == game.turn && unit.remainingmoves > 0) {
-//					unit.activate();
 					this.activeUnit = this.units[i];
 					this.activeUnit.origpos = {x:this.activeUnit.ux, y:this.activeUnit.uy};
 					this.dragoffset.x = this.activeUnit.ux - x;
@@ -104,35 +103,10 @@ UnitsClass = Class.extend({
 			board.unHighlight();
 		}
 	},
-	
-	isMovePossible: function (newtile) {
-		var oldtile = board.tiles[this.activeUnit.tileid].grididx;
-		var possibles = [];
-		var tgt = {};
-		directions = [{x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1},{x:0,y:-2},{x:0,y:2}];
-		for( i in directions ) {
-			tgt.x = parseInt(oldtile.x) + directions[i].x;
-			tgt.y = parseInt(oldtile.y) + directions[i].y;
-			console.log(tgt);
-			var tile = board.checkmove(tgt);
-			if(tile == newtile) return true;
-		}
-		return false;	 
-	},
-	
-	move: function (keycode) {
-		// move the active unit
-		if( this.activeUnit == null ) {
-			sound.playSound('doh');
-			effects.renderText('NO UNIT SELECTED',{center:true});
-			return;
-		}
-		else this.activeUnit.move(keycode);
-	},	
-	
+
 	teleport: function () {
 		// teleport the active unit
-		if( this.activeUnit == null ) {
+		if( this.activeUnit == null || this.activeUnit.remainingmoves < 1 ) {
 			sound.playSound('doh');
 			effects.renderText('NO UNIT SELECTED',{center:true});
 		}
@@ -174,7 +148,10 @@ UnitsClass = Class.extend({
 	destroy: function () {
 		// delete any "dead" units
 		for( i in this.units ) {
-			if(units.units[i].state == 'dead' ) delete units.units[i];
+			if(units.units[i].state == 'dead' ) {
+				if(units.units[i] == this.activeUnit) this.activeUnit = null;
+				delete units.units[i];
+			}
 		}
 	},
 
