@@ -29,6 +29,6 @@ intro[1] += '      <p>Worker units collect resources from resource tiles. Worker
 intro[1] += '      <p>Upgrading workers will increase the amount of resources they can harvest from a tile each turn.</p>';
 intro[1] += '    </div>';
 intro[1] += '  <div style="clear:both;"></div></div>';
-intro[1] += '  <p style="clear:both;">Both soldiers and workers can manually teleport back to home base on their turn.</p>';
+intro[1] += '  <p style="clear:both;">Both soldiers and workers can manually teleport back to home base on their turn. This can be useful for repairing damaged soldiers.</p>';
 intro[1] += '  <div style="clear:both;"></div><div style="float:right;width:360px;"><a href="">Next</a></div>';
 intro[1] += '</div>';
