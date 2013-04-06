@@ -128,7 +128,7 @@ var gameClass = Class.extend({
 		{
 			var unit = units.units[i];
 			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied soemone has won the game
-				console.log('win');
+				ui.widgets.winnerpopup.render();
 			}
 			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources

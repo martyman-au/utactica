@@ -1,4 +1,4 @@
-var intro = [];
+var intro = '';
 intro  = '<div id="intro1" style="padding:60px 10px 10px 10px; display:block; height:590px;">';
 intro += '  <img style="float:left;" src="_media/intro_board.png">';
 intro += '  <div style="float:right;width:360px;">';
@@ -40,3 +40,23 @@ intro += '    <span onclick="getElementById(\'intro2\').style.display=\'none\';g
 intro += '    &nbsp; <span onclick="getElementById(\'intro2\').style.display=\'none\';getElementById(\'intro3\').style.display=\'block\';" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';">Next >></span>';
 intro += '  </div>';
 intro += '</div>';
+
+intro += '<div id="intro3" style="padding:60px 10px 10px 10px; display:none; height:590px;">';
+intro += '  <p style="clear:both;">Both soldiers and workers can manually teleport back to home base on their turn. This can be useful for repairing damaged soldiers.</p>';
+intro += '  <div style="text-align:center;font-size:140%;position:absolute;bottom:0px;width:700px;">';
+intro += '    <span onclick="getElementById(\'intro3\').style.display=\'none\';getElementById(\'intro2\').style.display=\'block\';" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';"><< Prev</span>';
+intro += '    &nbsp; <span onclick="ui.popup.hidePopup();" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';">Play Game >></span>';
+intro += '  </div>';
+intro += '</div>';
+
+
+var winner = '';
+winner  = '<div id="winner" style="padding:60px 10px 10px 10px; height:590px;">';
+winner += '  <div style="font-size:150%">You have reigned supreme. Your foe has been beaten and the burnt out husk of the mighty planet of Utactica is yours.</div>';
+winner += '  <div style="font-size:150%; padding-top:10px;">A rumour has just come to hand of a new world. A world that must be claimed at all costs.</div>';
+winner += '  <div style="font-size:150%; padding-top:10px;">Good luck in your coming battle.</div>';
+winner += '  <div style="text-align:center;font-size:140%;position:absolute;bottom:0px;width:700px;">';
+winner += '    <span onclick="getElementById(\'intro3\').style.display=\'none\';getElementById(\'intro2\').style.display=\'block\';" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';"><< Prev</span>';
+winner += '    &nbsp; <span onclick="var div=document.getElementById(\'popupdiv\'); div.parentNode.removeChild(div); ui.popup=false;" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';">Play Game >></span>';
+winner += '  </div>';
+winner += '</div>';

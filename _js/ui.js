@@ -77,6 +77,11 @@ UIClass = Class.extend({
 		this.widgets.intropopup = new PopupClass( 'Introduction', 700, 600 );	
 		this.widgets.intropopup.div = document.createElement("div");
 		this.widgets.intropopup.div.innerHTML = intro;
+
+		// Define winner popup
+		this.widgets.winnerpopup = new PopupClass( 'Congratulations', 700, 600 );	
+		this.widgets.winnerpopup.div = document.createElement("div");
+		this.widgets.winnerpopup.div.innerHTML = winner;
 	},
 	
 	render: function () {
@@ -258,6 +263,7 @@ UIClass = Class.extend({
 			}
 		}
 	}
+
 });
 
 
@@ -520,5 +526,14 @@ PopupClass = WidgetClass.extend({
 			else if(this.widgets[i].sciencecost > game.sciencecash[game.turn]) this.widgets[i].greyed = true;
 			else this.widgets[i].greyed = false;
 		}
+	},
+	
+	hidePopup: function () {
+		ui.popup = false;
+		if(this.div) {
+			var div = document.getElementById('popupdiv')
+			div.parentNode.removeChild(div);
+		}
+		ui.redraw();
 	}
 });
