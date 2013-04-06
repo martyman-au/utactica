@@ -40,16 +40,16 @@ UIClass = Class.extend({
 		this.widgets.speaker = new ImageButtonClass( {left:25,bottom:30}, ['speaker.png', 'speaker_mute.png'], true);
 		this.widgets.speaker.action = function (){sound.toggleMute(); };
 
-		this.widgets.endturn = new VectorButtonClass( {right:125,top:90}, 'End turn', 110);
+		this.widgets.endturn = new VectorButtonClass( {right:125,top:40}, 'End turn', 110);
 		this.widgets.endturn.action = function (){ game.endTurn(); };
 		
-		this.widgets.teleport = new VectorButtonClass( {right:125,top:150}, 'Teleport', 110);
+		this.widgets.teleport = new VectorButtonClass( {right:125,top:100}, 'Teleport', 110);
 		this.widgets.teleport.action = function (){ units.teleport(); };
 
-		this.widgets.buyunits = new VectorButtonClass( {right:125,top:210}, 'Buy Units', 110);
+		this.widgets.buyunits = new VectorButtonClass( {right:125,top:160}, 'Buy Units', 110);
 		this.widgets.buyunits.action = function (){ ui.widgets.buyunitspopup.render(); };
 
-		this.widgets.upgrades = new VectorButtonClass( {right:125,top:270}, 'Upgrades', 110);
+		this.widgets.upgrades = new VectorButtonClass( {right:125,top:220}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
 		// Define upgrades popup and add buttons
