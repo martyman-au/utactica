@@ -46,6 +46,7 @@ var gameClass = Class.extend({
 		this.redraw();					// ditto
 		this.ready = true;
 		requestAnimationFrame( game.animFrame );	// Start animation loop
+		ui.widgets.intropopup.render();
 	},
 	
 

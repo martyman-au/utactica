@@ -76,7 +76,7 @@ UIClass = Class.extend({
 		// Define introduction popup
 		this.widgets.intropopup = new PopupClass( 'Introduction', 700, 600 );	
 		this.widgets.intropopup.div = document.createElement("div");
-		this.widgets.intropopup.div.innerHTML = intro[1];
+		this.widgets.intropopup.div.innerHTML = intro;
 	},
 	
 	render: function () {
