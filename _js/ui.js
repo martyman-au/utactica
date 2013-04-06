@@ -84,11 +84,11 @@ UIClass = Class.extend({
 		var i;
 		
 		this.wipe();
-		this.renderPlayerTurn();
+//		this.renderPlayerTurn();
 		this.renderGameTitle();
 		this.widgets.speaker.render();
 		
-		this.renderCash();		
+		this.renderInfoBlock();		
 		
 		for( i in this.widgets) // render all widgets
 		{
@@ -109,20 +109,6 @@ UIClass = Class.extend({
 		this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	},
 	
-	renderPlayerTurn: function () {
-		// Display the current side's name to show who's turn it is
-		var text = config.sides[game.turn].name + 's';
-		this.ctx.fillStyle = colours[config.sides[game.turn].colour];
-		this.ctx.shadowOffsetX = 0;
-		this.ctx.shadowOffsetY = 0;
-		this.ctx.shadowBlur = 3;
-		this.ctx.shadowColor = '#FFFFFF';  // TODO: hardcoded
-		var x = 10;
-		var y = 120;
-		this.ctx.font = "normal 400 40px 'Roboto Condensed','Trebuchet MS',sans-serif";
-		this.ctx.fillText(text, x, y);		
-		this.ctx.shadowColor = "transparent";
-	},
 	
 	renderGameTitle: function () {
 		// Display "Utactica"
@@ -138,28 +124,87 @@ UIClass = Class.extend({
 		this.ctx.shadowColor = "transparent";		
 	},
 	
-	renderCash: function () {
+	renderInfoBlock: function () {
 		// render the current team's resource totals
-		this.ctx.font = "normal 400 18px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		var x = 10;
+		var y = 100;
+		var w = 170;
+		var h = 200;
+//		var edgeColor = colours.brightorange;
+		var edgeColor = '#888888';
+		var background = '#505050';
+		
+		var col = [x+58, x+74, x+122];
+		var row = [210, 230, 250, 270, 290];
+		var headings = ['Food','Science','Attack','Defence','Workers'];
+		
+		this.ctx.shadowOffsetX = 2;
+		this.ctx.shadowOffsetY = 2;
+		this.ctx.shadowBlur = 12;
+		this.ctx.shadowColor = 	'#222222';
+
+		// White outline
+		this.ctx.fillStyle = background;
+		this.ctx.strokeStyle = '#FFFFFF';
+		this.ctx.lineWidth = 12;
+		this.ctx.roundRect(x , y, w, h, 9, true, true )
+
+		this.ctx.shadowColor = "transparent";
+		this.ctx.strokeStyle = edgeColor;
+		this.ctx.lineWidth = 5;		
+		this.ctx.roundRect(x , y, w, h, 9, true, true )			
+		
+		this.ctx.font = "normal 400 21px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.translate(col[1]+15, y+90);
+		this.ctx.rotate(-70*(3.14159/180));
+		this.ctx.fillStyle = colours[config.sides[0].colour];
+		this.ctx.fillText('Riveckians', 0, 0);
+		this.ctx.rotate(70*(3.14159/180));
+		this.ctx.translate(-(col[1]+15), -(y+90));
+
+		this.ctx.translate(col[2]+15, y+90);
+		this.ctx.rotate(-70*(3.14159/180));
+		this.ctx.fillStyle = colours[config.sides[1].colour];
+		this.ctx.fillText('Mecritians', 0, 0);
+		this.ctx.rotate(70*(3.14159/180));
+		this.ctx.translate(-(col[2]+15), -(y+90));
+		
+		
+		this.ctx.font = "normal 400 16px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		this.ctx.fillStyle = config.styles.cashtext; 
 		this.ctx.shadowOffsetX = 0;
 		this.ctx.shadowOffsetY = 1;
 		this.ctx.shadowBlur = 6;
 		this.ctx.shadowColor = config.styles.cashtextshadow;
-		var x = 10;
-		var y = 150;
-		this.ctx.fillText('Food resources: '+game.foodcash[game.turn], x, y);
-		var y = y + 20;
-		this.ctx.fillText('Science resources: '+game.sciencecash[game.turn], x, y);
-		var y = y + 20;
-		this.ctx.fillText('Attack upgrades: '+game.attack[game.turn]+'%', x, y);
-		var y = y + 20;
-		this.ctx.fillText('Defence upgrades: '+game.defence[game.turn]+'%', x, y);
-		var y = y + 20;
-		this.ctx.fillText('Production rate: '+parseInt(game.production[game.turn]*100)+'%', x, y);
-		this.ctx.shadowColor = "transparent";
-	},
 
+		// Print row headings
+		this.ctx.textAlign="end"; 
+		for(i in headings) {
+			this.ctx.fillText(headings[i]+':', col[0], row[i]);
+		}
+		this.ctx.textAlign="start"; 
+		
+		for( i in config.sides )
+		{
+			if( i == game.turn ) {
+				this.ctx.fillStyle = config.styles.cashtext; 
+				this.ctx.font = "normal 800 16px 'Roboto Condensed','Trebuchet MS',sans-serif";
+			}
+			else { 
+				this.ctx.fillStyle = colours.lightgrey; 
+				this.ctx.font = "normal 400 16px 'Roboto Condensed','Trebuchet MS',sans-serif";
+			}
+			var idx = parseInt(i)+1;
+			this.ctx.fillText(game.foodcash[i], col[idx], row[0]);
+			this.ctx.fillText(game.sciencecash[i], col[idx], row[1]);
+			this.ctx.fillText('+'+game.attack[i], col[idx], row[2]);
+			this.ctx.fillText('+'+game.defence[i], col[idx], row[3]);
+			this.ctx.fillText(parseInt(game.production[i]*100)+'%', col[idx], row[4]);
+		}
+
+		this.ctx.shadowColor = "transparent";
+	},	
+	
 	mouse: function (event,x,y,sx,sy) {
 		// Deal with a click by checking if it hits any UI elements
 		if(this.popup && this.popup !== 'closing' && this.popup.clickhit(x,y)) { // if it is a popup click
