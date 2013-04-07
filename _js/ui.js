@@ -92,7 +92,6 @@ UIClass = Class.extend({
 		var i;
 		
 		this.wipe();
-//		this.renderPlayerTurn();
 		this.renderGameTitle();
 		this.widgets.speaker.render();
 		
@@ -121,7 +120,7 @@ UIClass = Class.extend({
 	renderGameTitle: function () {
 		// Display "Utactica"
 		this.ctx.fillStyle = colours.white;  // TODO: hardcoded
-		this.ctx.font = "normal 400 80px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.font = "normal 400 90px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		this.ctx.shadowOffsetX = 0;
 		this.ctx.shadowOffsetY = 0;
 		this.ctx.shadowBlur = 6;
@@ -133,12 +132,11 @@ UIClass = Class.extend({
 	},
 	
 	renderInfoBlock: function () {
-		// render the current team's resource totals
-		var x = 10;
+		// render both teams's resources and upgrades
+		var x = 15;
 		var y = 100;
 		var w = 170;
 		var h = 200;
-//		var edgeColor = colours.brightorange;
 		var edgeColor = '#888888';
 		var background = '#505050';
 		
@@ -249,6 +247,7 @@ UIClass = Class.extend({
 	},
 	
 	greyWidgets: function () {
+		// Grey out any widgets that are not affordable
 		for( i in this.widgets ) {
 			var widget = this.widgets[i];
 			if( widget.widgets !== undefined ) { // check for sub widgets
@@ -399,7 +398,6 @@ VectorButtonClass = ButtonClass.extend({
 			this.position.y = this.position.y + 2;
 		}
 		
-//		this.ctx.shadowColor = "transparent";
 		if( this.state === 0) { // if normal state add shadow
 			this.ctx.shadowOffsetX = this.shadowOffset.x;
 			this.ctx.shadowOffsetY = this.shadowOffset.y;
