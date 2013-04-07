@@ -34,3 +34,8 @@ canvas {
 	font-size:150%;
 	padding: 50px;
 }
+
+a:link {color:#FFFFFF;}      /* unvisited link */
+a:visited {color:#FFFFFF;}  /* visited link */
+a:hover {color:#FFE0D0;}  /* mouse over link */
+a:active {color:#FFFFFF;}  /* selected link */
