@@ -166,10 +166,11 @@ TextEffectClass = Class.extend({
 	text: 'Test Text',
 	position: {x:0,y:0},	// starting position of vector
 	ctx: null,
-	length: 60,
+	length: 50,
 	count: 0,
-	size: 70,
+	size: 60,
 	colour: colours.white,
+	transparency: 1,
 	
 	init: function (text,position) {
 		this.ctx = cv.layers['effects'].context; // TODO: hardcoded?
@@ -187,7 +188,9 @@ TextEffectClass = Class.extend({
 	drawFrame: function () {
 		// Render the text to the effects layer
 		// TODO: Fade out text based on this.count
-		this.ctx.fillStyle = colours.orange;
+		this.size = this.size+1;
+		this.transparency = this.transparency - 0.01;
+		this.ctx.fillStyle = 'rgba(204,84,34,'+this.transparency+')';
 		this.ctx.textAlign = 'center';
 		this.ctx.shadowOffsetX = 0;
 		this.ctx.shadowOffsetY = 0;
@@ -210,4 +213,49 @@ BeamEffectClass = VectorEffectClass.extend({
 		this.drawcircle(this.interpolate(this.start,this.end,Math.min(1,(progress*2))), 20, 'rgba(255,255,56,0.3)');	// render a moving circle
 		if(progress >= 1) return 'done';			// if we have hit 100% of the animation signal it's deletion
 	},
+});
+
+
+ResourceEffectClass = Class.extend({
+	// Render a text effect to the screen
+	text: 'Test Text',
+	position: {x:0,y:0},	// starting position of vector
+	ctx: null,
+	length: 50,
+	count: 0,
+	size: 40,
+	colour: colours.white,
+	transparency: 1,
+	
+	init: function (text,position) {
+		this.ctx = cv.layers['effects'].context; // TODO: hardcoded?
+		this.text = text;
+		if(position.center) {
+			this.position.x = (window.innerWidth/2)/cv.scale;
+			this.position.y = (window.innerHeight/2)/cv.scale;
+		}
+		else {
+			this.position.x = position.x;
+			this.position.y = position.y;
+		};
+	},
+	
+	drawFrame: function () {
+		// Render the text to the effects layer
+		// TODO: Fade out text based on this.count
+		if( this.count == 0 ) sound.playSound('resource');
+		this.size = this.size+3;
+		this.transparency = this.transparency - 0.02;
+		this.ctx.fillStyle = 'rgba(204,84,34,'+this.transparency+')';
+		this.ctx.textAlign = 'center';
+		this.ctx.shadowOffsetX = 0;
+		this.ctx.shadowOffsetY = 0;
+		this.ctx.shadowBlur = 10;
+		this.ctx.shadowColor = '#FFFFFF';  // TODO: hardcoded
+		this.ctx.font = "bold "+this.size+"px 'Roboto Condensed','Trebuchet MS',sans-serif";
+		this.ctx.fillText(this.text, this.position.x + cv.Offset.x - 5, this.position.y + cv.Offset.y + 5);		
+		this.ctx.shadowColor = "transparent";
+		this.ctx.textAlign = 'start';
+		if(++this.count > this.length) return 'done';
+	}
 });

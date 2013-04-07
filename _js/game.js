@@ -6,9 +6,11 @@ var gameClass = Class.extend({
 	production: [1,1],		// Production rate for each side
 	attack: [0,0],			// Attack bonus for each side
 	defence: [0,0],			// Defence bonus for each side
-	initcheck: null,		// TODO: ?????
+//	initcheck: null,		// TODO: ?????
 	controlLock: false,		// Lock controls while an animation is running TODO: fix this up?
-	battle:  null,
+	battle:  null,			// Stores the currently running battle
+	turnnotes: [],			// store a list of the currently running notifications
+	turnchange: false,		// Flag indicating the period between turns
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -56,12 +58,28 @@ var gameClass = Class.extend({
 		board.animFrame();
 		effects.animFrame();						// render any currrent effects
 		units.animFrame();							// render any unit changes
-		if(game.battle) {
-			if(game.battle.done) {
+		if(game.battle) {					// We have a battle to run
+			if(game.battle.done) {			// Clear finished battle
 				game.battle = null;
 			}
 			else {
-				game.battle.animFrame();	// process any running battle
+				game.battle.animFrame();	// Process the running battle
+			}
+		}
+		if(game.turnchange) {				// End of turn period
+		
+			if( game.turnnotes.length > 0 ) {	//	Display turn notifications
+				if( game.turnnotes[0].drawFrame() == 'done')  game.turnnotes.shift();					// if the animation is done, delete it
+			}
+			else {								// Finish the end turn period
+				for( i in units.units )	{		// Run through all the units in the game
+					units.units[i].remainingmoves = units.units[i].maxmoves;	// reset remaining moves to the unit's max moves
+				}
+				game.turnchange = false;
+				game.turn = 1 - game.turn;		// switch to other player's turn
+				ui.greyWidgets(); 				// grey out any widgets that are too expensive
+				game.redraw();					// redraw everything
+				game.setControlLock(false); 	// Enable user input
 			}
 		}
 	},
@@ -78,31 +96,33 @@ var gameClass = Class.extend({
 	
 	keypress: function (e) {
 		// Deal with keypresses
-		if(ui.popup)	// If there is a popup then close it and exit
-		{
-			if( ui.popup.div ) {
-				var div = document.getElementById('popupdiv')
-				div.parentNode.removeChild(div);
+		if(!game.controlLock) {
+			if(ui.popup)	// If there is a popup then close it and exit
+			{
+				if( ui.popup.div ) {
+					var div = document.getElementById('popupdiv')
+					div.parentNode.removeChild(div);
+				}
+				ui.popup = false;
+				ui.redraw();
+				return;
+			}	
+			var code = e.keyCode;
+
+			if( code == '72' ) ui.widgets.intropopup.render();   					// "h" will bring up a help popup
+
+			else if (code == '32' ) {												// Space bar ends turn
+				ui.widgets.endturn.pulse(200);
+				game.endTurn();	
 			}
-			ui.popup = false;
-			ui.redraw();
-			return;
-		}	
-		var code = e.keyCode;
-
-		if( code == '72' ) ui.widgets.intropopup.render();   					// "h" will bring up a help popup
-
-		else if (code == '32' ) {												// Space bar ends turn
-			ui.widgets.endturn.pulse(200);
-			game.endTurn();	
-		}
-		else if (code == '77' ) {												// "m" Toogle mute status
-			ui.widgets.speaker.toggleState();
-			ui.widgets.speaker.action();
-		}
-		else if (code == '84' ) {												// "t" Teleport a unit home
-			ui.widgets.teleport.pulse(200);
-			units.teleport();
+			else if (code == '77' ) {												// "m" Toogle mute status
+				ui.widgets.speaker.toggleState();
+				ui.widgets.speaker.action();
+			}
+			else if (code == '84' ) {												// "t" Teleport a unit home
+				ui.widgets.teleport.pulse(200);
+				units.teleport();
+			}
 		}
 	},
 	
@@ -115,34 +135,32 @@ var gameClass = Class.extend({
 	
 	endTurn: function () {
 		// Perform actions required to end a players turn
-		units.deactivate();	// Deactivate current unit
-		
+		units.deactivate();				// Deactivate current unit
+		this.setControlLock(true); 		// Lock out user input
 		for( i in units.units )			// Run through all the units in the game
 		{
 			var unit = units.units[i];
 			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied soemone has won the game
 				ui.widgets.winnerpopup.render();
 			}
-			unit.remainingmoves = unit.maxmoves;	// reset remaining moves
-			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid].resource);	// collect resources
+			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid]);	// collect resources
 			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources
 		}
-		this.turn = 1 - this.turn;	// switch to other player's turn
-		ui.greyWidgets(); 			// grey out any widgets that are too expensive
-		this.redraw();
+		this.turnnotes.push( new TextEffectClass(config.sides[game.turn].name+'\'s turn', {center:true}));
+		this.turnchange = true;		// Set end of turn period
 	},
 	
-	collectResource: function (resource) {
+	collectResource: function (tile) {
 		// Allocate any occupied resources to that team
-		if( resource.substring(0,1) == 'f') {
-			var food = parseInt(this.production[this.turn] * Number(resource.substring(1)));
+		if( tile.resource.substring(0,1) == 'f') {
+			var food = parseInt(this.production[this.turn] * Number(tile.resource.substring(1)));
 			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] + food);
-			effects.renderText(food+' food resouces collected',{center:true});
+			this.turnnotes.push( new ResourceEffectClass(food, tile.center) );
 		}
-		else if( resource.substring(0,1) == 's') {
-			var science = parseInt(this.production[this.turn] * Number(resource.substring(1)));
+		else if( tile.resource.substring(0,1) == 's') {
+			var science = parseInt(this.production[this.turn] * Number(tile.resource.substring(1)));
 			this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] + science);
-			effects.renderText(science+' science resouces collected',{center:true});
+			this.turnnotes.push( new ResourceEffectClass(science, tile.center) );
 		}
 	},
 	
