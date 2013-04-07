@@ -59,6 +59,7 @@ function xhrGet(reqUri, callback, type) {
     request.send();
 };
 
+// From David Walsh's website http://davidwalsh.name/fullscreen
 // Find the right method, call on correct element
 function launchFullScreen(element) {
   if(element.requestFullScreen) {

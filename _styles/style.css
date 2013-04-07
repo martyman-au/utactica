@@ -28,5 +28,9 @@ canvas {
 #front {
 	font-size:150%;
 	padding: 40px;
+}
 
+#licenses {
+	font-size:150%;
+	padding: 50px;
 }
