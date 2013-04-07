@@ -52,6 +52,9 @@ UIClass = Class.extend({
 		this.widgets.upgrades = new VectorButtonClass( {right:125,top:220}, 'Upgrades', 110);
 		this.widgets.upgrades.action = function (){ ui.widgets.upgradespopup.render();  };
 
+		this.widgets.help = new VectorButtonClass( {right:125,bottom:60}, 'Help', 110);
+		this.widgets.help.action = function (){ ui.widgets.intropopup.render();  };
+		
 		// Define upgrades popup and add buttons
 		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 300 );
 		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-60}, 'Soldiers +20% attack (50 science)', 400);

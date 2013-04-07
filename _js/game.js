@@ -109,8 +109,9 @@ var gameClass = Class.extend({
 			}	
 			var code = e.keyCode;
 
-			if( code == '72' ) ui.widgets.intropopup.render();   					// "h" will bring up a help popup
-
+			if( code == '72' ) {   					// "h" will bring up a help popup
+				ui.widgets.intropopup.render();
+			}
 			else if (code == '32' ) {												// Space bar ends turn
 				ui.widgets.endturn.pulse(200);
 				game.endTurn();	
