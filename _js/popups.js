@@ -62,11 +62,12 @@ intro += '</div>';
 
 var winner = '';
 winner  = '<div id="winner" style="padding:60px 10px 10px 10px; height:590px;">';
-winner += '  <div style="font-size:150%; padding-top:10px;">You have reigned supreme. Your foe has been beaten and the burnt out husk of the once great planet of Utactica is yours.</div>';
+winner += '  <div style="font-size:150%; padding-top:10px;">You have reigned supreme. Your foe has been been driven away and now the burnt out husk of the once great planet of Utactica is yours.</div>';
 winner += '  <div style="font-size:150%; padding-top:10px;">In other news, a rumour has just come to hand of a newly discovered world. A world that must be claimed at all costs.</div>';
-winner += '  <div style="font-size:150%; padding-top:10px;">Good luck in your coming battle.</div>';
-winner += '  <div style="text-align:center;font-size:140%;position:absolute;bottom:0px;width:700px;">';
-winner += '  <!--  <span onclick="getElementById(\'intro3\').style.display=\'none\';getElementById(\'intro2\').style.display=\'block\';" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';"><< Prev</span>';
-winner += '    &nbsp; <span onclick="var div=document.getElementById(\'popupdiv\'); div.parentNode.removeChild(div); ui.popup=false;" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';">Play Game >></span>-->';
-winner += '  </div>';
+winner += '  <div style="font-size:150%; padding-top:10px;">Good luck in the coming battle.</div>';
+winner += '  <div style="text-align:center;padding-top:50px;"> <img src="_media/winner.jpg" /> </div>';
+//winner += '  <div style="text-align:center;font-size:140%;position:absolute;bottom:0px;width:700px;">';
+//winner += '    <span onclick="getElementById(\'intro3\').style.display=\'none\';getElementById(\'intro2\').style.display=\'block\';" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';"><< Prev</span>';
+//winner += '    &nbsp; <span onclick="var div=document.getElementById(\'popupdiv\'); div.parentNode.removeChild(div); ui.popup=false;" onmouseover="document.body.style.cursor=\'pointer\';" onmouseout="document.body.style.cursor=\'default\';">Play Game >></span>-->';
+//winner += '  </div>';
 winner += '</div>';
