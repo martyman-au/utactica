@@ -1,4 +1,4 @@
-utactica
+Utactica
 ========
 
 UTACTICA game in development for Udacity HTML5 course
@@ -9,4 +9,15 @@ I started by developing the game concept as a printed out board game. Once I had
 
 ![screenshot](https://github.com/martyman-au/utactica/raw/master/img/Utactica-screenshot.jpg)
 
+Utactica is playable at http://utactica.appspot.com
+
+license
+=======
+
+Utactica is licensed CC BY-NC-SA except where third part code is licensed in such a way as to prevent that.
+
+Please contact 
+
 ![CC BY-NC-SA](http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png)
+
+Martin Conway martin.conway@gmail.com
