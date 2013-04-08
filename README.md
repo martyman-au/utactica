@@ -11,7 +11,14 @@ I started by developing the game concept as a printed out board game. Once I had
 
 Utactica is playable at http://utactica.appspot.com
 
-license
+Changelog
+=========
+
+0.1 Initial release
+
+0.2 Added worker movement upgrade, various bug fixes
+
+License
 =======
 
 Utactica is licensed CC BY-NC-SA except where third part code is licensed in such a way as to prevent that.
