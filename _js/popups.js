@@ -30,7 +30,7 @@ intro += '  <div style="padding-top:20px;">';
 intro += '    <img style="float:left;" src="_media/intro_workers.png">';
 intro += '    <div style="float:right;width:420px;">';
 intro += '      <div><b>Worker units</b> collect resources from resource tiles. Worker units cannot attack or defend. If attacked a worker unit will operate its emergency teleporter to beam back to its home base. If there is no free space at the home base the worker will be destroyed.</div>';
-intro += '      <div style="padding-top:10px;">Upgrading workers will increase the amount of resources they can harvest from a tile each turn.</div>';
+intro += '      <div style="padding-top:10px;">Upgrading production increases the amount of resources workers can harvest from a tile each turn. Upgrading their movement allows them to move further each turn (applies next turn).</div>';
 intro += '    </div>';
 intro += '    <div style="clear:both;"></div>';
 intro += '  </div>';
