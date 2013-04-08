@@ -125,7 +125,6 @@ BoardClass = Class.extend({
 		// Given a starting tile, currently hoveredover tile and maximum move distance grey out unreachable tiles, highlight current tile
 		// This is then used by game logic to allow/disallow moves
 		var enemies;
-		var newtile = this.tiles[tile2];
 		for( j in this.tiles) {
 			var distance = this.tileDistance(tile1,this.tiles[j].tilenum);
 			if( distance > max ) this.tiles[j].state = 2;
@@ -135,7 +134,9 @@ BoardClass = Class.extend({
 				if(enemies.units.length > 0) { this.tiles[j].state = 2;	} // Grey out any tile with enemies
 			}
 		}
-		if( newtile.state == 0 ) newtile.state = 1; // If we haven't greyed out the moused over tile then highlight it
+		if(tile2 !== null) { // If the dragged piece is over a valid tile we want to highlight it
+			if( this.tiles[tile2].state == 0 ) this.tiles[tile2].state = 1; // If we haven't greyed out the moused over tile then highlight it
+		}
 	},
 	
 	unHighlight: function () {
