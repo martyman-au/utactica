@@ -23,8 +23,8 @@ License
 
 Utactica is licensed CC BY-NC-SA except where third part code is licensed in such a way as to prevent that.
 
-Please contact 
-
 ![CC BY-NC-SA](http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png)
+
+Please contact 
 
 Martin Conway martin.conway@gmail.com
