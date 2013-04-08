@@ -188,6 +188,7 @@ var gameClass = Class.extend({
 		if(type == 'attack') this.attack[this.turn] = parseInt(this.attack[this.turn] + 20);
 		else if(type == 'defence') this.defence[this.turn] = parseInt(this.defence[this.turn] + 20);
 		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
+		else if(type == 'workermovement') this.unitmaxmoves.worker[this.turn] += 1;
 		ui.greyWidgets(); // grey out any widgets that are too expensive
 	},
 	

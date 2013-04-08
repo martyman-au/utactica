@@ -67,7 +67,7 @@ var config = {
 
 	unitCosts:{worker:200,soldier:100},
 	
-	upgradeCosts:{attack:50,defence:50,production:100},
+	upgradeCosts:{attack:50,defence:50,production:100,workermovement:100},
 
 	Unithp:{soldier:50,worker:1},
 	

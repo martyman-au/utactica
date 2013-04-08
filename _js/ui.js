@@ -56,16 +56,19 @@ UIClass = Class.extend({
 		this.widgets.help.action = function (){ ui.widgets.intropopup.render();  };
 		
 		// Define upgrades popup and add buttons
-		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 300 );
-		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-60}, 'Soldiers +20% attack (50 science)', 400);
+		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 320 );
+		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-90}, 'Soldiers +20% attack (50 science)', 400);
 		this.widgets.upgradespopup.widgets.upgradeattack.action = function (){ game.buyUpgrade('attack'); };
 		this.widgets.upgradespopup.widgets.upgradeattack.sciencecost = 50;
-		this.widgets.upgradespopup.widgets.upgradedefence = new VectorButtonClass( {center:true,top:0}, 'Soldiers +20% defence (50 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradedefence = new VectorButtonClass( {center:true,top:-30}, 'Soldiers +20% defence (50 science)', 400);
 		this.widgets.upgradespopup.widgets.upgradedefence.action = function (){ game.buyUpgrade('defence'); };
 		this.widgets.upgradespopup.widgets.upgradedefence.sciencecost = 50;
-		this.widgets.upgradespopup.widgets.upgradeproduction = new VectorButtonClass( {center:true,top:60}, 'Workers +20% production (100 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeproduction = new VectorButtonClass( {center:true,top:30}, 'Workers +20% production (100 science)', 400);
 		this.widgets.upgradespopup.widgets.upgradeproduction.action = function (){ game.buyUpgrade('production'); };
 		this.widgets.upgradespopup.widgets.upgradeproduction.sciencecost = 100;
+		this.widgets.upgradespopup.widgets.upgradeworkermovement = new VectorButtonClass( {center:true,top:90}, 'Workers +1 movement (100 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeworkermovement.action = function (){ game.buyUpgrade('workermovement'); };
+		this.widgets.upgradespopup.widgets.upgradeworkermovement.sciencecost = 100;
 		
 		// Define buy units popup and add buttons
 		this.widgets.buyunitspopup = new PopupClass( 'Buy Units', 500, 200 );
