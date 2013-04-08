@@ -6,8 +6,8 @@ var gameClass = Class.extend({
 	production: [1,1],		// Production rate for each side
 	attack: [0,0],			// Attack bonus for each side
 	defence: [0,0],			// Defence bonus for each side
-//	initcheck: null,		// TODO: ?????
-	controlLock: false,		// Lock controls while an animation is running TODO: fix this up?
+	unitmaxmoves: {worker:[1,1], soldier:[1,1]},		// Keep track of how many moves each side gets (so we can upgrade it)
+	controlLock: false,		// Lock controls while an animation is running
 	battle:  null,			// Stores the currently running battle
 	turnnotes: [],			// store a list of the currently running notifications
 	turnchange: false,		// Flag indicating the period between turns
@@ -73,7 +73,7 @@ var gameClass = Class.extend({
 			}
 			else {								// Finish the end turn period
 				for( i in units.units )	{		// Run through all the units in the game
-					units.units[i].remainingmoves = units.units[i].maxmoves;	// reset remaining moves to the unit's max moves
+					units.units[i].remainingmoves = game.unitmaxmoves[units.units[i].type][units.units[i].side];	// reset remaining moves to the unit's max moves
 				}
 				game.turnchange = false;
 				game.turn = 1 - game.turn;		// switch to other player's turn

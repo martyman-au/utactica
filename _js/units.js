@@ -168,8 +168,7 @@ UnitClass = Class.extend({
 	ux: null,
 	uy: null,
 	origpos: {x:null, y:null},
-	maxmoves: 1,
-	remainingmoves: 1,
+	remainingmoves: null,
 	slotoffsetx: 0,
 	slotoffsety: 0,
 	spritewidth: null,
@@ -187,6 +186,7 @@ UnitClass = Class.extend({
 		this.spriteheight = stats.h;
 		this.spritewidth = stats.w;
 		this.hp = config.Unithp[this.type];
+		this.remainingmoves = game.unitmaxmoves[this.type][this.side];	// preload the remaining moves value
 	},
 
 	activate: function () {
