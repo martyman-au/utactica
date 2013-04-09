@@ -174,6 +174,7 @@ UnitClass = Class.extend({
 	spritewidth: null,
 	spriteheight: null,
 	hp: 0,							// Hit points for damage tracking
+	battles: 0,
 	type: '',
 	canvas: null,					// Offscreen canvas for unit compositing
 	context: null,
@@ -226,40 +227,7 @@ UnitClass = Class.extend({
 		this.calcPos();			// calculate new canvas location
 		this.render();
 	},
-/*	
-	move: function (code) {
-		var tgt = {}; 	// Target tile x and y indexes
-		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
-		tgt.y = parseInt(board.tiles[this.tileid].grididx.y) + config.movekeys[code].y;
-		
-		var newtile = board.checkmove(tgt); 			// find the ID of the deired tile
-		if( newtile ) { 								// if the desired tile exists check if this is a move or attack
-			var enemies = units.getEnemies(newtile);	// Check for enemies on teh target tile
-			if(enemies.units.length > 0) { 				// if there was at least one enemy on the target tile
-				if( this.canAttack ) this.attack(newtile, enemies);	// If this unit is a soldier then attack
-				else {
-					effects.renderText('WORKERS CAN\'T ATTACK',{center:true});
-					sound.playSound('doh');				// If this unit is worker don't move
-				}
-			}
-			else {	// There was no enemies lets see if we can move there
-				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
-				if( newslot ) { 
-					board.tiles[this.tileid].clearSlot(this.slotid); 	// release old slot
-					this.actualMove(newtile,newslot);					// animate the actual move
-				}	
-				else {
-					effects.renderText('THERE IS NO ROOM FOR THAT',{center:true});
-					sound.playSound('doh');
-				}
-			}
-		}
-		else {
-			effects.renderText('YOU CAN\'T MOVE THAT DIRECTION',{center:true});
-			sound.playSound('doh');
-		}
-	},
-*/	
+
 	dragmove: function (x,y) {
 		var newtile = board.clickhit(x,y);
 		if(newtile == this.tileid) { // If we haven't moved out of our original tile
@@ -279,8 +247,8 @@ UnitClass = Class.extend({
 				if( newslot ) { // animate the actual move
 					this.remainingmoves -= board.tileDistance(this.tileid,newtile);		// Decrement remaining moves count
 					this.prerender();													// Update look of unit in case we are out of moves
-					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
-					this.actualMove(newtile,newslot);			// Move the unit to the new tile and slot
+					board.tiles[this.tileid].clearSlot(this.slotid); 	// Clear old slot on board	
+					this.actualMove(newtile,newslot);					// Move the unit to the new tile and slot
 				}
 				else {
 					this.actualMove(this.tileid,this.slotid);	// Move back to where we came from
@@ -303,7 +271,6 @@ UnitClass = Class.extend({
 		newloc.x = board.tiles[newtile].center.x + cv.Offset.x + slotoffsetx;
 		newloc.y = board.tiles[newtile].center.y + cv.Offset.y + slotoffsety;
 		units.translations.push( new TranslateClass(this, newloc));
-//		board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 		this.tileid = newtile; 	// Set unit to new tile location
 		this.slotid = newslot;	// set unit to new tile slot
 	},
@@ -315,22 +282,22 @@ UnitClass = Class.extend({
 
 	prerender: function () {
 		// render this unit to it's hidden canvas
-		var baseimg = '';
-		var headimg = '';
-		var imgtype = '';
-		var healthcolor = ''; 
+		var baseimg, basetype, headimg, unitstate, healthcolor;
 		
 		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
 
-		if(this.remainingmoves == 0 || this.side != game.turn) imgtype = 'grey';
-		else imgtype = 'ready';
+		if(this.remainingmoves == 0 || this.side != game.turn) unitstate = 'grey';
+		else unitstate = 'ready';
+		
+		if( this.battles > 2 ) basetype = 2;	// If unit has survived more than two battles render as an elite unit
+		else basetype = 1;
 		
 		// First draw the base
-		baseimg = 'units/'+imgtype+'-base-'+this.colour+'-1.png';
+		baseimg = 'units/'+unitstate+'-base-'+this.colour+'-'+basetype+'.png';
 		drawSprite(baseimg, this.context, 50, 50); // TODO: hard coded
 
 		// Noew draw the head
-		headimg = 'units/'+imgtype+'-'+this.type+'-head-1.png';
+		headimg = 'units/'+unitstate+'-'+this.type+'-head-1.png';
 		drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
 		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
@@ -507,22 +474,26 @@ BattleClass = Class.extend({
 	results: null,
 	
 	init: function (unit, target) {
-		game.setControlLock(true);	// Lock control input TODO: Need to make this more formalized and robust
+		var elitebonus = {attacker:0, defender:0};	// Elite units get a bonus
+		game.setControlLock(true);					// Lock control input
 		this.start = Date.now();
-		this.attacker = unit;
+		this.attacker = unit;						// store the attackign unit
 		this.target = Number(target);
-		this.enemies = units.getEnemies(target);
+		this.enemies = units.getEnemies(target);	// store the defending unit
 		this.defender = this.enemies.bestunit;
 		
-		this.attackerstarthp = this.attacker.hp;
-		this.defenderstarthp = this.defender.hp;
+		this.attackerstarthp = this.attacker.hp;	// store the starting hp
+		this.defenderstarthp = this.defender.hp;	// store the starting hp
 		
+		if( this.attacker.battles > 2 ) elitebonus.attacker = 20;	// set the elite bonus if the unit is elite
+		if( this.defender.battles > 2 ) elitebonus.defender = 20;	// set the elite bonus if the unit is elite
+
 		// BATTLE CALCULATIONS
-		// Attack damage is a rnd(0-100) + attacker's attack upgrades - defender's defence upgrades
+		// Attack damage is a rnd(0-100) + attacker's attack upgrades - defender's defence upgrades 
 		// Retaliation damage is a rnd(0-100) + defender's attack upgrades - attacker's attack upgrades
-		var attackscore = Math.floor((Math.random()*100)+1) + game.attack[game.turn] - game.defence[(1-game.turn)];
+		var attackscore = Math.floor((Math.random()*100)+1) + game.attack[game.turn] - game.defence[(1-game.turn)] + elitebonus.attacker - elitebonus.defender;
 		if( this.defender.type == 'soldier' ) {	// Only soldiers can retaliate
-			var defendscore = Math.floor((Math.random()*100)+1) + game.attack[(1-game.turn)] - game.defence[game.turn];
+			var defendscore = Math.floor((Math.random()*100)+1) + game.attack[(1-game.turn)] - game.defence[game.turn] + elitebonus.defender - elitebonus.attacker;
 		}
 		else defendscore = 0; // workers are unable to retaliate
 		
@@ -598,10 +569,15 @@ BattleClass = Class.extend({
 			else {
 				if( this.progress >= 1) {				// End of the battle
 					game.setControlLock(false);			// release the control lock
-					if(this.attacker) { 
+					if(this.attacker) {
+						this.attacker.battles++;
 						this.attacker.remainingmoves--; 		// decrement remaining moves of the attacker if it wasn't destroyed
 						this.attacker.deactivate();
 						this.attacker.prerender();
+					}
+					if(this.defender) {
+						this.defender.battles++;
+						this.defender.prerender();
 					}
 					this.done = true;					// mark the battle done (will be deleted)
 				}
