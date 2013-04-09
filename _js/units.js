@@ -39,13 +39,20 @@ UnitsClass = Class.extend({
 	
 	render: function () {
 		// Render all of the units on the board
-		for( i in this.units ) this.units[i].render();	// render every unit
-		
+		for( i in this.units ) {
+			this.units[i].render();	// render every unit
+		}
 		if(this.activeUnit) {
 			this.activeUnit.render(); 					// render active unit again so that it does not end up behind other units
 		}
 	},
-
+	
+	prerender: function () {
+		for( i in this.units )	{		// Run through all the units in the game
+			this.units[i].prerender();	// update look of unit
+		}
+	},
+	
 	wipe: function () {
 		// wipe the units layer
 		cv.layers['units'].context.clearRect(0, 0, cv.layers['units'].canvas.width / cv.scale, cv.layers['units'].canvas.height / cv.scale); // clear all of units layer
@@ -227,7 +234,7 @@ UnitClass = Class.extend({
 		this.calcPos();			// calculate new canvas location
 		this.render();
 	},
-
+	
 	dragmove: function (x,y) {
 		var newtile = board.clickhit(x,y);
 		if(newtile == this.tileid) { // If we haven't moved out of our original tile
@@ -282,7 +289,7 @@ UnitClass = Class.extend({
 
 	prerender: function () {
 		// render this unit to it's hidden canvas
-		var baseimg, basetype, headimg, unitstate, healthcolor;
+		var baseimg, basetype, headimg, unitstate, healthcolor, weaponimg, weapontype;
 		
 		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
 
@@ -296,12 +303,12 @@ UnitClass = Class.extend({
 		baseimg = 'units/'+unitstate+'-base-'+this.colour+'-'+basetype+'.png';
 		drawSprite(baseimg, this.context, 50, 50); // TODO: hard coded
 
-		// Noew draw the head
+		// Now draw the head
 		headimg = 'units/'+unitstate+'-'+this.type+'-head-1.png';
 		drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
 		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
-			//Set the colour of teh health bar
+			//Set the colour of the health bar
 			if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
 			else {
 				if(this.hp >= 15) { healthcolor = config.styles.healthbarmid; }
@@ -319,7 +326,13 @@ UnitClass = Class.extend({
 			var yoffset = 90;
 			this.context.fillRect(xoffset, yoffset, Math.max(0,this.hp), 4);
 			this.context.shadowColor = "transparent";
-
+			
+			// Now draw the weapons
+			weapontype = Math.min(3,Math.round((game.attack[this.side]/20)+1));
+			weaponimg = 'units/'+unitstate+'-'+this.type+'-weapon-'+weapontype+'.png';
+			drawSprite(weaponimg, this.context, 50, 50); // TODO: hard coded
+			
+			// Now draw any damage
 			if( this.hp < 35 ) {	// unit is damaged include damage layer
 				drawSprite('units/damage.png', this.context, 50, 50); // TODO: hard coded	
 			}

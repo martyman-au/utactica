@@ -78,9 +78,7 @@ var gameClass = Class.extend({
 				game.turnchange = false;
 				game.turn = 1 - game.turn;		// switch to other player's turn
 				ui.greyWidgets(); 				// grey out any widgets that are too expensive
-				for( i in units.units )	{		// Run through all the units in the game
-					units.units[i].prerender();	// update look of unit
-				}
+				units.prerender();
 				game.redraw();					// redraw everything
 				game.setControlLock(false); 	// Enable user input
 			}
@@ -193,6 +191,7 @@ var gameClass = Class.extend({
 		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
 		else if(type == 'workermovement') this.unitmaxmoves.worker[this.turn] += 1;
 		ui.greyWidgets(); // grey out any widgets that are too expensive
+		units.prerender();
 	},
 	
 	setControlLock: function (value) {
