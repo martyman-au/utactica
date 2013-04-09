@@ -175,6 +175,8 @@ UnitClass = Class.extend({
 	spriteheight: null,
 	hp: 0,							// Hit points for damage tracking
 	type: '',
+	canvas: null,					// Offscreen canvas for unit compositing
+	context: null,
 	
 	init: function (side, tile) {
 		this.side = Number(side);
@@ -187,6 +189,12 @@ UnitClass = Class.extend({
 		this.spritewidth = stats.w;
 		this.hp = config.Unithp[this.type];
 		this.remainingmoves = game.unitmaxmoves[this.type][this.side];	// preload the remaining moves value
+		// Setup off screen canvas
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = 100; // TODO: hard coded
+		this.canvas.height = 100; // TODO: hard coded
+		this.context = this.canvas.getContext('2d');
+		this.prerender();
 	},
 
 	activate: function () {
@@ -200,7 +208,7 @@ UnitClass = Class.extend({
 		if(this.state == 'active')
 		{
 			this.state = 'normal';
-			this.redraw();
+//			this.redraw();
 			units.activeUnit = null;
 			effects.deleteAnimation('active');
 		}
@@ -208,6 +216,7 @@ UnitClass = Class.extend({
 	
 	regen: function () {
 		this.hp = config.Unithp[this.type];
+		this.prerender();
 	},
 	
 	redraw: function () {
@@ -215,7 +224,7 @@ UnitClass = Class.extend({
 		this.calcPos();			// calculate new canvas location
 		this.render();
 	},
-	
+/*	
 	move: function (code) {
 		var tgt = {}; 	// Target tile x and y indexes
 		tgt.x = parseInt(board.tiles[this.tileid].grididx.x) + config.movekeys[code].x;
@@ -248,7 +257,7 @@ UnitClass = Class.extend({
 			sound.playSound('doh');
 		}
 	},
-	
+*/	
 	dragmove: function (x,y) {
 		var newtile = board.clickhit(x,y);
 		if(newtile == this.tileid) { // If we haven't moved out of our original tile
@@ -267,6 +276,7 @@ UnitClass = Class.extend({
 				var newslot = board.allocateSlot(newtile);			// Allocate a slot on the target tile
 				if( newslot ) { // animate the actual move
 					this.remainingmoves -= board.tileDistance(this.tileid,newtile);		// Decrement remaining moves count
+					this.prerender();													// Update look of unit in case we are out of moves
 					board.tiles[this.tileid].clearSlot(this.slotid); // Clear old slot on board	
 					this.actualMove(newtile,newslot);			// Move the unit to the new tile and slot
 				}
@@ -300,17 +310,17 @@ UnitClass = Class.extend({
 		// wipe the units canvas to clear this unit off the board
 		cv.layers['units'].context.clearRect(this.ux-(this.spritewidth/2), this.uy-(this.spriteheight/2), this.spritewidth+2, this.spriteheight+2);
 	},
-	
-	render: function () {
+
+	prerender: function () {
 		// render this unit to the units canvas
-		var ctx = cv.layers['units'].context;
+		this.context.clearRect(0, 0, 100, 100);
 		var spriteimg = this.colour+'-'+this.type;
 		var healthcolor = null; 
 		
 		if(this.remainingmoves == 0 || this.side != game.turn) spriteimg = spriteimg+'-grey';
 		spriteimg = spriteimg+'.png';
 
-		drawSprite(spriteimg, ctx, this.ux, this.uy)
+		drawSprite(spriteimg, this.context, 50, 50); // TODO: hard coded
 		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
 			//Set the colour of teh health bar
@@ -320,21 +330,24 @@ UnitClass = Class.extend({
 				else { healthcolor = config.styles.healthbarbad; }
 			}
 			
-			ctx.fillStyle = healthcolor; 
-			
-			//ctx.font = "normal 700 20px 'Roboto Condensed'";
-			//ctx.fillText(this.hp, this.ux-10, this.uy); //TODO: remove debug code
-			
-			ctx.shadowColor = '#ffffff';
+			this.context.fillStyle = healthcolor; 
+
+			this.context.shadowColor = '#ffffff';
 			shadowOffsetX = 0;
-			ctx.shadowOffsetY = 0;
-			ctx.shadowBlur = 6;
+			this.context.shadowOffsetY = 0;
+			this.context.shadowBlur = 6;
 			
-			var xoffset = -25;
-			var yoffset = 38;
-			ctx.fillRect(this.ux + xoffset, this.uy + yoffset, Math.max(0,this.hp), 4);
-			ctx.shadowColor = "transparent";
+			var xoffset = 25;
+			var yoffset = 90;
+			this.context.fillRect(xoffset, yoffset, Math.max(0,this.hp), 4);
+			this.context.shadowColor = "transparent";
 		}
+	},
+	
+	render: function () {
+		// render this unit to the units canvas
+		var ctx = cv.layers['units'].context;
+		ctx.drawImage(this.canvas,this.ux-50, this.uy-50);
 	},
 	
 	calcPos: function () {
@@ -531,8 +544,14 @@ BattleClass = Class.extend({
 		this.progress = ( Date.now() - this.start ) / this.totaltime;
 		if(this.progress < 0.75) { 						// shooting phase first 75% of battle time (make noises, decrease unit's hp)
 			var battleprogress = this.progress / 0.75;	// calculate progress through the shooting phase
-			if( Math.random() < 0.08 ) this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
-			if( Math.random() < 0.08 ) this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
+			if( Math.random() < 0.08 ) {
+				this.attacker.hp = this.attackerstarthp - this.attackerdamage * battleprogress; // randomly apply damage to the units
+				this.attacker.prerender()	//update look of unit
+			}
+			if( Math.random() < 0.08 ) {
+				this.defender.hp = this.defenderstarthp - this.defenderdamage * battleprogress; // randomly apply damage to the units
+				this.defender.prerender()	//update look of unit
+			}
 		}
 		else {
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)

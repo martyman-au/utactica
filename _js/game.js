@@ -78,6 +78,9 @@ var gameClass = Class.extend({
 				game.turnchange = false;
 				game.turn = 1 - game.turn;		// switch to other player's turn
 				ui.greyWidgets(); 				// grey out any widgets that are too expensive
+				for( i in units.units )	{		// Run through all the units in the game
+					units.units[i].prerender();	// update look of unit
+				}
 				game.redraw();					// redraw everything
 				game.setControlLock(false); 	// Enable user input
 			}
