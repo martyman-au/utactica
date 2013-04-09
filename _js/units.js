@@ -184,9 +184,11 @@ UnitClass = Class.extend({
 		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
 		this.slotid = board.allocateSlot(this.tileid);		// Find which slot on the tile is available
-		var stats = sprites.getStats(this.colour+'-'+this.type+'.png');
-		this.spriteheight = stats.h;
-		this.spritewidth = stats.w;
+//		var stats = sprites.getStats(this.colour+'-'+this.type+'.png');
+//		this.spriteheight = stats.h;
+//		this.spritewidth = stats.w;
+		this.spriteheight = 80;
+		this.spritewidth = 80;
 		this.hp = config.Unithp[this.type];
 		this.remainingmoves = game.unitmaxmoves[this.type][this.side];	// preload the remaining moves value
 		// Setup off screen canvas
@@ -312,15 +314,24 @@ UnitClass = Class.extend({
 	},
 
 	prerender: function () {
-		// render this unit to the units canvas
-		this.context.clearRect(0, 0, 100, 100);
-		var spriteimg = this.colour+'-'+this.type;
-		var healthcolor = null; 
+		// render this unit to it's hidden canvas
+		var baseimg = '';
+		var headimg = '';
+		var imgtype = '';
+		var healthcolor = ''; 
 		
-		if(this.remainingmoves == 0 || this.side != game.turn) spriteimg = spriteimg+'-grey';
-		spriteimg = spriteimg+'.png';
+		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
+		
+		if(this.remainingmoves == 0 || this.side != game.turn) imgtype = 'grey';
+		else imgtype = 'ready';
+		
+		// First draw the base
+		baseimg = 'units/'+imgtype+'-base-'+this.colour+'-1.png';
+		drawSprite(baseimg, this.context, 50, 50); // TODO: hard coded
 
-		drawSprite(spriteimg, this.context, 50, 50); // TODO: hard coded
+		// Noew draw the head
+		headimg = 'units/'+imgtype+'-'+this.type+'-head-1.png';
+		drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
 		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
 			//Set the colour of teh health bar
@@ -353,8 +364,8 @@ UnitClass = Class.extend({
 	calcPos: function () {
 		// calculate the x,y position of the unit from the tile and slot
 		var slots = board.tiles[this.tileid].slots;
-		this.slotoffsetx = slots[this.slotid].xoffset*(this.spritewidth*0.55);		// calculate the position for this slot
-		this.slotoffsety = slots[this.slotid].yoffset*(this.spriteheight*0.6);	// calculate the position for this slot
+		this.slotoffsetx = slots[this.slotid].xoffset*(this.spritewidth*0.5);		// calculate the position for this slot
+		this.slotoffsety = slots[this.slotid].yoffset*(this.spriteheight*0.5);	// calculate the position for this slot
 		this.ux = board.tiles[this.tileid].center.x + cv.Offset.x + this.slotoffsetx;
 		this.uy = board.tiles[this.tileid].center.y + cv.Offset.y + this.slotoffsety;
 	},
