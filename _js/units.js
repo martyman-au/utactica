@@ -321,7 +321,7 @@ UnitClass = Class.extend({
 		var healthcolor = ''; 
 		
 		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
-		
+
 		if(this.remainingmoves == 0 || this.side != game.turn) imgtype = 'grey';
 		else imgtype = 'ready';
 		
@@ -352,7 +352,12 @@ UnitClass = Class.extend({
 			var yoffset = 90;
 			this.context.fillRect(xoffset, yoffset, Math.max(0,this.hp), 4);
 			this.context.shadowColor = "transparent";
+
+			if( this.hp < 35 ) {	// unit is damaged include damage layer
+				drawSprite('units/damage.png', this.context, 50, 50); // TODO: hard coded	
+			}
 		}
+
 	},
 	
 	render: function () {
@@ -596,6 +601,7 @@ BattleClass = Class.extend({
 					if(this.attacker) { 
 						this.attacker.remainingmoves--; 		// decrement remaining moves of the attacker if it wasn't destroyed
 						this.attacker.deactivate();
+						this.attacker.prerender();
 					}
 					this.done = true;					// mark the battle done (will be deleted)
 				}
