@@ -18,6 +18,8 @@ Changelog
 
 0.2 Added worker movement upgrade, various bug fixes
 
+0.3 Switched units to pre-rendered composited images, added the concept of elite units.
+
 License
 =======
 
