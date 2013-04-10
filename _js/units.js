@@ -289,25 +289,25 @@ UnitClass = Class.extend({
 
 	prerender: function () {
 		// render this unit to it's hidden canvas
-		var baseimg, basetype, headimg, unitstate, healthcolor, weaponimg, weapontype;
+		var baseimg, basetype, headimg, headtype, healthcolor, weaponimg, weapontype;
 		
 		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
 
-		if(this.remainingmoves == 0 || this.side != game.turn) unitstate = 'grey';
-		else unitstate = 'ready';
-		
 		if( this.battles > 2 ) basetype = 2;	// If unit has survived more than two battles render as an elite unit
 		else basetype = 1;
 		
 		// First draw the base
-		baseimg = 'units/'+unitstate+'-base-'+this.colour+'-'+basetype+'.png';
+		baseimg = 'units/base-'+this.colour+'-'+basetype+'.png';
 		drawSprite(baseimg, this.context, 50, 50); // TODO: hard coded
 
-		// Now draw the head
-		headimg = 'units/'+unitstate+'-'+this.type+'-head-1.png';
-		drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
+
 		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
+			// Now draw the head
+			headtype = Math.min(4,Math.round((game.defence[this.side]/20)+1));
+			headimg = 'units/soldier-head-'+headtype+'.png';
+			drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
+			
 			//Set the colour of the health bar
 			if(this.hp >= 35) { healthcolor = config.styles.healthbargood; }
 			else {
@@ -329,7 +329,7 @@ UnitClass = Class.extend({
 			
 			// Now draw the weapons
 			weapontype = Math.min(3,Math.round((game.attack[this.side]/20)+1));
-			weaponimg = 'units/'+unitstate+'-'+this.type+'-weapon-'+weapontype+'.png';
+			weaponimg = 'units/main-weapon-'+weapontype+'.png';
 			drawSprite(weaponimg, this.context, 50, 50); // TODO: hard coded
 			
 			// Now draw any damage
@@ -337,7 +337,27 @@ UnitClass = Class.extend({
 				drawSprite('units/damage.png', this.context, 50, 50); // TODO: hard coded	
 			}
 		}
-
+		else { // Worker
+			headimg = 'units/worker-head-1.png';
+			drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
+		}
+		
+		// If a unit is not ready we need to grey it out
+		if(this.remainingmoves == 0 || this.side != game.turn) { 
+			var imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+			for(var i = 0; i < imageData.data.length; i+=4) {
+				if( imageData.data[i+3] > 0 ) { // If not transparent then desaturate
+					var r = imageData.data[i],
+					g = imageData.data[i+1],
+					b = imageData.data[i+2],
+					gray = Math.min(255,((r+g+b)/3)+180);
+					imageData.data[i] = (gray+r)/2;
+					imageData.data[i+1] = (gray+g)/2;
+					imageData.data[i+2] = (gray+b)/2;
+				}
+			}
+			this.context.putImageData(imageData, 0, 0);
+		}
 	},
 	
 	render: function () {
