@@ -18,7 +18,7 @@
 },
 "active/active_03.png":
 {
-	"frame": {"x":1406,"y":0,"w":52,"h":52},
+	"frame": {"x":1406,"y":54,"w":52,"h":52},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":3,"y":3,"w":52,"h":52},
@@ -26,7 +26,7 @@
 },
 "active/active_04.png":
 {
-	"frame": {"x":1302,"y":210,"w":46,"h":46},
+	"frame": {"x":1310,"y":210,"w":46,"h":46},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":7,"y":7,"w":46,"h":46},
@@ -42,7 +42,7 @@
 },
 "active/active_06.png":
 {
-	"frame": {"x":1176,"y":222,"w":34,"h":34},
+	"frame": {"x":1210,"y":222,"w":34,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":13,"y":13,"w":34,"h":34},
@@ -194,7 +194,7 @@
 },
 "explosions/explosion2_15.png":
 {
-	"frame": {"x":1406,"y":52,"w":48,"h":54},
+	"frame": {"x":1363,"y":0,"w":48,"h":54},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":8,"y":6,"w":48,"h":54},
@@ -362,7 +362,7 @@
 },
 "units/base-blue-1.png":
 {
-	"frame": {"x":1392,"y":154,"w":66,"h":42},
+	"frame": {"x":1392,"y":148,"w":66,"h":42},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":17,"y":44,"w":66,"h":42},
@@ -386,7 +386,7 @@
 },
 "units/base-red-2.png":
 {
-	"frame": {"x":1236,"y":214,"w":66,"h":42},
+	"frame": {"x":1244,"y":214,"w":66,"h":42},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":17,"y":44,"w":66,"h":42},
@@ -402,26 +402,50 @@
 },
 "units/main-weapon-1.png":
 {
-	"frame": {"x":675,"y":244,"w":24,"h":12},
+	"frame": {"x":707,"y":244,"w":18,"h":10},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":56,"y":23,"w":24,"h":12},
+	"spriteSourceSize": {"x":55,"y":24,"w":18,"h":10},
 	"sourceSize": {"w":100,"h":100}
 },
 "units/main-weapon-2.png":
 {
-	"frame": {"x":782,"y":237,"w":30,"h":16},
+	"frame": {"x":675,"y":244,"w":32,"h":10},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":55,"y":24,"w":32,"h":10},
+	"sourceSize": {"w":100,"h":100}
+},
+"units/main-weapon-3.png":
+{
+	"frame": {"x":784,"y":237,"w":30,"h":16},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":54,"y":22,"w":30,"h":16},
 	"sourceSize": {"w":100,"h":100}
 },
-"units/main-weapon-3.png":
+"units/main-weapon-4.png":
 {
-	"frame": {"x":746,"y":237,"w":36,"h":18},
+	"frame": {"x":814,"y":237,"w":38,"h":14},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":54,"y":20,"w":36,"h":18},
+	"spriteSourceSize": {"x":54,"y":22,"w":38,"h":14},
+	"sourceSize": {"w":100,"h":100}
+},
+"units/main-weapon-5.png":
+{
+	"frame": {"x":746,"y":237,"w":38,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":55,"y":20,"w":38,"h":18},
+	"sourceSize": {"w":100,"h":100}
+},
+"units/main-weapon-6.png":
+{
+	"frame": {"x":1172,"y":224,"w":38,"h":22},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":60,"y":18,"w":38,"h":22},
 	"sourceSize": {"w":100,"h":100}
 },
 "units/soldier-head-1.png":
@@ -434,7 +458,7 @@
 },
 "units/soldier-head-2.png":
 {
-	"frame": {"x":1348,"y":203,"w":40,"h":46},
+	"frame": {"x":1396,"y":190,"w":40,"h":46},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":29,"y":13,"w":40,"h":46},
@@ -442,7 +466,7 @@
 },
 "units/soldier-head-3.png":
 {
-	"frame": {"x":1363,"y":0,"w":40,"h":46},
+	"frame": {"x":1356,"y":203,"w":40,"h":46},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":29,"y":13,"w":40,"h":46},
@@ -450,7 +474,7 @@
 },
 "units/soldier-head-4.png":
 {
-	"frame": {"x":1405,"y":106,"w":46,"h":48},
+	"frame": {"x":1411,"y":0,"w":46,"h":48},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":27,"y":11,"w":46,"h":48},
@@ -458,7 +482,7 @@
 },
 "units/worker-head-1.png":
 {
-	"frame": {"x":1388,"y":203,"w":38,"h":42},
+	"frame": {"x":1405,"y":106,"w":38,"h":42},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":30,"y":18,"w":38,"h":42},
@@ -469,8 +493,8 @@
 	"version": "1.0",
 	"image": "sprites.png",
 	"format": "RGBA8888",
-	"size": {"w":1458,"h":256},
+	"size": {"w":1460,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:0af40f6799c9a9793fffbea3a26bf3da$"
+	"smartupdate": "$TexturePacker:SmartUpdate:0ab562bf0ae75242e7b4458d25d02c8a$"
 }
 }

@@ -328,7 +328,7 @@ UnitClass = Class.extend({
 			this.context.shadowColor = "transparent";
 			
 			// Now draw the weapons
-			weapontype = Math.min(3,Math.round((game.attack[this.side]/20)+1));
+			weapontype = Math.min(6,Math.round((game.attack[this.side]/20)+1));
 			weaponimg = 'units/main-weapon-'+weapontype+'.png';
 			drawSprite(weaponimg, this.context, 50, 50); // TODO: hard coded
 			
