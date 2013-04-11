@@ -20,6 +20,8 @@ Changelog
 
 0.3 Switched units to pre-rendered composited images, added the concept of elite units.
 
+0.4 Units change appear when upgraded, unit battle noises also change.
+
 License
 =======
 
