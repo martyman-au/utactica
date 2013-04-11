@@ -89,7 +89,7 @@ var config = {
 	
 	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh', 'resource'],
 
-	soldiersounds: ['battle', 'battle', 'battle', 'battle', 'battle', 'laser'],
+	soldiersounds: ['pistol', 'rifle', 'machine_gun', 'small_booms', 'strange_booms', 'laser'],
 	
 	music: ['ObservingTheStar', 'OutThere', 'shrine'],
 	
