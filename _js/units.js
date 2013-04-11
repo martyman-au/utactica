@@ -32,7 +32,7 @@ UnitsClass = Class.extend({
 	
 	redraw: function () {
 		// Redraw all the units at their current location
-		this.destroy(); // delete dead units
+//		this.destroy(); // delete dead units
 		this.wipe();	// clear the board
 		this.render();	// redraw existing units
 	},
@@ -595,8 +595,6 @@ BattleClass = Class.extend({
 					board.tiles[this.attacker.tileid].clearSlot(this.attacker.slotid); // Clear old slot on board	
 					this.attacker.actualMove(this.target,board.allocateSlot(this.target)); // move the unit to it's new location
 				}
-				
-				
 				this.results = true; 					// Mark results stage done
 			}
 			else {
