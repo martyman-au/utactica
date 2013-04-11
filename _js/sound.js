@@ -1,6 +1,7 @@
 SoundClass = Class.extend({
 	mute: false,
 	sounds: {},
+	soldiersounds: {},
 	music: {},
 	track: 0,
 	musictag: null,
@@ -10,10 +11,21 @@ SoundClass = Class.extend({
 		for( i in config.soundeffects ) {
 			var name = config.soundeffects[i]
 			this.sounds[name] = new Howl({
-				urls: ['_media/'+name+'.ogg', '_media/'+name+'.mp3'],
+				urls: ['_media/'+name+'.ogg'],
 				loop: false
 			});
 		}
+		
+		for( i in config.soldiersounds ) {
+			var name = config.soldiersounds[i]
+			if(! this.soldiersounds[name]) {
+				this.soldiersounds[name] = new Howl({
+					urls: ['_media/'+name+'.ogg'],
+					loop: true
+				});
+			}
+		}
+		
 		// load in our music files
 		fisherYates ( config.music ); 						// Shuffle music tracks
 		this.musictag = document.createElement('audio');	// Create a html5 audio tag
@@ -25,6 +37,15 @@ SoundClass = Class.extend({
 	playSound: function (name) {
 		// Simple interface to play a sound effect
 		this.sounds[name].play();
+		return this.sounds[name];
+	},
+
+	getSoldierSound: function (name) {
+		// Simple interface to play a sound effect
+		return new Howl({
+					urls: ['_media/'+name+'.ogg'],
+					loop: true
+				});
 	},
 	
 	nextTrack: function () {

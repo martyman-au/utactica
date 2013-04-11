@@ -185,6 +185,7 @@ UnitClass = Class.extend({
 	type: '',
 	canvas: null,					// Offscreen canvas for unit compositing
 	context: null,
+	sound: null,
 	
 	init: function (side, tile) {
 		this.side = Number(side);
@@ -300,8 +301,6 @@ UnitClass = Class.extend({
 		baseimg = 'units/base-'+this.colour+'-'+basetype+'.png';
 		drawSprite(baseimg, this.context, 50, 50); // TODO: hard coded
 
-
-		
 		if(this.type == 'soldier') { // Only soldiers get a health bar
 			// Now draw the head
 			headtype = Math.min(4,Math.round((game.defence[this.side]/20)+1));
@@ -424,6 +423,13 @@ SoldierUnitClass = UnitClass.extend({
 		board.tiles[this.tileid].clearSlot(this.slotid); 	// Clear slot on board	
 		this.state = 'dead';								// Set state to dead so that it is deleted
 	},
+	
+	getAttackSound: function (side) {
+		var soundname = config.soldiersounds[Math.min(5,Math.round((game.attack[this.side]/20)))];
+		return sound.getSoldierSound(soundname);	// Play the battle sound effect
+	},
+
+	
 });
 
 WorkerUnitClass = UnitClass.extend({
@@ -505,6 +511,8 @@ BattleClass = Class.extend({
 	defenderdamage: 0,
 	attackerdamage: 0,
 	results: null,
+	attackersound: null,
+	defendersound: null,
 	
 	init: function (unit, target) {
 		var elitebonus = {attacker:0, defender:0};	// Elite units get a bonus
@@ -557,7 +565,10 @@ BattleClass = Class.extend({
 			this.attackerdamage += maxattackerdamage/10;
 			if( this.defenderdamage >= this.defenderstarthp || this.attackerdamage >= this.attackerstarthp)	break;
 		}
-		sound.playSound('battle');	// Play the battle sound effect
+		this.attackersound = this.attacker.getAttackSound('attacker');
+		this.attackersound.play();
+		this.defendersound = this.defender.getAttackSound('defender');
+		window.setTimeout(function(){game.battle.defendersound.play()},400);
 	},
 	
 	animFrame: function () {
@@ -577,6 +588,8 @@ BattleClass = Class.extend({
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
 				this.attacker.hp = this.attackerstarthp - this.attackerdamage;	// Reduce units to their final hp level
 				this.defender.hp = this.defenderstarthp - this.defenderdamage;	// Reduce units to their final hp level
+				this.attackersound.fadeOut(0,300);
+				this.defendersound.fadeOut(0,300);
 				if( this.attacker.hp < 1 ) {
 					this.attacker.lose();	// destroy losing attacker
 					this.attacker = null;	// remove local reference

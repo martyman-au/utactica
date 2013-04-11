@@ -89,6 +89,8 @@ var config = {
 	
 	soundeffects: ['battle', 'explosion', 'doh', 'beam', 'doh', 'resource'],
 
+	soldiersounds: ['battle', 'battle', 'battle', 'battle', 'battle', 'laser'],
+	
 	music: ['ObservingTheStar', 'OutThere', 'shrine'],
 	
 	//pre-computed distances between hextile gridids
