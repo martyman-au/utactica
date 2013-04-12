@@ -185,7 +185,6 @@ UnitClass = Class.extend({
 	type: '',
 	canvas: null,					// Offscreen canvas for unit compositing
 	context: null,
-	sound: null,
 	
 	init: function (side, tile) {
 		this.side = Number(side);
@@ -193,9 +192,6 @@ UnitClass = Class.extend({
 		else this.colour = 'red';			// Side 0 has red units
 		this.tileid = tile;
 		this.slotid = board.allocateSlot(this.tileid);		// Find which slot on the tile is available
-//		var stats = sprites.getStats(this.colour+'-'+this.type+'.png');
-//		this.spriteheight = stats.h;
-//		this.spritewidth = stats.w;
 		this.spriteheight = 80;
 		this.spritewidth = 80;
 		this.hp = config.Unithp[this.type];
@@ -209,7 +205,6 @@ UnitClass = Class.extend({
 	},
 
 	activate: function () {
-//		units.activeUnit = this;	// TODO need to set units.activeUnit to this unit's ID...
 		this.state = 'active';
 		this.redraw();
 		effects.renderEffect('active', this.ux, this.uy);
@@ -456,6 +451,11 @@ WorkerUnitClass = UnitClass.extend({
 			this.state = 'dead';
 		}
 	},
+
+	getAttackSound: function (side) {
+		return null;	// Play the battle sound effect
+	},
+
 });
 
 
@@ -566,9 +566,9 @@ BattleClass = Class.extend({
 			if( this.defenderdamage >= this.defenderstarthp || this.attackerdamage >= this.attackerstarthp)	break;
 		}
 		this.attackersound = this.attacker.getAttackSound('attacker');
-		this.attackersound.play();
+		if( this.attackersound ) this.attackersound.play();
 		this.defendersound = this.defender.getAttackSound('defender');
-		window.setTimeout(function(){game.battle.defendersound.play()},400);
+		if( this.defendersound ) window.setTimeout(function(){game.battle.defendersound.play()},400);
 	},
 	
 	animFrame: function () {
@@ -588,8 +588,8 @@ BattleClass = Class.extend({
 			if( this.progress > 0.75 && !this.results ) { // Results stage (blow up units)
 				this.attacker.hp = this.attackerstarthp - this.attackerdamage;	// Reduce units to their final hp level
 				this.defender.hp = this.defenderstarthp - this.defenderdamage;	// Reduce units to their final hp level
-				this.attackersound.fadeOut(0,300);
-				this.defendersound.fadeOut(0,300);
+				if(this.attackersound) this.attackersound.fadeOut(0,300);
+				if(this.defendersound) this.defendersound.fadeOut(0,300);
 				if( this.attacker.hp < 1 ) {
 					this.attacker.lose();	// destroy losing attacker
 					this.attacker = null;	// remove local reference
