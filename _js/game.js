@@ -26,6 +26,7 @@ var gameClass = Class.extend({
 						if(game.ready) { game.redraw();	}
 					};
 		spritejson.send();
+		sound = new SoundClass();							// all sound output (music, effects)
 	},
 
 	setupGame: function () {
@@ -41,7 +42,7 @@ var gameClass = Class.extend({
 		units = new UnitsClass();							// units
 		effects = new EffectsClass(sprites); 				// effects (animations, etc)			
 		ui = new UIClass();									// user interface
-		sound = new SoundClass();							// all sound output (music, effects)
+		sound.startGame();
 		
 		this.setupListners();			// Add some listner code
 		cv.setScale();					// TODO: not sure about this line and the next
@@ -144,6 +145,7 @@ var gameClass = Class.extend({
 			var unit = units.units[i];
 			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied soemone has won the game
 				ui.widgets.winnerpopup.render();
+				sound.endGame();
 			}
 			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid]);	// collect resources
 			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources

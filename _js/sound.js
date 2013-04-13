@@ -16,21 +16,22 @@ SoundClass = Class.extend({
 			});
 		}
 		
-		for( i in config.soldiersounds ) {
-			var name = config.soldiersounds[i]
-			if(! this.soldiersounds[name]) {
-				this.soldiersounds[name] = new Howl({
-					urls: ['_media/'+name+'.ogg'],
-					loop: true
-				});
-			}
-		}
 		
 		// load in our music files
-		fisherYates ( config.music ); 						// Shuffle music tracks
 		this.musictag = document.createElement('audio');	// Create a html5 audio tag
+		this.musictag.setAttribute('src', '_media/Dark Intro_0.ogg');	// set the source to the first track
+		this.musictag.play();								// Kick off playback
+	},
+	
+	startGame: function () {
+		fisherYates ( config.music ); 						// Shuffle music tracks
 		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');	// set the source to the first track
 		this.musictag.addEventListener('ended', function() { sound.nextTrack(); });		// add a callback for the end of the tack
+		this.musictag.play();								// Kick off playback		
+	},
+
+	endGame: function () {
+		this.musictag.setAttribute('src', '_media/technogeek.ogg');	// set the source to the first track
 		this.musictag.play();								// Kick off playback
 	},
 	
