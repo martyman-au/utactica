@@ -20,7 +20,7 @@ SoundClass = Class.extend({
 		
 		
 		this.intromusic = new Howl({
-			urls: ['_media/dark_intro.ogg'],
+			urls: ['_media/dark_intro.mp3', '_media/dark_intro.ogg'],
 			buffer: true,
 			loop: true
 		});
