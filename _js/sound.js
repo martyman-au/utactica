@@ -5,6 +5,8 @@ SoundClass = Class.extend({
 	music: {},
 	track: 0,
 	musictag: null,
+	intromusic: null,
+	endmusic: null,
 	
 	init: function () {
 		// load in all our sound effects
@@ -17,22 +19,36 @@ SoundClass = Class.extend({
 		}
 		
 		
-		// load in our music files
-		this.musictag = document.createElement('audio');	// Create a html5 audio tag
-		this.musictag.setAttribute('src', '_media/dark_intro.ogg');	// set the source to the first track
-		this.musictag.play();								// Kick off playback
+		this.intromusic = new Howl({
+			urls: ['_media/dark_intro.ogg'],
+			buffer: true,
+			loop: true
+		});
+		this.intromusic.play();
+
+
 	},
 	
 	startGame: function () {
+		this.intromusic.stop();
+		
 		fisherYates ( config.music ); 						// Shuffle music tracks
+		this.musictag = document.createElement('audio');	// Create a html5 audio tag
 		this.musictag.setAttribute('src', '_media/'+config.music[this.track]+'.ogg');	// set the source to the first track
 		this.musictag.addEventListener('ended', function() { sound.nextTrack(); });		// add a callback for the end of the tack
 		this.musictag.play();								// Kick off playback		
+		
+		this.endmusic = new Howl({
+			urls: ['_media/technogeek.ogg'],
+			buffer: true,
+			loop: true
+		});
 	},
 
 	endGame: function () {
-		this.musictag.setAttribute('src', '_media/technogeek.ogg');	// set the source to the first track
-		this.musictag.play();								// Kick off playback
+//		this.musictag.setAttribute('src', '_media/technogeek.ogg');	// set the source to the first track
+		this.musictag.pause();								// Kick off playback
+		this.endmusic.play();
 	},
 	
 	playSound: function (name) {
