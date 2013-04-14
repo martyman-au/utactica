@@ -19,7 +19,7 @@ SoundClass = Class.extend({
 		
 		// load in our music files
 		this.musictag = document.createElement('audio');	// Create a html5 audio tag
-		this.musictag.setAttribute('src', '_media/Dark Intro_0.ogg');	// set the source to the first track
+		this.musictag.setAttribute('src', '_media/dark_intro.ogg');	// set the source to the first track
 		this.musictag.play();								// Kick off playback
 	},
 	
