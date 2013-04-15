@@ -26,72 +26,71 @@ var gameClass = Class.extend({
 						if(game.ready) { game.redraw();	}
 					};
 		spritejson.send();
-		sound = new SoundClass();							// all sound output (music, effects)
+		sound = new SoundClass();						// all sound output (music, effects)
 	},
 
 	setupGame: function () {
 		// Create objects to look after game output, data and logic
-		
 		var front = document.getElementById('front');
-		front.parentNode.removeChild(front);
+		front.parentNode.removeChild(front);			// remove front screen text
 		
-		this.turn = Math.floor((Math.random()*2)); // set this.turn to 0 or 1
+		this.turn = Math.floor((Math.random()*2)); 		// set this.turn to 0 or 1
 
-		cv = new CanvasClass();  							// canvas layers and contexts
-		board = new BoardClass(config.boardPattern);		// board and tiles
-		units = new UnitsClass();							// units
-		effects = new EffectsClass(sprites); 				// effects (animations, etc)			
-		ui = new UIClass();									// user interface
-		sound.startGame();
+		cv = new CanvasClass();  						// canvas layers and contexts
+		board = new BoardClass(config.boardPattern);	// board and tiles
+		units = new UnitsClass();						// units
+		effects = new EffectsClass(sprites); 			// effects (animations, etc)			
+		ui = new UIClass();								// user interface
+		sound.startGame();								// stop menu music and start game soundtrack
 		
-		this.setupListners();			// Add some listner code
+		this.setupListners();			// Add some listners
 		cv.setScale();					// TODO: not sure about this line and the next
 		this.redraw();					// ditto
-		this.ready = true;
-		requestAnimationFrame( game.animFrame );	// Start animation loop
-		ui.widgets.intropopup.render();
+		this.ready = true;				
+		requestAnimationFrame( game.animFrame );		// Start animation loop
+		ui.widgets.intropopup.render();					// Display introduction popup
 	},
 	
 
 	animFrame: function(){
 		// Animation loop
-		requestAnimationFrame( game.animFrame ); 	// continue loop
+		requestAnimationFrame( game.animFrame ); 		// continue loop
 		board.animFrame();
-		effects.animFrame();						// render any currrent effects
-		units.animFrame();							// render any unit changes
-		if(game.battle) {					// We have a battle to run
-			if(game.battle.done) {			// Clear finished battle
+		effects.animFrame();							// render any currrent effects
+		units.animFrame();								// render any unit changes
+		if(game.battle) {								// We have a battle to run
+			if(game.battle.done) {						// Clear finished battle
 				game.battle = null;
 			}
 			else {
-				game.battle.animFrame();	// Process the running battle
+				game.battle.animFrame();				// Process the running battle
 			}
 		}
-		if(game.turnchange) {				// End of turn period
+		if(game.turnchange) {							// End of turn period
 		
-			if( game.turnnotes.length > 0 ) {	//	Display turn notifications
+			if( game.turnnotes.length > 0 ) {			//	Display turn notifications
 				if( game.turnnotes[0].drawFrame() == 'done')  game.turnnotes.shift();					// if the animation is done, delete it
 			}
-			else {								// Finish the end turn period
-				for( i in units.units )	{		// Run through all the units in the game
+			else {										// Finish the end turn period
+				for( i in units.units )	{				// Run through all the units in the game
 					units.units[i].remainingmoves = game.unitmaxmoves[units.units[i].type][units.units[i].side];	// reset remaining moves to the unit's max moves
 				}
 				game.turnchange = false;
-				game.turn = 1 - game.turn;		// switch to other player's turn
-				ui.greyWidgets(); 				// grey out any widgets that are too expensive
+				game.turn = 1 - game.turn;				// switch to other player's turn
+				ui.greyWidgets(); 						// grey out any widgets that are too expensive
 				units.prerender();
-				game.redraw();					// redraw everything
-				game.setControlLock(false); 	// Enable user input
+				game.redraw();							// redraw everything
+				game.setControlLock(false); 			// Enable user input
 			}
 		}
 	},
 	
 	setupListners: function () {
-		window.onkeydown = game.keypress;	// TODO: best place for this?
+		window.onkeydown = game.keypress;	// send keypresses to this.keypress();
 		
-		window.onresize = function(event) {  // on resize we should reset the canvas size and scale and redraw the board, ui and units
-			cv.setScale();		// Scale canvases
-			game.redraw();		// redraw canvases
+		window.onresize = function(event) {  	// on resize we should reset the canvas size and scale and redraw the board, ui and units
+			cv.setScale();						// Scale canvases
+			game.redraw();						// redraw all canvases
 			if(units.activeUnit) units.units[units.activeUnit].deactivate();  // Deactivate active unit on resize to avoid misplaced "active" effect
 		}
 	},
@@ -111,18 +110,18 @@ var gameClass = Class.extend({
 			}	
 			var code = e.keyCode;
 
-			if( code == '72' ) {   					// "h" will bring up a help popup
+			if( code == '72' ) {   						// "h" will bring up a help popup
 				ui.widgets.intropopup.render();
 			}
-			else if (code == '32' ) {												// Space bar ends turn
+			else if (code == '32' ) {					// Space bar ends turn
 				ui.widgets.endturn.pulse(200);
 				game.endTurn();	
 			}
-			else if (code == '77' ) {												// "m" Toogle mute status
+			else if (code == '77' ) {					// "m" Toogle mute status
 				ui.widgets.speaker.toggleState();
 				ui.widgets.speaker.action();
 			}
-			else if (code == '84' ) {												// "t" Teleport a unit home
+			else if (code == '84' ) {					// "t" Teleport a unit home
 				ui.widgets.teleport.pulse(200);
 				units.teleport();
 			}
@@ -143,12 +142,12 @@ var gameClass = Class.extend({
 		for( i in units.units )			// Run through all the units in the game
 		{
 			var unit = units.units[i];
-			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied soemone has won the game
+			if( unit.tileid == config.homeTile[1-unit.side]) {	// A home base has been occupied someone has won the game
 				ui.widgets.winnerpopup.render();
 				sound.endGame();
 			}
-			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid]);	// collect resources
-			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// collect resources
+			if(unit.side == this.turn && unit.type == 'worker') this.collectResource(board.tiles[unit.tileid]);				// collect resources
+			if(unit.side == this.turn && unit.type == 'soldier' && unit.tileid == config.homeTile[this.turn]) unit.regen();	// regenerate units if located at home base
 		}
 		this.turnnotes.push( new TextEffectClass(config.sides[game.turn].name+'\'s turn', {center:true}));
 		this.turnchange = true;		// Set end of turn period
@@ -197,6 +196,7 @@ var gameClass = Class.extend({
 	},
 	
 	setControlLock: function (value) {
+		// set control lock to true or false
 		if( value ) {
 			document.body.style.cursor = 'wait';
 			this.controlLock = value;
