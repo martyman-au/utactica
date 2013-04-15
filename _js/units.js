@@ -527,8 +527,8 @@ BattleClass = Class.extend({
 		this.attackerstarthp = this.attacker.hp;	// store the starting hp
 		this.defenderstarthp = this.defender.hp;	// store the starting hp
 		
-		if( this.attacker.battles > 2 ) elitebonus.attacker = 20;	// set the elite bonus if the unit is elite
-		if( this.defender.battles > 2 ) elitebonus.defender = 20;	// set the elite bonus if the unit is elite
+		if( this.attacker.battles > 2 ) elitebonus.attacker = 40;	// set the elite bonus if the unit is elite
+		if( this.defender.battles > 2 ) elitebonus.defender = 40;	// set the elite bonus if the unit is elite
 
 		// BATTLE CALCULATIONS
 		// Attack damage is a rnd(0-100) + attacker's attack upgrades - defender's defence upgrades 
