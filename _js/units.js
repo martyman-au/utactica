@@ -299,7 +299,7 @@ UnitClass = Class.extend({
 
 		if(this.type == 'soldier') { // Only soldiers get a health bar
 			// Now draw the head
-			headtype = Math.min(4,Math.round((game.defence[this.side]/20)+1));
+			headtype = Math.min(6,Math.round((game.defence[this.side]/20)+1));
 			headimg = 'units/soldier-head-'+headtype+'.png';
 			drawSprite(headimg, this.context, 50, 50); // TODO: hard coded
 			
@@ -323,7 +323,7 @@ UnitClass = Class.extend({
 			this.context.shadowColor = "transparent";
 			
 			// Now draw the weapons
-			weapontype = Math.min(6,Math.round((game.attack[this.side]/20)+1));
+			weapontype = Math.min(8,Math.round((game.attack[this.side]/20)+1));
 			weaponimg = 'units/main-weapon-'+weapontype+'.png';
 			drawSprite(weaponimg, this.context, 50, 50); // TODO: hard coded
 			
