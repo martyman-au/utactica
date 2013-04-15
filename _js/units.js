@@ -32,7 +32,6 @@ UnitsClass = Class.extend({
 	
 	redraw: function () {
 		// Redraw all the units at their current location
-//		this.destroy(); // delete dead units
 		this.wipe();	// clear the board
 		this.render();	// redraw existing units
 	},
@@ -181,10 +180,10 @@ UnitClass = Class.extend({
 	spritewidth: null,
 	spriteheight: null,
 	hp: 0,							// Hit points for damage tracking
-	battles: 0,
+	battles: 0,						// Number of battles survived
 	type: '',
 	canvas: null,					// Offscreen canvas for unit compositing
-	context: null,
+	context: null,					// Context for offscreen canvas
 	
 	init: function (side, tile) {
 		this.side = Number(side);
@@ -196,12 +195,13 @@ UnitClass = Class.extend({
 		this.spritewidth = 80;
 		this.hp = config.Unithp[this.type];
 		this.remainingmoves = game.unitmaxmoves[this.type][this.side];	// preload the remaining moves value
+		
 		// Setup off screen canvas
 		this.canvas = document.createElement("canvas");
-		this.canvas.width = 100; // TODO: hard coded
-		this.canvas.height = 100; // TODO: hard coded
-		this.context = this.canvas.getContext('2d');
-		this.prerender();
+		this.canvas.width = 100; 						// TODO: hard coded
+		this.canvas.height = 100; 						// TODO: hard coded
+		this.context = this.canvas.getContext('2d');	// Create context
+		this.prerender();								// Pre-render this unit to offscreen canvas
 	},
 
 	activate: function () {
@@ -214,7 +214,6 @@ UnitClass = Class.extend({
 		if(this.state == 'active')
 		{
 			this.state = 'normal';
-//			this.redraw();
 			units.activeUnit = null;
 			effects.deleteAnimation('active');
 		}
@@ -232,6 +231,7 @@ UnitClass = Class.extend({
 	},
 	
 	dragmove: function (x,y) {
+		// check if a drag and drop is a valid move or attack and decrement remaining moves
 		var newtile = board.clickhit(x,y);
 		if(newtile == this.tileid) { // If we haven't moved out of our original tile
 			this.actualMove(this.tileid,this.slotid); // Move back where we came from
@@ -267,6 +267,7 @@ UnitClass = Class.extend({
 	},
 		
 	actualMove: function (newtile,newslot) {
+		// Create a translation that will move the unit to it's new location
 		var newloc = {};
 		var slots = board.tiles[newtile].slots;
 		var slotoffsetx = slots[newslot].xoffset*(this.spritewidth*0.55);		// calculate the position for this slot
@@ -284,7 +285,7 @@ UnitClass = Class.extend({
 	},
 
 	prerender: function () {
-		// render this unit to it's hidden canvas
+		// composit this unit's graphical layers to it's hidden canvas
 		var baseimg, basetype, headimg, headtype, healthcolor, weaponimg, weapontype;
 		
 		this.context.clearRect(0, 0, 100, 100); // clear hidden canvas
