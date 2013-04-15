@@ -1,7 +1,7 @@
 var gameClass = Class.extend({
 	ready: false,			// Used in the game initialisation phase TODO: Is this needed?
 	turn: null,				// Tracks which player's turn it is
-	foodcash: [250,250],	// Food resources for each side
+	foodcash: [450,450],	// Food resources for each side
 	sciencecash: [100,100],	// Science resources for each side
 	production: [1,1],		// Production rate for each side
 	attack: [0,0],			// Attack bonus for each side
@@ -11,6 +11,7 @@ var gameClass = Class.extend({
 	battle:  null,			// Stores the currently running battle
 	turnnotes: [],			// store a list of the currently running notifications
 	turnchange: false,		// Flag indicating the period between turns
+	unitCosts: [{},{}],
 
 	init: function () {
 		// Start loading sprites, fonts, etc
@@ -27,6 +28,8 @@ var gameClass = Class.extend({
 					};
 		spritejson.send();
 		sound = new SoundClass();						// all sound output (music, effects)
+		this.unitCosts[0] = config.unitCosts;			// Preset unit costs for team 0
+		this.unitCosts[1] = config.unitCosts;			// Preset unit costs for team 1
 	},
 
 	setupGame: function () {
@@ -169,7 +172,7 @@ var gameClass = Class.extend({
 	
 	buyUnit: function (type) {
 		// Buy a new unit and debit food resources
-		var cost = config.unitCosts[type];
+		var cost = game.unitCosts[game.turn][type];
 		if( board.tiles[config.homeTile[this.turn]].checkSlots() ) { // check for available home slot
 			this.foodcash[this.turn] = parseInt(this.foodcash[this.turn] - cost);
 			if( type == 'soldier') units.units.push( new SoldierUnitClass(this.turn, config.homeTile[this.turn]) );

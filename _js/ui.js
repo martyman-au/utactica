@@ -72,12 +72,13 @@ UIClass = Class.extend({
 		
 		// Define buy units popup and add buttons
 		this.widgets.buyunitspopup = new PopupClass( 'Buy Units', 500, 200 );
-		this.widgets.buyunitspopup.widgets.buysoldier = new VectorButtonClass( {center:true,top:-30}, 'New soldier costs 100 food resources', 400);
+		var costs = game.unitCosts[game.turn];
+		this.widgets.buyunitspopup.widgets.buysoldier = new VectorButtonClass( {center:true,top:-30}, 'New soldier costs '+costs.soldier+' food resources', 400);
 		this.widgets.buyunitspopup.widgets.buysoldier.action = function (){ game.buyUnit('soldier');};
-		this.widgets.buyunitspopup.widgets.buysoldier.foodcost = 100;
-		this.widgets.buyunitspopup.widgets.buyworker = new VectorButtonClass( {center:true,top:30}, 'New worker costs 200 food resources', 400);
+		this.widgets.buyunitspopup.widgets.buysoldier.foodcost = costs.soldier;
+		this.widgets.buyunitspopup.widgets.buyworker = new VectorButtonClass( {center:true,top:30}, 'New worker costs '+costs.worker+' food resources', 400);
 		this.widgets.buyunitspopup.widgets.buyworker.action = function (){ game.buyUnit('worker');};
-		this.widgets.buyunitspopup.widgets.buyworker.foodcost = 200;
+		this.widgets.buyunitspopup.widgets.buyworker.foodcost = costs.worker;
 
 		// Define introduction popup
 		this.widgets.intropopup = new PopupClass( 'Introduction', 700, 600 );	

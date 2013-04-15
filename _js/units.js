@@ -14,11 +14,11 @@ UnitsClass = Class.extend({
 		// give out the starting units
 		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
 		this.units.push( new SoldierUnitClass(0, config.homeTile[0]) );
-		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
+//		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
 		this.units.push( new WorkerUnitClass(0, config.homeTile[0]) );
 		this.units.push( new SoldierUnitClass(1, config.homeTile[1]) );
 		this.units.push( new SoldierUnitClass(1, config.homeTile[1]) );
-		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
+//		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
 		this.units.push( new WorkerUnitClass(1, config.homeTile[1]) );
 	},
 	
