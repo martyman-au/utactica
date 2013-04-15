@@ -198,7 +198,7 @@ var gameClass = Class.extend({
 	setControlLock: function (value) {
 		// set control lock to true or false
 		if( value ) {
-			document.body.style.cursor = 'wait';
+			document.body.style.cursor = 'progress';
 			this.controlLock = value;
 		}
 		else {
