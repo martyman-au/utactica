@@ -57,26 +57,26 @@ UIClass = Class.extend({
 		
 		// Define upgrades popup and add buttons
 		this.widgets.upgradespopup = new PopupClass( 'Upgrades', 500, 320 );
-		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-90}, 'Soldiers +20% attack (50 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeattack = new VectorButtonClass( {center:true,top:-90}, 'Soldiers +20% attack', 400);
 		this.widgets.upgradespopup.widgets.upgradeattack.action = function (){ game.buyUpgrade('attack'); };
 		this.widgets.upgradespopup.widgets.upgradeattack.sciencecost = 50;
-		this.widgets.upgradespopup.widgets.upgradedefence = new VectorButtonClass( {center:true,top:-30}, 'Soldiers +20% defence (50 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradedefence = new VectorButtonClass( {center:true,top:-30}, 'Soldiers +20% defence', 400);
 		this.widgets.upgradespopup.widgets.upgradedefence.action = function (){ game.buyUpgrade('defence'); };
 		this.widgets.upgradespopup.widgets.upgradedefence.sciencecost = 50;
-		this.widgets.upgradespopup.widgets.upgradeproduction = new VectorButtonClass( {center:true,top:30}, 'Workers +10% production (100 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeproduction = new VectorButtonClass( {center:true,top:30}, 'Workers +10% production', 400);
 		this.widgets.upgradespopup.widgets.upgradeproduction.action = function (){ game.buyUpgrade('production'); };
 		this.widgets.upgradespopup.widgets.upgradeproduction.sciencecost = 100;
-		this.widgets.upgradespopup.widgets.upgradeworkermovement = new VectorButtonClass( {center:true,top:90}, 'Workers +1 movement (100 science)', 400);
+		this.widgets.upgradespopup.widgets.upgradeworkermovement = new VectorButtonClass( {center:true,top:90}, 'Workers +1 movement', 400);
 		this.widgets.upgradespopup.widgets.upgradeworkermovement.action = function (){ game.buyUpgrade('workermovement'); };
 		this.widgets.upgradespopup.widgets.upgradeworkermovement.sciencecost = 100;
 		
 		// Define buy units popup and add buttons
 		this.widgets.buyunitspopup = new PopupClass( 'Buy Units', 500, 200 );
 		var costs = game.unitCosts[game.turn];
-		this.widgets.buyunitspopup.widgets.buysoldier = new VectorButtonClass( {center:true,top:-30}, 'New soldier costs '+costs.soldier+' food resources', 400);
+		this.widgets.buyunitspopup.widgets.buysoldier = new VectorButtonClass( {center:true,top:-30}, 'New soldier', 400);
 		this.widgets.buyunitspopup.widgets.buysoldier.action = function (){ game.buyUnit('soldier');};
 		this.widgets.buyunitspopup.widgets.buysoldier.foodcost = costs.soldier;
-		this.widgets.buyunitspopup.widgets.buyworker = new VectorButtonClass( {center:true,top:30}, 'New worker costs '+costs.worker+' food resources', 400);
+		this.widgets.buyunitspopup.widgets.buyworker = new VectorButtonClass( {center:true,top:30}, 'New worker', 400);
 		this.widgets.buyunitspopup.widgets.buyworker.action = function (){ game.buyUnit('worker');};
 		this.widgets.buyunitspopup.widgets.buyworker.foodcost = costs.worker;
 
@@ -99,6 +99,10 @@ UIClass = Class.extend({
 		this.renderGameTitle();
 		this.widgets.speaker.render();
 		
+		var costs = game.unitCosts[game.turn];
+		this.widgets.buyunitspopup.widgets.buysoldier.foodcost = costs.soldier;	// update unit costs
+		this.widgets.buyunitspopup.widgets.buyworker.foodcost = costs.worker;	// update unit costs
+
 		this.renderInfoBlock();		
 		
 		for( i in this.widgets) // render all widgets
@@ -420,12 +424,16 @@ VectorButtonClass = ButtonClass.extend({
 		this.ctx.lineWidth = 7;		
 		this.ctx.roundRect(this.position.x , this.position.y, this.size.w, this.size.h, 9, true, true )
 		
+		var output = this.text;
+		if(this.sciencecost>0) output += ' ('+this.sciencecost+' science)';
+		if(this.foodcost>0) output += ' ('+this.foodcost+' food)';
+		
 		this.ctx.font = "normal 400 25px 'Roboto Condensed','Trebuchet MS',sans-serif";
 		this.ctx.textAlign = 'center';
 		this.ctx.fillStyle = '#222222';
 		var x = this.position.x + this.size.w/2;
 		var y = this.position.y + this.size.h/2 + 8;
-		this.ctx.fillText(this.text, x, y);
+		this.ctx.fillText(output, x, y);
 		this.ctx.textAlign = 'start';
 
 		//re-calculate edges for click hit matching

@@ -188,12 +188,31 @@ var gameClass = Class.extend({
 	
 	buyUpgrade: function (type) {
 		// Buy an upgrade and debit science resources
-		var cost = config.upgradeCosts[type];
-		this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] - cost);
-		if(type == 'attack') this.attack[this.turn] = parseInt(this.attack[this.turn] + 20);
-		else if(type == 'defence') this.defence[this.turn] = parseInt(this.defence[this.turn] + 20);
-		else if(type == 'production') this.production[this.turn] = this.production[this.turn] + 0.1;
-		else if(type == 'workermovement') this.unitmaxmoves.worker[this.turn] += 1;
+		var cost = config.upgradeCosts[type];	// cost of the upgrade
+		var upgrade = 0;						// numerical amount of the upgrade
+		
+		this.sciencecash[this.turn] = parseInt(this.sciencecash[this.turn] - cost); // Charge for the upgrade
+		
+		if(type == 'attack') {
+			upgrade = 20;
+			this.attack[this.turn] = parseInt(this.attack[this.turn] + upgrade);
+			this.unitCosts[this.turn].soldier += upgrade * config.upgradeUnitPriceRatio;
+		}
+		else if(type == 'defence') {
+			upgrade = 20;
+			this.defence[this.turn] = parseInt(this.defence[this.turn] + upgrade);
+			this.unitCosts[this.turn].soldier += upgrade * config.upgradeUnitPriceRatio;
+		}
+		else if(type == 'production') {
+			upgrade = 10;
+			this.production[this.turn] = this.production[this.turn] + (upgrade/100);
+			this.unitCosts[this.turn].worker += upgrade * config.upgradeUnitPriceRatio;
+		}
+		else if(type == 'workermovement') {
+			upgrade = 10;
+			this.unitmaxmoves.worker[this.turn] += upgrade/10;
+			this.unitCosts[this.turn].worker += upgrade * config.upgradeUnitPriceRatio;
+		}
 		ui.greyWidgets(); // grey out any widgets that are too expensive
 		units.prerender();
 	},
