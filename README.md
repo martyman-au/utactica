@@ -11,6 +11,11 @@ I started by developing the game concept as a printed out board game. Once I had
 
 Utactica is playable at http://utactica.appspot.com
 
+To Do
+=====
+
+Hopefully coming soon, touch support for pass and play on tablets.
+
 Changelog
 =========
 
