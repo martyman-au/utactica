@@ -126,7 +126,7 @@ UnitsClass = Class.extend({
 	getEnemies: function (tile) {
 		// get array of enemies located on a tile
 		var enemies = { units: [], soldier: 0, worker: 0, bestunit: {}};
-		var besthp = 0;
+		var besthp = -999999;
 		var bestunit = {};
 		var unit;
 		for( i in units.units ) // count how many soldiers exist on a tile
@@ -519,7 +519,7 @@ BattleClass = Class.extend({
 		var elitebonus = {attacker:0, defender:0};	// Elite units get a bonus
 		game.setControlLock(true);					// Lock control input
 		this.start = Date.now();
-		this.attacker = unit;						// store the attackign unit
+		this.attacker = unit;						// store the attacking unit
 		this.target = Number(target);
 		this.enemies = units.getEnemies(target);	// store the defending unit
 		this.defender = this.enemies.bestunit;
